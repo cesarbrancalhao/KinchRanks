@@ -34,6 +34,8 @@ tbody tr:hover { background: #1c2533; }
 td { color: #c9d1d9; }
 td:first-child { color: #58a6ff; font-weight: 600; }
 td:nth-child(2) { font-weight: 500; text-align: left; }
+.person-link { color: inherit; text-decoration: none; }
+.person-link:hover { text-decoration: underline; }
 td:nth-child(3) { font-weight: 700; color: #f0883e; }
 .score-100 { color: #7ee787; font-weight: 700; }
 .score-90 { font-weight: 700; }
@@ -456,7 +458,7 @@ function renderTable() {
     html += "<tr>";
     html += `<td>${e.rank}</td>`;
     const flag = currentCountry === "__world__" ? ` <span style="color:#8b949e;font-size:11px">${esc(e.country)}</span>` : "";
-    html += `<td>${esc(e.name)}${flag}</td>`;
+    html += `<td><a href="https://www.worldcubeassociation.org/persons/${esc(e.id)}" target="_blank" class="person-link">${esc(e.name)}</a>${flag}</td>`;
     html += `<td>${e.overall.toFixed(2)}</td>`;
     const evtCount = activeEvents.filter(eid => e.events[eid] > 0).length;
     html += `<td>${evtCount}</td>`;
