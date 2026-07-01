@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinch Ranks</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f1117; color: #e1e4e8; }
+.container { max-width: 100%; margin: 0 auto; padding: 24px; }
+h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; }
+.subtitle { font-size: 13px; color: #8b949e; margin-bottom: 10px; }
+
+.controls { display: flex; flex-direction: column; gap: 2px; margin-bottom: 16px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 6px; }
+.ctrl-row { display: flex; gap: 12px; }
+.ctrl-cell { flex: 1; display: flex; align-items: center; gap: 6px; padding: 4px 8px; min-width: 0; }
+.cg-label { font-size: 11px; color: #6e7681; text-transform: uppercase; white-space: nowrap; min-width: 40px; }
+.controls select, .controls input[type="text"] { padding: 5px 10px; border: 1px solid #21262d; border-radius: 4px; background: #0d1117; color: #c9d1d9; font-size: 13px; outline: none; }
+.controls select:focus, .controls input[type="text"]:focus { border-color: #58a6ff; }
+.controls input[type="text"] { width: 100%; min-width: 80px; }
+.clock-label { font-size: 11px; color: #6e7681; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 4px; white-space: nowrap; margin-left: 12px; }
+
+.table-wrap { overflow-x: auto; border: 1px solid #30363d; border-radius: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+th, td { padding: 6px 10px; text-align: right; }
+th:first-child, td:first-child { position: sticky; left: 0; background: #161b22; z-index: 1; min-width: 38px; padding: 6px 8px; }
+th:nth-child(2), td:nth-child(2) { position: sticky; left: 38px; background: #161b22; z-index: 1; text-align: left; padding: 6px 8px; }
+thead th { background: #21262d; border-bottom: 1px solid #30363d; position: sticky; top: 0; z-index: 2; font-weight: 600; color: #8b949e; cursor: pointer; }
+thead th:hover { color: #e1e4e8; }
+thead th:first-child, thead th:nth-child(2) { z-index: 3; }
+tbody tr { transition: background 0.1s; }
+tbody tr:nth-child(even) { background: #161b22; }
+tbody tr:hover { background: #1c2533; }
+td { color: #c9d1d9; }
+td:first-child { color: #58a6ff; font-weight: 600; }
+td:nth-child(2) { font-weight: 500; text-align: left; }
+td:nth-child(3) { font-weight: 700; color: #f0883e; }
+.score-100 { color: #7ee787; font-weight: 700; }
+.score-90 { font-weight: 700; }
+
+.status { font-size: 14px; color: #8b949e; padding: 40px 0; text-align: center; }
+.status.error { color: #f85149; }
+.status small { display: block; margin-top: 8px; color: #484f58; }
+
+.no-data { text-align: center; padding: 30px; color: #8b949e; }
+
+.legend { font-size: 12px; color: #8b949e; }
+.legend a { color: #58a6ff; }
+
+.pagination { display: flex; gap: 4px; align-items: center; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+.pagination button { padding: 4px 10px; border: 1px solid #30363d; border-radius: 4px; background: #161b22; color: #c9d1d9; font-size: 13px; cursor: pointer; }
+.pagination button:hover { background: #21262d; }
+.pagination button.active { background: #1f6feb; border-color: #1f6feb; color: white; }
+.pagination button:disabled { opacity: 0.4; cursor: default; }
+.pagination .info { font-size: 13px; color: #8b949e; margin: 0 8px; }
+
+.theme-toggle { position: absolute; top: 24px; right: 24px; padding: 5px 14px; border: 1px solid #30363d; border-radius: 6px; background: #21262d; color: #c9d1d9; font-size: 13px; cursor: pointer; }
+.theme-toggle:hover { background: #30363d; }
+
+body.light { background: #fff; color: #222; }
+body.light .subtitle { color: #666; }
+body.light h1 { color: #111; }
+body.light .legend { color: #555; }
+body.light .legend a { color: #0055A4; }
+body.light .no-data { color: #666; }
+body.light .status { color: #555; }
+body.light .status.error { color: #c00; }
+body.light .status small { color: #888; }
+
+body.light .controls { background: #fff; border-color: #ddd; }
+body.light .ctrl-row .ctrl-cell:first-child { background: #e8f0ff; border-radius: 4px; }
+body.light .ctrl-row .ctrl-cell:last-child { background: #e6ffe6; border-radius: 4px; }
+body.light .cg-label { color: #555; }
+body.light .controls select, body.light .controls input[type="text"] { background: #fff; border-color: #ccc; color: #222; }
+body.light .controls select:focus, body.light .controls input[type="text"]:focus { border-color: #0055A4; }
+body.light .clock-label { color: #555; }
+
+body.light .table-wrap { border-color: #ddd; }
+body.light thead th { background: #0055A4; color: #fff; border-bottom-color: #004494; font-weight: 700; }
+body.light thead th:hover { color: #d8e8ff; }
+body.light tbody tr:nth-child(even) { background: #f5f5f5; }
+body.light tbody tr:hover { background: #e8f0ff; }
+body.light th:first-child, body.light td:first-child,
+body.light th:nth-child(2), body.light td:nth-child(2) { background: #fff; }
+body.light tbody tr:nth-child(even) td:first-child,
+body.light tbody tr:nth-child(even) td:nth-child(2) { background: #f5f5f5; }
+body.light thead th:first-child, body.light thead th:nth-child(2) { background: #0055A4; }
+body.light td { color: #222; }
+body.light td:first-child { color: #222; }
+body.light td:nth-child(2) { color: #222; }
+body.light td:nth-child(3) { font-weight: 700; color: #f4771d; }
+body.light .score-100 { color: #0055A4; font-weight: 700; }
+body.light .score-90 { font-weight: 700; }
+
+body.light .pagination button { background: #fff; border-color: #ccc; color: #333; }
+body.light .pagination button:hover { background: #e8f0ff; }
+body.light .pagination button.active { background: #0055A4; border-color: #0055A4; color: #fff; }
+body.light .pagination button:disabled { opacity: 0.3; }
+body.light .pagination .info { color: #666; }
+
+body.light .theme-toggle { background: #0055A4; border-color: #0055A4; color: #fff; }
+body.light .theme-toggle:hover { background: #004494; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1><a href="https://github.com/cesarbrancalhao" target="_blank" style="color:inherit;">MCBF</a> Kinch Ranks</h1>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ Day</button>
+  <p class="subtitle">Higher score is better (max 100). <span id="genDate" style="color:#484f58"></span></p>
+  <p class="legend">Kinch score = average of (WR / personal record × 100) across all 17 events. Missing events count as 0. MBF uses points + time ratio.</p>
+
+  <div class="controls" id="controls" style="display:none">
+    <div class="ctrl-row">
+      <div class="ctrl-cell">
+        <span class="cg-label">Country / Region</span>
+        <select id="continentSelect">
+          <option value="__world__">World</option>
+        </select>
+        <select id="countrySelect"></select>
+      </div>
+      <div class="ctrl-cell">
+        <span class="cg-label">Events</span>
+        <select id="groupSelect">
+          <option value="__all__">All events</option>
+          <option value="nxn">NxN</option>
+          <option value="big">Big cubes</option>
+          <option value="bld">BLD</option>
+          <option value="nonbld">Non-BLD</option>
+          <option value="other">Other events</option>
+        </select>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-cell">
+        <span class="cg-label">Gender</span>
+        <select id="genderSelect">
+          <option value="all">All</option>
+          <option value="m">Male</option>
+          <option value="f">Female</option>
+        </select>
+      </div>
+      <div class="ctrl-cell">
+        <span class="cg-label">Name</span>
+        <input type="text" id="search" placeholder="Search...">
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-cell">
+        <span class="cg-label">Debut</span>
+        <select id="sinceSelect">
+          <option value="0">After</option>
+        </select>
+        <select id="untilSelect">
+          <option value="9999">Before</option>
+        </select>
+      </div>
+      <div class="ctrl-cell">
+        <span class="cg-label">Show</span>
+        <select id="pageSizeSelect">
+          <option value="50">50</option>
+          <option value="100" selected>100</option>
+          <option value="200">200</option>
+          <option value="300">300</option>
+          <option value="500">500</option>
+          <option value="1000">1000</option>
+        </select>
+        <label class="clock-label">Clock <input type="checkbox" id="includeClock"></label>
+      </div>
+    </div>
+  </div>
+  <div id="status" class="status">Loading data...</div>
+  <div class="table-wrap" id="tableWrap" style="display:none"></div>
+  <div id="pagination" class="pagination" style="display:none"></div>
+</div>
+
+<script src="data.js"></script>
+<script>
+const EVENT_IDS = ["333","222","444","555","666","777","333bf","333fm","333oh","minx","pyram","skewb","sq1","444bf","555bf","333mbf"];
+const EVENT_IDS_ALL = ["333","222","444","555","666","777","333bf","333fm","333oh","clock","minx","pyram","skewb","sq1","444bf","555bf","333mbf"];
+const EVENT_LABELS = { "333":"333", "222":"222", "444":"444", "555":"555", "666":"666", "777":"777", "333bf":"333BLD", "333fm":"333FM", "333oh":"333OH", "clock":"Clock", "minx":"Mega", "pyram":"Pyra", "skewb":"Skewb", "sq1":"SQ1", "444bf":"444BLD", "555bf":"555BLD", "333mbf":"333MBLD" };
+const AVERAGE_EVENTS = new Set(["333","222","444","555","666","777","333oh","clock","minx","pyram","skewb","sq1"]);
+const BETTER_OF_EVENTS = new Set(["333bf","444bf","555bf","333fm"]);
+
+const GROUP_EVENTS = {
+  "__all__": EVENT_IDS,
+  "nxn": ["333","222","444","555","666","777","333oh"],
+  "big": ["444","555","666","777"],
+  "bld": ["333bf","444bf","555bf","333mbf"],
+  "nonbld": ["333","222","444","555","666","777","333fm","333oh","clock","minx","pyram","skewb","sq1"],
+  "other": ["clock","minx","pyram","skewb","sq1","333fm"],
+};
+
+let allData = {};
+let currentCountry = null;
+let currentContinent = "__world__";
+let currentGender = "all";
+let currentGroup = "__all__";
+let currentSince = 0;
+let currentUntil = 9999;
+let currentPage = 1;
+let pageSize = 100;
+let sortCol = 2;
+let sortDir = -1;
+let includeClock = false;
+
+function decodeMbf(wca) {
+  if (wca <= 0) return null;
+  const old = Math.floor(wca / 1000000000) !== 0;
+  let solved, attempted, timeSec;
+  if (old) {
+    timeSec = wca % 100000;
+    wca = Math.floor(wca / 100000);
+    attempted = wca % 100;
+    wca = Math.floor(wca / 100);
+    solved = 99 - (wca % 100);
+  } else {
+    const missed = wca % 100;
+    wca = Math.floor(wca / 100);
+    timeSec = wca % 100000;
+    wca = Math.floor(wca / 100000);
+    const diff = 99 - (wca % 100);
+    solved = diff + missed;
+    attempted = solved + missed;
+  }
+  const points = 2 * solved - attempted;
+  return points + Math.max(0, 3600 - Math.min(timeSec, 3600)) / 3600;
+}
+
+function computeKinch(pbs, wr, activeEvents) {
+  const scores = {};
+  let total = 0;
+  for (const eid of activeEvents) {
+    let v = 0;
+    const pb = pbs[eid];
+    if (!pb) { scores[eid] = 0; continue; }
+    if (eid === "333mbf") {
+      if (pb.s && wr.mbf_score) {
+        const raw = decodeMbf(pb.s);
+        if (raw != null) v = raw / wr.mbf_score * 100;
+      }
+    } else if (AVERAGE_EVENTS.has(eid)) {
+      if (pb.a && wr.average && wr.average[eid]) v = wr.average[eid] / pb.a * 100;
+    } else {
+      let ks = 0, ka = 0;
+      if (pb.s && wr.single && wr.single[eid]) ks = wr.single[eid] / pb.s * 100;
+      if (pb.a && wr.average && wr.average[eid]) ka = wr.average[eid] / pb.a * 100;
+      v = Math.max(ks, ka);
+    }
+    v = Math.min(v, 100);
+    scores[eid] = v;
+    total += v;
+  }
+  return { scores, overall: total / activeEvents.length };
+}
+
+function getWR() {
+  let src;
+  if (currentCountry && currentCountry !== "__world__") {
+    src = (allData.cwr && allData.cwr[currentCountry]) || allData.wr;
+  } else if (currentContinent && currentContinent !== "__world__") {
+    src = (allData.conwr && allData.conwr[currentContinent]) || allData.wr;
+  } else {
+    src = allData.wr;
+  }
+  return src[currentGender] || src["all"];
+}
+
+async function loadData() {
+  allData = window.KINCH_DATA;
+  init();
+}
+
+function init() {
+  const countries = Object.keys(allData.countries).sort();
+  if (countries.length === 0) {
+    document.getElementById("status").textContent = "No data found.";
+    return;
+  }
+  document.getElementById("controls").style.display = "flex";
+  document.getElementById("status").style.display = "none";
+  if (allData.generated_at) {
+    document.getElementById("genDate").textContent = "— Generated: " + allData.generated_at;
+  }
+
+  const conSel = document.getElementById("continentSelect");
+  if (allData.continents) {
+    for (const [id, name] of Object.entries(allData.continents)) {
+      conSel.add(new Option(name, id));
+    }
+  }
+  conSel.addEventListener("change", () => {
+    currentContinent = conSel.value;
+    currentCountry = "__world__";
+    currentPage = 1;
+    populateCountries();
+    renderTable();
+  });
+
+  const sel = document.getElementById("countrySelect");
+  sel.add(new Option("World", "__world__"));
+  sel.addEventListener("change", () => { currentCountry = sel.value; currentPage = 1; renderTable(); });
+
+  populateCountries();
+  populateSince();
+
+  document.getElementById("search").addEventListener("input", () => { currentPage = 1; renderTable(); });
+  document.getElementById("includeClock").addEventListener("change", function() {
+    includeClock = this.checked;
+    currentPage = 1;
+    renderTable();
+  });
+  document.getElementById("genderSelect").addEventListener("change", function() {
+    currentGender = this.value;
+    currentPage = 1;
+    renderTable();
+  });
+  document.getElementById("groupSelect").addEventListener("change", function() {
+    currentGroup = this.value;
+    currentPage = 1;
+    renderTable();
+  });
+  document.getElementById("sinceSelect").addEventListener("change", function() {
+    currentSince = parseInt(this.value);
+    currentPage = 1;
+    renderTable();
+  });
+  document.getElementById("untilSelect").addEventListener("change", function() {
+    currentUntil = parseInt(this.value);
+    currentPage = 1;
+    renderTable();
+  });
+  document.getElementById("pageSizeSelect").addEventListener("change", function() {
+    pageSize = parseInt(this.value);
+    currentPage = 1;
+    renderTable();
+  });
+
+  conSel.value = "__world__";
+  currentContinent = conSel.value;
+  sel.value = "__world__";
+  currentCountry = sel.value;
+  renderTable();
+}
+
+function populateCountries() {
+  const sel = document.getElementById("countrySelect");
+  sel.innerHTML = '<option value="__world__">World</option>';
+  const cc = allData.country_continent || {};
+  const sorted = Object.keys(allData.countries).sort();
+  for (const c of sorted) {
+    if (currentContinent === "__world__" || cc[c] === currentContinent) {
+      sel.add(new Option(`${c} (${allData.countries[c].count})`, c));
+    }
+  }
+  sel.value = "__world__";
+  currentCountry = "__world__";
+}
+
+function populateSince() {
+  const selAfter = document.getElementById("sinceSelect");
+  const selUntil = document.getElementById("untilSelect");
+  const years = new Set();
+  for (const c of Object.values(allData.countries)) {
+    for (const e of c.entries) {
+      const y = parseInt((e.id || "").substring(0, 4));
+      if (!isNaN(y) && y >= 2000) years.add(y);
+    }
+  }
+  const sorted = [...years].sort();
+  for (const y of sorted) {
+    selAfter.add(new Option(y, y));
+    selUntil.add(new Option(y, y));
+  }
+}
+
+function getEntries() {
+  let all = [];
+  if (currentCountry && currentCountry !== "__world__") {
+    all = (allData.countries[currentCountry] && allData.countries[currentCountry].entries) || [];
+  } else {
+    for (const c of Object.values(allData.countries)) {
+      for (const e of c.entries) {
+        if (currentContinent !== "__world__" && e.continent !== currentContinent) continue;
+        all.push(e);
+      }
+    }
+  }
+  if (currentGender !== "all") {
+    all = all.filter(e => e.gender === currentGender);
+  }
+  if (currentSince > 0 || currentUntil < 9999) {
+    all = all.filter(e => {
+      const y = parseInt((e.id || "").substring(0, 4));
+      if (isNaN(y)) return true;
+      return y >= currentSince && y <= currentUntil;
+    });
+  }
+  return all;
+}
+
+function getActiveEvents() {
+  let events = GROUP_EVENTS[currentGroup] || EVENT_IDS;
+  if (includeClock && !events.includes("clock")) {
+    events = [...events, "clock"];
+  }
+  return events;
+}
+
+function renderTable() {
+  const wrap = document.getElementById("tableWrap");
+  let entries = getEntries();
+  if (entries.length === 0) { wrap.style.display = "none"; document.getElementById("pagination").style.display = "none"; return; }
+
+  const q = document.getElementById("search").value.toLowerCase();
+  if (q) entries = entries.filter(e => e.name.toLowerCase().includes(q));
+
+  const activeEvents = getActiveEvents();
+  const wr = getWR();
+
+  entries = entries.map(e => {
+    const k = computeKinch(e.pbs, wr, activeEvents);
+    return { ...e, overall: k.overall, events: k.scores };
+  });
+
+  entries.sort((a, b) => b.overall - a.overall);
+
+  entries = [...entries].sort((a, b) => {
+    let va, vb;
+    if (sortCol === 0) { va = a.overall; vb = b.overall; }
+    else if (sortCol === 1) { va = a.name; vb = b.name; return sortDir * va.localeCompare(vb); }
+    else if (sortCol === 2) { va = a.overall; vb = b.overall; }
+    else if (sortCol === 3) {
+      va = activeEvents.filter(eid => a.events[eid] > 0).length;
+      vb = activeEvents.filter(eid => b.events[eid] > 0).length;
+    }
+    else { const eid = activeEvents[sortCol - 4]; va = a.events[eid] || 0; vb = b.events[eid] || 0; }
+    return sortDir * (va - vb);
+  });
+
+  const totalEntries = entries.length;
+  const totalPages = Math.max(1, Math.ceil(totalEntries / pageSize));
+  if (currentPage > totalPages) currentPage = totalPages;
+  const start = (currentPage - 1) * pageSize;
+  const pageEntries = entries.slice(start, start + pageSize)
+    .map((e, i) => ({ ...e, rank: start + i + 1 }));
+
+  let html = "<table><thead><tr>";
+  html += `<th data-col="0">#</th>`;
+  html += `<th data-col="1">Person</th>`;
+  html += `<th data-col="2">Overall</th>`;
+  html += `<th data-col="3">Evts</th>`;
+  activeEvents.forEach((eid, i) => html += `<th data-col="${i + 4}">${EVENT_LABELS[eid]}</th>`);
+  html += "</tr></thead><tbody>";
+
+  pageEntries.forEach(e => {
+    html += "<tr>";
+    html += `<td>${e.rank}</td>`;
+    const flag = currentCountry === "__world__" ? ` <span style="color:#8b949e;font-size:11px">${esc(e.country)}</span>` : "";
+    html += `<td>${esc(e.name)}${flag}</td>`;
+    html += `<td>${e.overall.toFixed(2)}</td>`;
+    const evtCount = activeEvents.filter(eid => e.events[eid] > 0).length;
+    html += `<td>${evtCount}</td>`;
+    activeEvents.forEach(eid => {
+      const v = e.events[eid] || 0;
+      if (v > 0) {
+        const cls = v >= 100 ? "score-100" : v >= 90 ? "score-90" : "";
+        html += `<td class="${cls}">${v.toFixed(2)}</td>`;
+      } else {
+        html += `<td>-</td>`;
+      }
+    });
+    html += "</tr>";
+  });
+  html += "</tbody></table>";
+  wrap.innerHTML = html;
+  wrap.style.display = "block";
+
+  const pagDiv = document.getElementById("pagination");
+  let pagHtml = `<span class="info">${totalEntries} total</span>`;
+  pagHtml += `<button ${currentPage === 1 ? "disabled" : ""} data-page="1">First</button>`;
+  pagHtml += `<button ${currentPage === 1 ? "disabled" : ""} data-page="${currentPage - 1}">Prev</button>`;
+  const startPg = Math.max(1, currentPage - 3);
+  const endPg = Math.min(totalPages, currentPage + 3);
+  for (let p = startPg; p <= endPg; p++) {
+    pagHtml += `<button class="${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
+  }
+  pagHtml += `<button ${currentPage === totalPages ? "disabled" : ""} data-page="${currentPage + 1}">Next</button>`;
+  pagHtml += `<button ${currentPage === totalPages ? "disabled" : ""} data-page="${totalPages}">Last</button>`;
+  pagDiv.innerHTML = pagHtml;
+  pagDiv.style.display = "flex";
+  pagDiv.querySelectorAll("button[data-page]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      currentPage = parseInt(btn.dataset.page);
+      renderTable();
+    });
+  });
+
+  wrap.querySelectorAll("thead th").forEach(th => {
+    th.addEventListener("click", () => {
+      const col = parseInt(th.dataset.col);
+      if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = col === 1 ? 1 : -1; }
+      renderTable();
+    });
+  });
+}
+
+function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function toggleTheme() {
+  document.body.classList.toggle("light");
+  const btn = document.getElementById("themeToggle");
+  if (document.body.classList.contains("light")) {
+    btn.textContent = "☾ Night";
+    localStorage.setItem("theme", "light");
+  } else {
+    btn.textContent = "☀ Day";
+    localStorage.setItem("theme", "dark");
+  }
+}
+
+(function() {
+  if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light");
+    document.getElementById("themeToggle").textContent = "☾ Night";
+  }
+})();
+
+loadData();
+</script>
+</body>
+</html>
