@@ -37,8 +37,12 @@ td:nth-child(2) { font-weight: 500; text-align: left; }
 .person-link { color: inherit; text-decoration: none; }
 .person-link:hover { text-decoration: underline; }
 td:nth-child(3) { font-weight: 700; color: #f0883e; }
-.score-100 { color: #7ee787; font-weight: 700; }
+.score-100 { color: #f0c040; font-weight: 700; }
 .score-90 { font-weight: 700; }
+.score-cell { cursor: pointer; }
+.showing-time { font-weight: 700; white-space: nowrap; }
+.showing-time.single { color: #58a6ff; }
+.showing-time.average { color: #7ee787; }
 
 .status { font-size: 14px; color: #8b949e; padding: 40px 0; text-align: center; }
 .status.error { color: #f85149; }
@@ -91,8 +95,10 @@ body.light td { color: #222; }
 body.light td:first-child { color: #222; }
 body.light td:nth-child(2) { color: #222; }
 body.light td:nth-child(3) { font-weight: 700; color: #f4771d; }
-body.light .score-100 { color: #0055A4; font-weight: 700; }
+body.light .score-100 { color: #d32f2f; font-weight: 700; }
 body.light .score-90 { font-weight: 700; }
+body.light .showing-time.single { color: #0055A4; }
+body.light .showing-time.average { color: #1a7f3a; }
 
 body.light .pagination button { background: #fff; border-color: #ccc; color: #333; }
 body.light .pagination button:hover { background: #e8f0ff; }
@@ -110,6 +116,7 @@ body.light .theme-toggle:hover { background: #004494; }
   <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ Day</button>
   <p class="subtitle">Higher score is better (max 100). <span id="genDate" style="color:#484f58"></span></p>
   <p class="legend">Kinch score = average of (WR / personal record × 100) across all 17 events. Missing events count as 0. MBF uses points + time ratio.</p>
+  <p class="legend"><span class="showing-time single" style="font-weight:700;white-space:normal">Blue</span> = single solve &nbsp; <span class="showing-time average" style="font-weight:700;white-space:normal">Green</span> = average. Click any score to reveal the underlying times.</p>
 
   <div class="controls" id="controls" style="display:none">
     <div class="ctrl-row">
@@ -226,6 +233,74 @@ function decodeMbf(wca) {
   }
   const points = 2 * solved - attempted;
   return points + Math.max(0, 3600 - Math.min(timeSec, 3600)) / 3600;
+}
+
+function formatCenti(c) {
+  const total = c / 100;
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${s.toFixed(2).padStart(5, "0")}`;
+  if (m > 0) return `${m}:${s.toFixed(2).padStart(5, "0")}`;
+  return s.toFixed(2);
+}
+
+function decodeMbfText(wca) {
+  if (wca <= 0) return null;
+  const old = Math.floor(wca / 1000000000) !== 0;
+  let solved, attempted, timeSec;
+  if (old) {
+    timeSec = wca % 100000;
+    wca = Math.floor(wca / 100000);
+    attempted = wca % 100;
+    wca = Math.floor(wca / 100);
+    solved = 99 - (wca % 100);
+  } else {
+    const missed = wca % 100;
+    wca = Math.floor(wca / 100);
+    timeSec = wca % 100000;
+    wca = Math.floor(wca / 100000);
+    const diff = 99 - (wca % 100);
+    solved = diff + missed;
+    attempted = solved + missed;
+  }
+  const min = Math.floor(timeSec / 60);
+  const sec = timeSec % 60;
+  return `${solved}/${attempted} in ${min}:${String(sec).padStart(2, "0")}`;
+}
+
+function getTimeString(eid, pbs, wr) {
+  const pb = pbs[eid];
+  if (!pb) return null;
+
+  if (eid === "333mbf") {
+    if (pb.s) return { text: decodeMbfText(pb.s), type: "single" };
+    return null;
+  }
+
+  if (eid === "333fm") {
+    if (pb.s && pb.a) {
+      const ks = pb.s && wr.single && wr.single[eid] ? wr.single[eid] / pb.s * 100 : 0;
+      const ka = pb.a && wr.average && wr.average[eid] ? wr.average[eid] / pb.a * 100 : 0;
+      if (ka >= ks) return { text: (pb.a / 100).toFixed(2), type: "average" };
+      return { text: pb.s.toString(), type: "single" };
+    }
+    if (pb.s) return { text: pb.s.toString(), type: "single" };
+    if (pb.a) return { text: (pb.a / 100).toFixed(2), type: "average" };
+    return null;
+  }
+
+  if (AVERAGE_EVENTS.has(eid)) {
+    if (pb.a) return { text: formatCenti(pb.a), type: "average" };
+    return null;
+  }
+
+  let ks = 0, ka = 0;
+  if (pb.s && wr.single && wr.single[eid]) ks = wr.single[eid] / pb.s * 100;
+  if (pb.a && wr.average && wr.average[eid]) ka = wr.average[eid] / pb.a * 100;
+  if (ka >= ks && pb.a) return { text: formatCenti(pb.a), type: "average" };
+  if (pb.s) return { text: formatCenti(pb.s), type: "single" };
+  return null;
 }
 
 function computeKinch(pbs, wr, activeEvents) {
@@ -465,8 +540,9 @@ function renderTable() {
     activeEvents.forEach(eid => {
       const v = e.events[eid] || 0;
       if (v > 0) {
-        const cls = v >= 100 ? "score-100" : v >= 90 ? "score-90" : "";
-        html += `<td class="${cls}">${v.toFixed(2)}</td>`;
+        const cls = (v >= 100 ? "score-100" : v >= 90 ? "score-90" : "") + " score-cell";
+        const info = getTimeString(eid, e.pbs, wr);
+        html += `<td class="${cls}" data-time="${esc(info ? info.text : "")}" data-type="${info ? info.type : ""}">${v.toFixed(2)}</td>`;
       } else {
         html += `<td>-</td>`;
       }
@@ -502,6 +578,25 @@ function renderTable() {
       const col = parseInt(th.dataset.col);
       if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = col === 1 ? 1 : -1; }
       renderTable();
+    });
+  });
+
+  wrap.querySelectorAll("td.score-cell").forEach(td => {
+    td.addEventListener("click", () => {
+      const colIdx = td.cellIndex;
+      const allCells = wrap.querySelectorAll(`tr td:nth-child(${colIdx + 1}).score-cell`);
+      const showing = td.classList.contains("showing-time");
+
+      allCells.forEach(cell => {
+        if (showing) {
+          cell.textContent = cell.dataset.score;
+          cell.classList.remove("showing-time", "single", "average");
+        } else if (cell.dataset.time) {
+          cell.dataset.score = cell.textContent;
+          cell.textContent = cell.dataset.time;
+          cell.classList.add("showing-time", cell.dataset.type);
+        }
+      });
     });
   });
 }
