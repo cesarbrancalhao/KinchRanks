@@ -1,26 +1,35 @@
 # Kinch Ranks
 
-Interactive [Kinch rank](https://www.speedsolving.com/wiki/index.php/KinchRanks) visualizer but with better filters, search by country, continent, event group, gender, debut year and more.
+Interactive [Kinch rank](https://www.speedsolving.com/wiki/index.php/KinchRanks) visualizer with filters for region/country, continent, event group, gender, debut year and more.
 
 ## Features
 
 - **Full Kinch scoring** — event scores computed as WR / personal record × 100, capped at 100
-- **Country & continent views** — filter rankings against world or local records
+- **Instant load** — top 1000 pre-computed rankings render immediately; full dataset loads in background
+- **Region & country views** — filter rankings against world or local records
 - **Gender & debut year filters** — drill down by male/female and WCA ID year
 - **Event grouping** — NxN, big cubes, BLD, non-BLD, other
-- **Clock toggle** — include or exclude clock from the overall average (since its getting bonked)
+- **Clock toggle** — include or exclude clock from the overall average
+- **Search & sort** — search by name, sort by any column
+- **Profile view** — click any name for detailed event-by-event results with NR/CR/WR ranks
 - **Dark/light mode** — night theme (default) and WCA-inspired day theme
+- **9 languages** — English, Portuguese, Spanish, German, Italian, Catalan, Korean, Chinese, Vietnamese
 
 ## How it works
 
-The data pipeline (`build.py`) streams the [WCA developer database dump](https://www.worldcubeassociation.org/export/results), extracting personal bests per person per event. It then computes world and country records, selects the top entries per country, and outputs `data.js`.
+The data pipeline (`build.py`) streams the [WCA developer database dump](https://www.worldcubeassociation.org/export/results), extracts personal bests, computes world/country records, selects top entries per country, and outputs two files:
 
-The `index.html` loads `data.js` and computes Kinch scores on the fly, no server, no API calls, fully static (this was done this way because I'm not getting a penny from this ok, don't complain).
+- `1000.js` (~200KB) — top 1000 pre-computed entries with world-record Kinch scores. Loads instantly for the default view.
+- `data.js` (~76MB) — the full dataset loaded asynchronously. Unlocks all filters once ready.
 
-## Setup (if you want to generate your own data)
+The frontend (`index.html`) renders the table immediately from `1000.js` while `data.js` loads in the background. Country, region and debut-year filters are disabled with a "Loading" placeholder until the full dataset arrives. A result cache avoids recomputing Kinch scores for repeated filter combinations.
+
+No server, no API calls, fully static.
+
+## Setup (generate your own data)
 
 1. Download the WCA SQL dump: `wca-developer-database-dump.sql`
 2. Copy `.env.example` to `.env` and set your paths
 3. Run `python3 build.py`
 
-This outputs `data.js` and `data.json` (standalone JSON).
+This outputs `data.js` and `1000.js`.

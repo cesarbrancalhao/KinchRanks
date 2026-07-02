@@ -17,6 +17,7 @@ h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; }
 .ctrl-cell { flex: 1; display: flex; align-items: center; gap: 6px; padding: 4px 8px; min-width: 0; }
 .cg-label { font-size: 11px; color: #6e7681; text-transform: uppercase; white-space: nowrap; min-width: 40px; }
 .controls select, .controls input[type="text"] { padding: 5px 10px; border: 1px solid #21262d; border-radius: 4px; background: #0d1117; color: #c9d1d9; font-size: 13px; outline: none; }
+.controls select:disabled { opacity: 0.45; cursor: not-allowed; }
 .controls select:focus, .controls input[type="text"]:focus { border-color: #58a6ff; }
 .controls input[type="text"] { width: 100%; min-width: 80px; }
 .clock-label { font-size: 11px; color: #6e7681; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 4px; white-space: nowrap; margin-left: 12px; }
@@ -190,14 +191,14 @@ body.light .profile-events-table .rank-cr { font-weight: 700; color: #1a7f3a; }
     </select>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ Day</button>
   </div>
-  <p class="subtitle"><span data-i18n="subtitle">Higher score is better (max 100).</span> <span id="genDate" style="color:#484f58"></span></p>
-  <p class="legend" data-i18n="legendKinch">Kinch score = average of (WR / personal record × 100) across all 17 events. Missing events count as 0. MBF uses points + time ratio.</p>
-  <p class="legend"><span class="showing-time single" style="font-weight:700;white-space:normal" data-i18n="legendBlue">Blue</span><span data-i18n="legendSingle"> = single solve</span> &nbsp; <span class="showing-time average" style="font-weight:700;white-space:normal" data-i18n="legendGreen">Green</span><span data-i18n="legendAverage"> = average. Click any score to reveal the underlying times.</span></p>
+  <p class="subtitle" id="subtitle"><span data-i18n="subtitle">Higher score is better (max 100).</span> <span id="genDate" style="color:#484f58"></span></p>
+  <p class="legend" id="legendKinch" data-i18n="legendKinch">Kinch score = average of (WR / personal record × 100) across all 17 events. Missing events count as 0. MBF uses points + time ratio.</p>
+  <p class="legend" id="legendColors"><span class="showing-time single" style="font-weight:700;white-space:normal" data-i18n="legendBlue">Blue</span><span data-i18n="legendSingle"> = single solve</span> &nbsp; <span class="showing-time average" style="font-weight:700;white-space:normal" data-i18n="legendGreen">Green</span><span data-i18n="legendAverage"> = average. Click any score to reveal the underlying times.</span></p>
 
-  <div class="controls" id="controls" style="display:none">
+  <div class="controls" id="controls">
     <div class="ctrl-row">
       <div class="ctrl-cell">
-        <span class="cg-label" data-i18n="countryRegion">Country / Region</span>
+        <span class="cg-label" data-i18n="countryRegion">Region / Country</span>
         <select id="continentSelect">
           <option value="__world__" data-i18n="world">World</option>
         </select>
@@ -259,8 +260,12 @@ body.light .profile-events-table .rank-cr { font-weight: 700; color: #1a7f3a; }
   <div id="profileView" style="display:none"></div>
 </div>
 
-<script src="data.js"></script>
+<script src="1000.js"></script>
 <script>
+var _dataScript = document.createElement('script');
+_dataScript.src = 'data.js';
+document.head.appendChild(_dataScript);
+
 const LANG = {
   en: {
     title: "Kinch Ranks",
@@ -271,7 +276,7 @@ const LANG = {
     legendSingle: " = single solve",
     legendGreen: "Green",
     legendAverage: " = average. Click any score to reveal the underlying times.",
-    countryRegion: "Country / Region",
+    countryRegion: "Region / Country",
     events: "Events",
     gender: "Gender",
     name: "Name",
@@ -335,7 +340,7 @@ const LANG = {
     legendSingle: " = single",
     legendGreen: "Verde",
     legendAverage: " = média. Clique em qualquer pontuação para ver os tempos.",
-    countryRegion: "País / Região",
+    countryRegion: "Região / País",
     events: "Eventos",
     gender: "Gênero",
     name: "Nome",
@@ -385,7 +390,7 @@ const LANG = {
     legendSingle: " = single",
     legendGreen: "Verde",
     legendAverage: " = media. Haz clic en cualquier puntuación para ver los tiempos.",
-    countryRegion: "País / Región",
+    countryRegion: "Región / País",
     events: "Eventos",
     gender: "Género",
     name: "Nombre",
@@ -435,7 +440,7 @@ const LANG = {
     legendSingle: " = Single",
     legendGreen: "Grün",
     legendAverage: " = Durchschnitt. Klicke auf eine Wertung, um die Zeiten anzuzeigen.",
-    countryRegion: "Land / Region",
+    countryRegion: "Region / Land",
     events: "Events",
     gender: "Geschlecht",
     name: "Name",
@@ -485,7 +490,7 @@ const LANG = {
     legendSingle: " = singolo",
     legendGreen: "Verde",
     legendAverage: " = media. Clicca su un punteggio per vedere i tempi.",
-    countryRegion: "Paese / Regione",
+    countryRegion: "Regione / Paese",
     events: "Eventi",
     gender: "Genere",
     name: "Nome",
@@ -535,7 +540,7 @@ const LANG = {
     legendSingle: " = single",
     legendGreen: "Verd",
     legendAverage: " = mitjana. Fes clic en qualsevol puntuació per veure els temps.",
-    countryRegion: "País / Regió",
+    countryRegion: "Regió / País",
     events: "Esdeveniments",
     gender: "Gènere",
     name: "Nom",
@@ -585,7 +590,7 @@ const LANG = {
     legendSingle: " = 싱글",
     legendGreen: "초록",
     legendAverage: " = 평균. 점수를 클릭하면 기록 시간을 볼 수 있습니다.",
-    countryRegion: "국가 / 지역",
+    countryRegion: "지역 / 국가",
     events: "종목",
     gender: "성별",
     name: "이름",
@@ -635,7 +640,7 @@ const LANG = {
     legendSingle: " = 单次",
     legendGreen: "绿",
     legendAverage: " = 平均。点击分数可查看原始成绩。",
-    countryRegion: "国家 / 地区",
+    countryRegion: "地区 / 国家",
     events: "项目",
     gender: "性别",
     name: "姓名",
@@ -685,7 +690,7 @@ const LANG = {
     legendSingle: " = single",
     legendGreen: "Xanh lá",
     legendAverage: " = trung bình. Nhấp vào điểm số để xem thời gian.",
-    countryRegion: "Quốc gia / Khu vực",
+    countryRegion: "Khu vực / Quốc gia",
     events: "Nội dung",
     gender: "Giới tính",
     name: "Tên",
@@ -1670,6 +1675,9 @@ function setLanguage(lang) {
   applyTranslations();
   populateCountries(true);
   currentPage = 1;
+  if (document.getElementById("profileView").style.display === "block") {
+    hideProfile();
+  }
   renderTable();
 }
 
@@ -1725,6 +1733,23 @@ let pageSize = 100;
 let sortCol = 2;
 let sortDir = -1;
 let includeClock = false;
+let resultsCache = {};
+let _lastEntries = null;
+let _lastActiveEvents = null;
+let _lastWR = null;
+let _nextPageHTML = null;
+let _preRenderedPage = 0;
+let _pendingFullRefresh = false;
+
+function isDefaultFilters() {
+  return (currentCountry === null || currentCountry === "__world__") &&
+         currentContinent === "__world__" &&
+         currentGender === "all" &&
+         currentGroup === "__all__" &&
+         !includeClock &&
+         currentSince === 0 &&
+         currentUntil === 9999;
+}
 
 function decodeMbf(wca) {
   if (wca <= 0) return null;
@@ -1832,13 +1857,28 @@ function getWR() {
   return src[currentGender] || src["all"];
 }
 
-async function loadData() {
-  allData = window.KINCH_DATA;
-  personLookup = {};
-  for (const c of Object.values(allData.countries)) {
-    for (const e of c.entries) {
-      personLookup[e.id] = e;
+function loadData() {
+  if (window.KINCH_DATA) {
+    allData = window.KINCH_DATA;
+    personLookup = {};
+    for (const c of Object.values(allData.countries)) {
+      for (const e of c.entries) {
+        personLookup[e.id] = e;
+      }
     }
+  } else if (window.KINCH_QUICK) {
+    var q = window.KINCH_QUICK;
+    allData = {
+      precomputed: q.entries,
+      wr: { all: q.wr },
+      cwr: {},
+      conwr: {},
+      countries: {},
+      country_continent: {},
+      continents: {},
+      competitions: {},
+      generated_at: q.generated_at
+    };
   }
   init();
 }
@@ -1847,19 +1887,25 @@ function init() {
   document.getElementById("langSelect").value = currentLang;
   applyTranslations();
 
-  const countries = Object.keys(allData.countries).sort();
-  if (countries.length === 0) {
+  var hasFullData = !!window.KINCH_DATA;
+
+  if (!hasFullData && !(allData.precomputed && allData.precomputed.length)) {
+    document.getElementById("status").style.display = "block";
     document.getElementById("status").textContent = t("noData");
     return;
   }
-  document.getElementById("controls").style.display = "flex";
+
+  if (document.getElementById("profileView").style.display !== "block") {
+    document.getElementById("controls").style.display = "flex";
+  }
   document.getElementById("status").style.display = "none";
   if (allData.generated_at) {
-    document.getElementById("genDate").textContent = "— " + t("generated") + ": " + allData.generated_at;
+    document.getElementById("genDate").textContent = "\u2014 " + t("generated") + ": " + allData.generated_at;
   }
 
-  const conSel = document.getElementById("continentSelect");
-  if (allData.continents) {
+  var conSel = document.getElementById("continentSelect");
+  while (conSel.options.length > 1) conSel.remove(1);
+  if (hasFullData && allData.continents) {
     for (const [id, name] of Object.entries(allData.continents)) {
       const i18nKey = CONTINENT_I18N[id] || id;
       const opt = document.createElement("option");
@@ -1869,7 +1915,8 @@ function init() {
       conSel.add(opt);
     }
   }
-  conSel.addEventListener("change", () => {
+  conSel.onchange = null;
+  conSel.addEventListener("change", function() {
     currentContinent = conSel.value;
     currentCountry = "__world__";
     currentPage = 1;
@@ -1877,49 +1924,59 @@ function init() {
     renderTable();
   });
 
-  const sel = document.getElementById("countrySelect");
+  var sel = document.getElementById("countrySelect");
+  sel.innerHTML = "";
   sel.add(new Option(t("world"), "__world__"));
-  sel.addEventListener("change", () => { currentCountry = sel.value; currentPage = 1; renderTable(); });
+  sel.onchange = null;
+  sel.addEventListener("change", function() { currentCountry = sel.value; currentPage = 1; renderTable(); });
 
   populateCountries();
-  populateSince();
+  if (hasFullData) populateSince();
 
-  document.getElementById("search").addEventListener("input", () => { currentPage = 1; renderTable(); });
-  document.getElementById("includeClock").addEventListener("change", function() {
-    includeClock = this.checked;
-    currentPage = 1;
-    renderTable();
-  });
-  document.getElementById("genderSelect").addEventListener("change", function() {
-    currentGender = this.value;
-    currentPage = 1;
-    renderTable();
-  });
-  document.getElementById("groupSelect").addEventListener("change", function() {
-    currentGroup = this.value;
-    currentPage = 1;
-    renderTable();
-  });
-  document.getElementById("sinceSelect").addEventListener("change", function() {
-    currentSince = parseInt(this.value);
-    currentPage = 1;
-    renderTable();
-  });
-  document.getElementById("untilSelect").addEventListener("change", function() {
-    currentUntil = parseInt(this.value);
-    currentPage = 1;
-    renderTable();
-  });
-  document.getElementById("pageSizeSelect").addEventListener("change", function() {
-    pageSize = parseInt(this.value);
-    currentPage = 1;
-    renderTable();
-  });
+  var searchEl = document.getElementById("search");
+  searchEl.oninput = null;
+  searchEl.addEventListener("input", function() { currentPage = 1; renderTable(); });
+
+  var clockEl = document.getElementById("includeClock");
+  clockEl.onchange = null;
+  clockEl.addEventListener("change", function() { includeClock = this.checked; currentPage = 1; renderTable(); });
+
+  var genderEl = document.getElementById("genderSelect");
+  genderEl.onchange = null;
+  genderEl.addEventListener("change", function() { currentGender = this.value; currentPage = 1; renderTable(); });
+
+  var groupEl = document.getElementById("groupSelect");
+  groupEl.onchange = null;
+  groupEl.addEventListener("change", function() { currentGroup = this.value; currentPage = 1; renderTable(); });
+
+  var sinceEl = document.getElementById("sinceSelect");
+  sinceEl.onchange = null;
+  sinceEl.addEventListener("change", function() { currentSince = parseInt(this.value); currentPage = 1; renderTable(); });
+
+  var untilEl = document.getElementById("untilSelect");
+  untilEl.onchange = null;
+  untilEl.addEventListener("change", function() { currentUntil = parseInt(this.value); currentPage = 1; renderTable(); });
+
+  var psEl = document.getElementById("pageSizeSelect");
+  psEl.onchange = null;
+  psEl.addEventListener("change", function() { pageSize = parseInt(this.value); currentPage = 1; renderTable(); });
 
   conSel.value = "__world__";
   currentContinent = conSel.value;
   sel.value = "__world__";
   currentCountry = sel.value;
+
+  if (!hasFullData) {
+    document.getElementById("continentSelect").disabled = true;
+    document.getElementById("continentSelect").options[0].textContent = "Loading";
+    document.getElementById("countrySelect").disabled = true;
+    document.getElementById("countrySelect").innerHTML = "<option>Loading</option>";
+    document.getElementById("sinceSelect").disabled = true;
+    document.getElementById("sinceSelect").options[0].textContent = "Loading";
+    document.getElementById("untilSelect").disabled = true;
+    document.getElementById("untilSelect").options[0].textContent = "Loading";
+  }
+
   renderTable();
 }
 
@@ -1927,14 +1984,37 @@ function populateCountries(preserveValue) {
   const sel = document.getElementById("countrySelect");
   const prevValue = preserveValue ? sel.value : "__world__";
   sel.innerHTML = `<option value="__world__" data-i18n="world">${t("world")}</option>`;
-  const cc = allData.country_continent || {};
-  const sorted = Object.keys(allData.countries).sort();
-  for (const c of sorted) {
-    if (currentContinent === "__world__" || cc[c] === currentContinent) {
-      const name = getCountryName(c);
-      sel.add(new Option(`${name} (${allData.countries[c].count})`, c));
+  var cc = allData.country_continent || {};
+  var hasFullData = !!window.KINCH_DATA;
+
+  if (hasFullData) {
+    const sorted = Object.keys(allData.countries).sort();
+    for (const c of sorted) {
+      if (currentContinent === "__world__" || cc[c] === currentContinent) {
+        const name = getCountryName(c);
+        sel.add(new Option(name + " (" + allData.countries[c].count + ")", c));
+      }
+    }
+  } else if (allData.precomputed) {
+    var seen = {};
+    var countries = [];
+    for (var i = 0; i < allData.precomputed.length; i++) {
+      var e = allData.precomputed[i];
+      if (!seen[e.country]) {
+        seen[e.country] = true;
+        countries.push(e.country);
+        if (!cc[e.country]) cc[e.country] = e.continent;
+      }
+    }
+    countries.sort();
+    for (var j = 0; j < countries.length; j++) {
+      var c = countries[j];
+      if (currentContinent === "__world__" || cc[c] === currentContinent) {
+        sel.add(new Option(getCountryName(c), c));
+      }
     }
   }
+
   sel.value = prevValue;
   currentCountry = prevValue;
 }
@@ -1991,8 +2071,54 @@ function getActiveEvents() {
 
 function renderTable() {
   const wrap = document.getElementById("tableWrap");
-  let entries = getEntries();
+
+  const filterKey = `${currentCountry || "__world__"}|${currentContinent}|${currentGender}|${currentGroup}|${includeClock}|${currentSince}|${currentUntil}`;
+  let entries = resultsCache[filterKey];
+
+  if (!entries) {
+    if (isDefaultFilters() && allData.precomputed) {
+      entries = allData.precomputed;
+    } else {
+      entries = getEntries();
+      if (entries.length === 0) {
+        if (allData.precomputed) {
+          entries = allData.precomputed.filter(function(e) {
+            if (currentCountry !== null && currentCountry !== "__world__" && e.country !== currentCountry) return false;
+            if (currentContinent !== "__world__" && e.continent !== currentContinent) return false;
+            if (currentGender !== "all" && e.gender !== currentGender) return false;
+            if (currentSince > 0 || currentUntil < 9999) {
+              var y = parseInt((e.id || "").substring(0, 4));
+              if (!isNaN(y) && (y < currentSince || y > currentUntil)) return false;
+            }
+            return true;
+          });
+        } else {
+          wrap.style.display = "none";
+          document.getElementById("pagination").style.display = "none";
+          return;
+        }
+      } else {
+        const activeEvents = getActiveEvents();
+        const wr = getWR();
+        entries = entries.map(e => {
+          const k = computeKinch(e.pbs, wr, activeEvents);
+          return { ...e, overall: k.overall, events: k.scores };
+        });
+        entries.sort((a, b) => b.overall - a.overall);
+      }
+    }
+    resultsCache[filterKey] = entries;
+  }
+
   if (entries.length === 0) { wrap.style.display = "none"; document.getElementById("pagination").style.display = "none"; return; }
+
+  entries = entries.map(e => {
+    if (!e.pbs) {
+      const person = personLookup[e.id];
+      return { ...e, pbs: person ? person.pbs || {} : {} };
+    }
+    return e;
+  });
 
   const q = document.getElementById("search").value.toLowerCase();
   if (q) {
@@ -2005,13 +2131,6 @@ function renderTable() {
 
   const activeEvents = getActiveEvents();
   const wr = getWR();
-
-  entries = entries.map(e => {
-    const k = computeKinch(e.pbs, wr, activeEvents);
-    return { ...e, overall: k.overall, events: k.scores };
-  });
-
-  entries.sort((a, b) => b.overall - a.overall);
 
   entries = [...entries].sort((a, b) => {
     let va, vb;
@@ -2081,7 +2200,11 @@ function renderTable() {
   pagDiv.querySelectorAll("button[data-page]").forEach(btn => {
     btn.addEventListener("click", () => {
       currentPage = parseInt(btn.dataset.page);
-      renderTable();
+      if (_lastEntries && _lastActiveEvents) {
+        renderPage();
+      } else {
+        renderTable();
+      }
     });
   });
 
@@ -2111,6 +2234,125 @@ function renderTable() {
       });
     });
   });
+
+  _lastEntries = entries;
+  _lastActiveEvents = activeEvents;
+  _lastWR = wr;
+  _nextPageHTML = null;
+  _preRenderedPage = 0;
+}
+
+function renderPage() {
+  var entries = _lastEntries;
+  var activeEvents = _lastActiveEvents;
+  var wr = _lastWR;
+  var totalEntries = entries.length;
+  var totalPages = Math.max(1, Math.ceil(totalEntries / pageSize));
+  if (currentPage > totalPages) currentPage = totalPages;
+  var start = (currentPage - 1) * pageSize;
+  var pageEntries = entries.slice(start, start + pageSize).map(function(e, i) { return { ...e, rank: start + i + 1 }; });
+
+  var wrap = document.getElementById("tableWrap");
+  var tbody = wrap.querySelector("tbody");
+  if (!tbody) return renderTable();
+
+  var html = "";
+  if (currentPage === _preRenderedPage && _nextPageHTML) {
+    html = _nextPageHTML;
+    _nextPageHTML = null;
+    _preRenderedPage = 0;
+  } else {
+    pageEntries.forEach(function(e) {
+      html += "<tr>";
+      html += "<td>" + e.rank + "</td>";
+      var flag = currentCountry === "__world__" ? " <span style=\"color:#8b949e;font-size:11px\">" + esc(e.country) + "</span>" : "";
+      html += "<td><a href=\"javascript:void(0)\" class=\"person-link\" data-wca-id=\"" + esc(e.id) + "\" onclick=\"showProfile('" + esc(e.id) + "');return false\">" + esc(e.name) + "</a>" + flag + "</td>";
+      html += "<td>" + e.overall.toFixed(2) + "</td>";
+      var evtCount = activeEvents.filter(function(eid) { return e.events[eid] > 0; }).length;
+      html += "<td>" + evtCount + "</td>";
+      activeEvents.forEach(function(eid) {
+        var v = e.events[eid] || 0;
+        if (v > 0) {
+          var cls = (v >= 100 ? "score-100" : v >= 90 ? "score-90" : "") + " score-cell";
+          var info = getTimeString(eid, e.pbs, wr);
+          html += "<td class=\"" + cls + "\" data-time=\"" + esc(info ? info.text : "") + "\" data-type=\"" + (info ? info.type : "") + "\">" + v.toFixed(2) + "</td>";
+        } else {
+          html += "<td>-</td>";
+        }
+      });
+      html += "</tr>";
+    });
+  }
+  tbody.innerHTML = html;
+
+  var pagDiv = document.getElementById("pagination");
+  var pagHtml = "<span class=\"info\">" + totalEntries + " " + t("total") + "</span>";
+  pagHtml += "<button " + (currentPage === 1 ? "disabled" : "") + " data-page=\"1\">" + t("first") + "</button>";
+  pagHtml += "<button " + (currentPage === 1 ? "disabled" : "") + " data-page=\"" + (currentPage - 1) + "\">" + t("prev") + "</button>";
+  var startPg = Math.max(1, currentPage - 3);
+  var endPg = Math.min(totalPages, currentPage + 3);
+  for (var p = startPg; p <= endPg; p++) {
+    pagHtml += "<button class=\"" + (p === currentPage ? "active" : "") + "\" data-page=\"" + p + "\">" + p + "</button>";
+  }
+  pagHtml += "<button " + (currentPage === totalPages ? "disabled" : "") + " data-page=\"" + (currentPage + 1) + "\">" + t("next") + "</button>";
+  pagHtml += "<button " + (currentPage === totalPages ? "disabled" : "") + " data-page=\"" + totalPages + "\">" + t("last") + "</button>";
+  pagDiv.innerHTML = pagHtml;
+  pagDiv.style.display = "flex";
+
+  pagDiv.querySelectorAll("button[data-page]").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      currentPage = parseInt(btn.dataset.page);
+      renderPage();
+    });
+  });
+
+  wrap.querySelectorAll("td.score-cell").forEach(function(td) {
+    td.addEventListener("click", function() {
+      var colIdx = td.cellIndex;
+      var allCells = wrap.querySelectorAll("tr td:nth-child(" + (colIdx + 1) + ").score-cell");
+      var showing = td.classList.contains("showing-time");
+      allCells.forEach(function(cell) {
+        if (showing) {
+          cell.textContent = cell.dataset.score;
+          cell.classList.remove("showing-time", "single", "average");
+        } else if (cell.dataset.time) {
+          cell.dataset.score = cell.textContent;
+          cell.textContent = cell.dataset.time;
+          cell.classList.add("showing-time", cell.dataset.type);
+        }
+      });
+    });
+  });
+
+  if (currentPage < totalPages) {
+    var _n = currentPage + 1;
+    var _ns = (_n - 1) * pageSize;
+    var _ne = entries.slice(_ns, _ns + pageSize);
+    setTimeout(function() {
+      _nextPageHTML = "";
+      _ne.forEach(function(e, idx) {
+        var rank = _ns + idx + 1;
+        _nextPageHTML += "<tr><td>" + rank + "</td>";
+        var flag2 = currentCountry === "__world__" ? " <span style=\"color:#8b949e;font-size:11px\">" + esc(e.country) + "</span>" : "";
+        _nextPageHTML += "<td><a href=\"javascript:void(0)\" class=\"person-link\" data-wca-id=\"" + esc(e.id) + "\" onclick=\"showProfile('" + esc(e.id) + "');return false\">" + esc(e.name) + "</a>" + flag2 + "</td>";
+        _nextPageHTML += "<td>" + e.overall.toFixed(2) + "</td>";
+        var ec = activeEvents.filter(function(eid) { return e.events[eid] > 0; }).length;
+        _nextPageHTML += "<td>" + ec + "</td>";
+        activeEvents.forEach(function(eid) {
+          var v2 = e.events[eid] || 0;
+          if (v2 > 0) {
+            var cls2 = (v2 >= 100 ? "score-100" : v2 >= 90 ? "score-90" : "") + " score-cell";
+            var info2 = getTimeString(eid, e.pbs, wr);
+            _nextPageHTML += "<td class=\"" + cls2 + "\" data-time=\"" + esc(info2 ? info2.text : "") + "\" data-type=\"" + (info2 ? info2.type : "") + "\">" + v2.toFixed(2) + "</td>";
+          } else {
+            _nextPageHTML += "<td>-</td>";
+          }
+        });
+        _nextPageHTML += "</tr>";
+      });
+      _preRenderedPage = _n;
+    }, 0);
+  }
 }
 
 function showProfile(wcaId) {
@@ -2121,6 +2363,9 @@ function showProfile(wcaId) {
   document.getElementById("status").style.display = "none";
   document.getElementById("tableWrap").style.display = "none";
   document.getElementById("pagination").style.display = "none";
+  document.getElementById("subtitle").style.display = "none";
+  document.getElementById("legendKinch").style.display = "none";
+  document.getElementById("legendColors").style.display = "none";
 
   const profileDiv = document.getElementById("profileView");
   profileDiv.style.display = "block";
@@ -2135,6 +2380,13 @@ function hideProfile() {
   document.getElementById("controls").style.display = "flex";
   document.getElementById("tableWrap").style.display = "block";
   document.getElementById("pagination").style.display = "flex";
+  document.getElementById("subtitle").style.display = "";
+  document.getElementById("legendKinch").style.display = "";
+  document.getElementById("legendColors").style.display = "";
+  if (_pendingFullRefresh) {
+    _pendingFullRefresh = false;
+    init();
+  }
 }
 
 function renderProfile(person) {
@@ -2277,7 +2529,32 @@ function toggleTheme() {
   }
 })();
 
-loadData();
+function onFullDataLoaded() {
+  allData = window.KINCH_DATA;
+  resultsCache = { _generated_at: allData.generated_at };
+  personLookup = {};
+  for (const c of Object.values(allData.countries)) {
+    for (const e of c.entries) {
+      personLookup[e.id] = e;
+    }
+  }
+  document.getElementById("continentSelect").disabled = false;
+  document.getElementById("countrySelect").disabled = false;
+  document.getElementById("sinceSelect").disabled = false;
+  document.getElementById("untilSelect").disabled = false;
+  if (document.getElementById("profileView").style.display === "block") {
+    _pendingFullRefresh = true;
+    return;
+  }
+  init();
+}
+
+if (window.KINCH_DATA) {
+  loadData();
+} else {
+  loadData();
+  _dataScript.onload = onFullDataLoaded;
+}
 </script>
 </body>
 </html>

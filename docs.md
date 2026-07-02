@@ -1,8 +1,8 @@
-# Kinch Ranks — Documentation (Generated)
+# Kinch Ranks — Documentation
 
 ## Overview
 
-Kinch Ranks is a data pipeline + static frontend for visualizing WCA Kinch scores. It streams the WCA developer SQL dump (~5GB, ~50M lines) in a single pass, computes personal bests, world/country records, country-specific Kinch scores, and outputs a static JS file consumed by the frontend.
+Kinch Ranks is a data pipeline + static frontend for visualizing WCA Kinch scores. It streams the WCA developer SQL dump (~5GB, ~50M lines) in a single pass, computes personal bests, world/country records, Kinch scores, and outputs static JS files consumed by the frontend. The page loads instantly using a pre-computed top-1000 summary (`1000.js`) while the full dataset (`data.js`) arrives asynchronously.
 
 ---
 
@@ -17,35 +17,47 @@ Streams the WCA developer SQL dump in a single pass. Extracts the `persons` tabl
 Computes the all-time personal record (minimum valid solve) per person per event, for both single and average. Multi-Blind raw WCA integer values are stored directly (decoded later).
 
 **Phase 3 — World records & country records**
-Iterates all PBs to find the best (lowest) single/average per event, both globally (`wr_*`) and per country (`cwr[*]`). MBF records use the Kinch raw score (points + time ratio) rather than the WCA integer.
+Iterates all PBs to find the best (lowest) single/average per event, both globally (`wr`) and per country (`cwr`) and per continent (`conwr`). MBF records use the Kinch raw score (points + time ratio) rather than the WCA integer.
 
 **Phase 4 — Country-specific Kinch & selection**
-For each person, computes Kinch event scores against their country's WR baseline. Persons with fewer than `MIN_EVENTS` non-zero scores are discarded. The overall is the average of the 16 default events (clock excluded).
+For each person, computes Kinch event scores against their country's WR baseline. Persons with fewer than `MIN_EVENTS` non-zero scores are discarded. Per-event scores (`_scores`) and overall (`overall`) are preserved on each entry in the output. The overall is the average of the 17 default events (clock excluded).
 
 Per-country selection (ensuring specialists aren't lost):
-- Top 200 by overall score
-- Top 50 per individual event
+- Top 1000 by overall score
+- Top 200 per individual event
 - Union of both sets → stored in the JSON.
 
 Raw PBs (single/average per event) are written into the JS output so the frontend can recompute scores against any baseline (global or country-specific) and toggle Clock inclusion dynamically.
 
-**Phase 5 — JSON output**
+**Phase 5 — Global pre-computed rankings**
+After building all country data, computes Kinch scores for all selected entries using **world records** (not country-specific records). Sorts globally by overall score (default view: World, All events, All genders, no clock). Stores the top 1000 as `precomputed` in the JSON output. This data powers the instant initial table render.
+
+**Phase 6 — Output**
+Writes two files:
+- `data.js` — `window.KINCH_DATA` containing the full dataset (`wr`, `cwr`, `conwr`, `countries`, `competitions`, `precomputed`)
+- `data.js` — `window.KINCH_QUICK` containing the top 1000 pre-computed entries plus world-record baselines for the default view
+
 Output structure:
 ```json
 {
-  "wr": { "single": {"333": best, ...}, "average": {"333": best, ...}, "mbf_score": float },
-  "cwr": { "USA": { ... }, ... },
-  "conwr": { "_Europe": { ... }, ... },
+  "wr": { "all": { "single": {...}, "average": {...}, "mbf_score": ... }, "m": {...}, "f": {...} },
+  "cwr": { "USA": { "all": {...}, ... }, ... },
+  "conwr": { "_Europe": { "all": {...}, ... }, ... },
   "countries": {
     "USA": {
       "name": "USA",
       "count": 200,
       "entries": [
         { "id": "2005XXXX01", "name": "Max Park", "country": "USA",
-          "pbs": { "333": {"s": 422, "a": 501}, ... } }
+          "pbs": { "333": {"s": 422, "a": 501}, ... },
+          "overall": 85.43, "_scores": {"333": 90.1, ...}, "_n_events": 17 }
       ]
     }
-  }
+  },
+  "precomputed": [
+    { "id": "...", "name": "...", "country": "...", "overall": 92.5,
+      "events": {"333": 95.0, ...} }
+  ]
 }
 ```
 
@@ -61,7 +73,7 @@ Events are grouped by how their Kinch score is derived:
 | `BETTER_OF_EVENTS` | 333bf, 444bf, 555bf, 333fm | `max(score_from_single, score_from_average)` |
 | `MBF_EVENT` | 333mbf | decode WCA multi-blind integer → `(points + time_ratio) / WR_mbf_score × 100` |
 
-`KINCH_EVENTS` is the default 16-event set (clock exclued). `KINCH_EVENTS_ALL` includes clock for data collection; the frontend toggles it.
+`KINCH_EVENTS` is the default 17-event set (clock excluded). `KINCH_EVENTS_ALL` includes clock for data collection; the frontend toggles it.
 
 ### Selection tuning
 
@@ -78,7 +90,7 @@ Events are grouped by how their Kinch score is derived:
 
 **`parse_sql_row(line)`** — parse a single SQL VALUES row like `(123,456,'text with spaces',...)`. Handles quoted strings (single quotes, escaped `''`), NULL literals, integers, floats, and bare strings. Deliberately simple to stay fast over 50M+ lines.
 
-**`main()`** — run the full pipeline: parse → PBs → WRs → Kinch → JSON.
+**`main()`** — run the full pipeline: parse → PBs → WRs → Kinch → global pre-computed → JSON.
 
 ### Scaling notes
 
@@ -101,11 +113,24 @@ WR/country-WR data assembled at the top level contains per-gender baselines (`"a
 
 ## index.html — Frontend
 
+### Loading strategy (two-phase)
+
+1. `1000.js` loads synchronously — sets `window.KINCH_QUICK` with top 1000 pre-computed entries + world-record baselines. Small file (~200KB), loads instantly.
+2. `data.js` loads asynchronously via a dynamic `<script>` tag — sets `window.KINCH_DATA` with the full dataset (~76MB).
+
+On page load:
+- **Quick mode**: renders the table immediately from `KINCH_QUICK`. Country/continent/debut-year filters are shown but disabled with "Loading" text. Gender, event group, clock, search, and page size filters are fully functional.
+- **Full mode** (after `data.js` loads): all filters are enabled, dropdowns populated with complete country/continent lists and counts. The cache is cleared and the table re-renders with full data.
+
 ### Data flow
 
-`data.js` (generated by `build.py`) is loaded via a `<script>` tag. It sets `window.KINCH_DATA` containing raw personal bests (`pbs`) per person, plus world-record baselines: global (`wr`) and per-country (`cwr`).
+`1000.js` and `data.js` (both generated by `build.py`) are loaded via `<script>` tags. `KINCH_QUICK` contains pre-computed event scores and overall for the top 1000, so no computation is needed for the default view. `KINCH_DATA` contains raw personal bests (`pbs`) per person, plus world-record baselines: global (`wr`), per-country (`cwr`), and per-continent (`conwr`).
 
-Event scores are NOT pre-computed in the JS file. Instead, `computeKinch(pbs, wr, activeEvents)` calculates them on the fly. This allows switching baselines instantly (World vs. country) and toggling the Clock event without re-fetching data.
+For non-default filter combinations, `computeKinch(pbs, wr, activeEvents)` calculates scores on the fly. This allows switching baselines instantly (World vs. country) and toggling the Clock event without re-fetching data.
+
+### Result cache
+
+A `resultsCache` object keyed by filter signature (`country|continent|gender|group|clock|since|until`) stores full sorted entry arrays. Subsequent renders with the same filters skip the expensive `computeKinch` step entirely. The cache is cleared when `data.js` finishes loading (to ensure fresh pbs from `personLookup`).
 
 ### Key functions
 
@@ -114,8 +139,13 @@ Event scores are NOT pre-computed in the JS file. Instead, `computeKinch(pbs, wr
 | `decodeMbf(wca)` | Decode WCA multi-blind integer → raw Kinch score. Returns null for DNF (-1), DNS (-2), or skipped (0). Logic mirrors `decode_mbf` + `compute_kinch_mbf` in `build.py`. |
 | `computeKinch(pbs, wr, activeEvents)` | Compute `{ scores, overall }` from raw PBs + WR baseline. Each event score is capped at 100. Overall = average across `activeEvents` (missing events contribute 0). |
 | `getWR()` | Returns the right WR baseline. Hierarchy: country > continent > world. |
-| `getEntries()` | Collects entries for the current view, filtered by country, continent, gender, and debut year. |
-| `renderTable()` | Builds/refreshes the HTML table. Applies column-sort on top of the default overall sort. Paginates with global ranks. |
+| `getEntries()` | Collects entries for the current view, filtered by country, continent, gender, and debut year. Falls back to precomputed entries in quick mode. |
+| `renderTable()` | Builds/refreshes the HTML table. Uses pre-computed data for default view, result cache for repeated filters, or computes from scratch. Applies column-sort on top of the default overall sort. Paginates with global ranks. |
+| `renderPage()` | Fast page-only render — slices cached `_lastEntries` without recomputation. Pre-builds the next page's tbody HTML for instant pagination. |
+| `isDefaultFilters()` | Returns true when all filters are at their default values (World, All events, All genders, no clock, full date range). |
+| `onFullDataLoaded()` | Callback when `data.js` finishes. Rebuilds `personLookup`, clears cache, enables disabled filters, and re-initializes the UI. Defers if profile view is active. |
+| `showProfile()` / `hideProfile()` | Toggle between rankings table and single-person profile view. Hide legends/subtitle in profile view. On back, triggers pending full-data refresh if data loaded while profile was open. |
+| `setLanguage(lang)` | Switch locale. If profile view is open, closes it first before re-rendering. |
 
 ### Event classification (must match build.py)
 
@@ -126,14 +156,18 @@ Event scores are NOT pre-computed in the JS file. Instead, `computeKinch(pbs, wr
 ### Visual hints (dark mode)
 
 - Scores ≥ 90: bold
-- Scores = 100: green + bold (world record tier)
+- Scores = 100: gold + bold (world record tier)
 
 ### Visual hints (light mode)
 
 - Scores ≥ 90: bold
-- Scores = 100: blue + bold (world record tier)
+- Scores = 100: red + bold (world record tier)
 - Overall scores: always bold + dark orange
 
 ### Column sort behavior
 
 The default sort is by overall score (descending). Column sort is applied on top. The top-200 per-event slice happens AFTER the column sort so that event specialists (e.g. #1 in 5BLD but low overall) surface correctly.
+
+### Pagination & preloading
+
+Default page size is 100. After rendering the current page, the next page's table body HTML is built asynchronously and cached. Clicking "Next" uses the pre-built HTML for an instant transition, then pre-builds the following page.

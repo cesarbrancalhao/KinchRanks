@@ -24,7 +24,6 @@ def _load_dotenv():
 _load_dotenv()
 
 DUMP_PATH = os.environ["DUMP_PATH"]
-OUTPUT_PATH = os.environ["OUTPUT_PATH"]
 
 KINCH_EVENTS = [
     "333", "222", "444", "555", "666", "777",
@@ -542,9 +541,6 @@ def main():
 
         for rank, entry in enumerate(top_entries, 1):
             entry["rank"] = rank
-            del entry["overall"]
-            del entry["_scores"]
-            del entry["_n_events"]
             for pb in entry.get("pbs", {}).values():
                 if pb.get("sc"):
                     used_comp_ids.add(pb["sc"])
@@ -573,6 +569,56 @@ def main():
         if confid in CONTINENT_NAMES:
             conwr_data[confid] = {gk: _filter_wr(conwr[confid][gk]) for gk in ("all", "m", "f")}
 
+    print("Building global pre-computed rankings (World / All events / All genders)...", flush=True)
+    global_entries = []
+    w = wr["all"]
+    ws = w["single"]
+    wa = w["average"]
+    wm = w["mbf_score"]
+    for cid, cdata in result.items():
+        for entry in cdata["entries"]:
+            scores = {}
+            for eid in KINCH_EVENTS:
+                pb = entry["pbs"].get(eid, {})
+                kinch = 0.0
+                if eid == MBF_EVENT:
+                    sv = pb.get("s")
+                    if sv is not None and wm and wm > 0:
+                        raw = compute_kinch_mbf(sv)
+                        if raw is not None:
+                            kinch = raw / wm * 100
+                elif eid in AVERAGE_EVENTS:
+                    av = pb.get("a")
+                    wv = wa.get(eid)
+                    if av is not None and av > 0 and wv and wv > 0:
+                        kinch = wv / av * 100
+                elif eid in BETTER_OF_EVENTS:
+                    sv = pb.get("s")
+                    av = pb.get("a")
+                    ks = 0.0
+                    ka = 0.0
+                    wvs = ws.get(eid)
+                    wva = wa.get(eid)
+                    if sv is not None and sv > 0 and wvs and wvs > 0:
+                        ks = wvs / sv * 100
+                    if av is not None and av > 0 and wva and wva > 0:
+                        ka = wva / av * 100
+                    kinch = max(ks, ka)
+                scores[eid] = round(min(kinch, 100.0), 2)
+            overall = round(sum(scores.values()) / len(KINCH_EVENTS), 2)
+            global_entries.append({
+                "id": entry["id"],
+                "name": entry["name"],
+                "country": entry["country"],
+                "continent": entry["continent"],
+                "gender": entry["gender"],
+                "overall": overall,
+                "events": scores,
+            })
+    global_entries.sort(key=lambda x: x["overall"], reverse=True)
+    precomputed = global_entries[:1000]
+    print(f"  Pre-computed {len(precomputed)} entries for default view", flush=True)
+
     comps_output = {cid: comp_names[cid] for cid in used_comp_ids if cid in comp_names}
 
     output = {
@@ -584,6 +630,7 @@ def main():
         "continents": CONTINENT_NAMES,
         "countries": result,
         "competitions": comps_output,
+        "precomputed": precomputed,
     }
 
     total_entries = sum(v["count"] for v in result.values())
@@ -591,16 +638,24 @@ def main():
     print(f"  {len(result)} countries, {total_entries} total entries, {count_200} with 200+ entries", flush=True)
     print(f"  {len(comps_output)} competitions referenced in output", flush=True)
 
-    with open(OUTPUT_PATH, "w") as f:
-        json.dump(output, f, ensure_ascii=False)
-    print(f"Wrote {OUTPUT_PATH}", flush=True)
-
     data_js = os.path.join(os.path.dirname(__file__), "data.js")
     with open(data_js, "w") as f:
         f.write("window.KINCH_DATA=")
         json.dump(output, f, ensure_ascii=False)
         f.write(";")
     print(f"Wrote {data_js}", flush=True)
+
+    quick_data = {
+        "entries": precomputed,
+        "wr": wr_data["all"],
+        "generated_at": output["generated_at"],
+    }
+    quick_js = os.path.join(os.path.dirname(__file__), "1000.js")
+    with open(quick_js, "w") as f:
+        f.write("window.KINCH_QUICK=")
+        json.dump(quick_data, f, ensure_ascii=False)
+        f.write(";")
+    print(f"Wrote {quick_js}", flush=True)
 
 
 if __name__ == "__main__":
