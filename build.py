@@ -157,10 +157,28 @@ def parse_sql_row(line):
     return fields
 
 
+def _compute_rank(sorted_items):
+    result = {}
+    rank = 0
+    prev_val = None
+    prev_rank = 0
+    for val, pid in sorted_items:
+        rank += 1
+        if val is not None and val == prev_val:
+            actual_rank = prev_rank
+        else:
+            actual_rank = rank
+            prev_rank = rank
+        prev_val = val
+        result[pid] = actual_rank
+    return result
+
+
 def main():
     persons = {}
     pbs = defaultdict(lambda: defaultdict(dict))
     country_continent = {}
+    comp_names = {}
 
     in_table = None
     line_no = 0
@@ -171,6 +189,9 @@ def main():
             line_no += 1
             stripped = line.strip()
 
+            if stripped.startswith("INSERT INTO `competitions` VALUES") or stripped.startswith("INSERT INTO `Competitions` VALUES"):
+                in_table = "competitions"
+                continue
             if stripped.startswith("INSERT INTO `countries` VALUES"):
                 in_table = "countries"
                 continue
@@ -188,7 +209,16 @@ def main():
                     in_table = None
                     continue
 
-                if in_table == "persons":
+                if in_table == "competitions":
+                    row = parse_sql_row(line)
+                    if row is None or len(row) < 49:
+                        continue
+                    cid = row[0]
+                    cname = row[48]
+                    if cid and cname:
+                        comp_names[cid] = cname
+
+                elif in_table == "persons":
                     row = parse_sql_row(line)
                     if row is None or len(row) < 9:
                         continue
@@ -213,6 +243,7 @@ def main():
                     if row is None or len(row) < 8:
                         continue
                     try:
+                        competition_id = row[3]
                         event_id = row[5]
                         person_id = row[7]
                         average = row[1]
@@ -227,7 +258,7 @@ def main():
 
                     result_count += 1
                     if result_count % 500000 == 0:
-                        print(f"  line {line_no}: {result_count} results, {len(persons)} persons, {len(pbs)} with PBs", flush=True)
+                        print(f"  line {line_no}: {result_count} results, {len(persons)} persons, {len(pbs)} with PBs, {len(comp_names)} comps", flush=True)
 
                     entry = pbs[person_id][event_id]
 
@@ -236,17 +267,20 @@ def main():
                             cur = entry.get("single")
                             if cur is None or best < cur:
                                 entry["single"] = best
+                                entry["single_comp"] = competition_id
                         else:
                             cur = entry.get("single")
                             if cur is None or best < cur:
                                 entry["single"] = best
+                                entry["single_comp"] = competition_id
 
                     if isinstance(average, int) and average > 0:
                         cur = entry.get("average")
                         if cur is None or average < cur:
                             entry["average"] = average
+                            entry["average_comp"] = competition_id
 
-    print(f"Parsed: {len(persons)} persons, {result_count} results, {len(pbs)} with PBs", flush=True)
+    print(f"Parsed: {len(persons)} persons, {result_count} results, {len(pbs)} with PBs, {len(comp_names)} comps", flush=True)
     print(f"  Country→continent mappings: {len(country_continent)}", flush=True)
 
     for p in persons.values():
@@ -316,6 +350,74 @@ def main():
                             if event_id not in acoe or a < acoe.get(event_id, float("inf")):
                                 acoe[event_id] = a
 
+    print("Computing event ranks (NR/CR/WR)...", flush=True)
+
+    for eid in KINCH_EVENTS_ALL:
+        s_world = []
+        a_world = []
+        s_by_country = defaultdict(list)
+        a_by_country = defaultdict(list)
+        s_by_continent = defaultdict(list)
+        a_by_continent = defaultdict(list)
+
+        for pid, events in pbs.items():
+            person = persons.get(pid)
+            if not person:
+                continue
+            cid = person["country_id"]
+            conid = person.get("continent_id", "")
+            vals = events.get(eid)
+            if not vals:
+                continue
+
+            sv = vals.get("single")
+            if sv is not None and sv > 0:
+                s_world.append((sv, pid))
+                s_by_country[cid].append((sv, pid))
+                if conid:
+                    s_by_continent[conid].append((sv, pid))
+
+            av = vals.get("average")
+            if av is not None and av > 0:
+                a_world.append((av, pid))
+                a_by_country[cid].append((av, pid))
+                if conid:
+                    a_by_continent[conid].append((av, pid))
+
+        s_world.sort(key=lambda x: x[0])
+        a_world.sort(key=lambda x: x[0])
+
+        wr_s = _compute_rank(s_world)
+        wr_a = _compute_rank(a_world)
+
+        nr_s = {cid: _compute_rank(sorted(items, key=lambda x: x[0])) for cid, items in s_by_country.items()}
+        nr_a = {cid: _compute_rank(sorted(items, key=lambda x: x[0])) for cid, items in a_by_country.items()}
+
+        cr_s = {conid: _compute_rank(sorted(items, key=lambda x: x[0])) for conid, items in s_by_continent.items()}
+        cr_a = {conid: _compute_rank(sorted(items, key=lambda x: x[0])) for conid, items in a_by_continent.items()}
+
+        for pid, events in pbs.items():
+            person = persons.get(pid)
+            if not person:
+                continue
+            cid = person["country_id"]
+            conid = person.get("continent_id", "")
+            vals = events.get(eid)
+            if not vals:
+                continue
+
+            if vals.get("single") is not None and vals["single"] > 0:
+                vals["sr"] = (nr_s.get(cid) or {}).get(pid)
+                vals["swr"] = wr_s.get(pid)
+                if conid:
+                    vals["scr"] = (cr_s.get(conid) or {}).get(pid)
+
+            if vals.get("average") is not None and vals["average"] > 0:
+                vals["ar"] = (nr_a.get(cid) or {}).get(pid)
+                vals["awr"] = wr_a.get(pid)
+                if conid:
+                    vals["acr"] = (cr_a.get(conid) or {}).get(pid)
+
     active_countries = {person["country_id"] for pid, person in persons.items() if pbs.get(pid)}
 
     print(f"  WR single (all): {wr['all']['single']}", flush=True)
@@ -382,9 +484,25 @@ def main():
             s = vals.get("single")
             if s is not None and s > 0:
                 pb["s"] = s
+                if vals.get("single_comp"):
+                    pb["sc"] = vals["single_comp"]
+                if vals.get("sr") is not None:
+                    pb["sr"] = vals["sr"]
+                if vals.get("swr") is not None:
+                    pb["swr"] = vals["swr"]
+                if vals.get("scr") is not None:
+                    pb["scr"] = vals["scr"]
             a = vals.get("average")
             if a is not None and a > 0:
                 pb["a"] = a
+                if vals.get("average_comp"):
+                    pb["ac"] = vals["average_comp"]
+                if vals.get("ar") is not None:
+                    pb["ar"] = vals["ar"]
+                if vals.get("awr") is not None:
+                    pb["awr"] = vals["awr"]
+                if vals.get("acr") is not None:
+                    pb["acr"] = vals["acr"]
             if pb:
                 entry_pbs[event_id] = pb
 
@@ -403,6 +521,8 @@ def main():
     print(f"  Computed scores for {sum(len(v) for v in by_country.values())} persons", flush=True)
 
     result = {}
+    used_comp_ids = set()
+
     for cid, entries in sorted(by_country.items()):
         entries.sort(key=lambda x: x["overall"], reverse=True)
 
@@ -425,6 +545,12 @@ def main():
             del entry["overall"]
             del entry["_scores"]
             del entry["_n_events"]
+            for pb in entry.get("pbs", {}).values():
+                if pb.get("sc"):
+                    used_comp_ids.add(pb["sc"])
+                if pb.get("ac"):
+                    used_comp_ids.add(pb["ac"])
+
         result[cid] = {
             "name": cid,
             "count": len(top_entries),
@@ -447,6 +573,8 @@ def main():
         if confid in CONTINENT_NAMES:
             conwr_data[confid] = {gk: _filter_wr(conwr[confid][gk]) for gk in ("all", "m", "f")}
 
+    comps_output = {cid: comp_names[cid] for cid in used_comp_ids if cid in comp_names}
+
     output = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y/%m/%d"),
         "wr": wr_data,
@@ -455,11 +583,13 @@ def main():
         "country_continent": country_continent,
         "continents": CONTINENT_NAMES,
         "countries": result,
+        "competitions": comps_output,
     }
 
     total_entries = sum(v["count"] for v in result.values())
     count_200 = sum(1 for v in result.values() if v["count"] >= 200)
     print(f"  {len(result)} countries, {total_entries} total entries, {count_200} with 200+ entries", flush=True)
+    print(f"  {len(comps_output)} competitions referenced in output", flush=True)
 
     with open(OUTPUT_PATH, "w") as f:
         json.dump(output, f, ensure_ascii=False)
