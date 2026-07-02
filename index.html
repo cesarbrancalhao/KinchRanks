@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.png">
 <title>Kinch Ranks</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; }
@@ -60,8 +61,10 @@ td:nth-child(3) { font-weight: 700; color: #f0883e; }
 .pagination button:disabled { opacity: 0.4; cursor: default; }
 .pagination .info { font-size: 13px; color: #8b949e; margin: 0 8px; }
 
-.theme-toggle { position: absolute; top: 24px; right: 24px; padding: 5px 14px; border: 1px solid #30363d; border-radius: 6px; background: #21262d; color: #c9d1d9; font-size: 13px; cursor: pointer; }
+.theme-toggle { padding: 5px 14px; border: 1px solid #30363d; border-radius: 6px; background: #21262d; color: #c9d1d9; font-size: 13px; cursor: pointer; }
 .theme-toggle:hover { background: #30363d; }
+#langSelect { padding: 5px 8px; border: 1px solid #30363d; border-radius: 6px; background: #21262d; color: #c9d1d9; font-size: 13px; cursor: pointer; }
+#langSelect:hover { background: #30363d; }
 
 body.light { background: #fff; color: #222; }
 body.light .subtitle { color: #666; }
@@ -108,63 +111,78 @@ body.light .pagination .info { color: #666; }
 
 body.light .theme-toggle { background: #0055A4; border-color: #0055A4; color: #fff; }
 body.light .theme-toggle:hover { background: #004494; }
+body.light #langSelect { background: #0055A4; border-color: #0055A4; color: #fff; }
+body.light #langSelect:hover { background: #004494; }
 </style>
 </head>
 <body>
 <div class="container">
-  <h1><a href="https://github.com/cesarbrancalhao" target="_blank" style="color:inherit;">MCBF</a> Kinch Ranks</h1>
-  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ Day</button>
-  <p class="subtitle">Higher score is better (max 100). <span id="genDate" style="color:#484f58"></span></p>
-  <p class="legend">Kinch score = average of (WR / personal record × 100) across all 17 events. Missing events count as 0. MBF uses points + time ratio.</p>
-  <p class="legend"><span class="showing-time single" style="font-weight:700;white-space:normal">Blue</span> = single solve &nbsp; <span class="showing-time average" style="font-weight:700;white-space:normal">Green</span> = average. Click any score to reveal the underlying times.</p>
+  <h1><a href="https://github.com/cesarbrancalhao" target="_blank" style="color:inherit;">MCBF</a> <span data-i18n="title">Kinch Ranks</span></h1>
+  <div style="position:absolute;top:24px;right:24px;display:flex;gap:8px;align-items:center">
+    <select id="langSelect" onchange="setLanguage(this.value)">
+      <option value="en">English</option>
+      <option value="pt">Português</option>
+      <option value="es">Español</option>
+      <option value="de">Deutsch</option>
+      <option value="it">Italiano</option>
+      <option value="ca">Català</option>
+      <option value="ko">한국어</option>
+      <option value="zh">中文</option>
+      <option value="vi">Tiếng Việt</option>
+    </select>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ Day</button>
+  </div>
+  <p class="subtitle"><span data-i18n="subtitle">Higher score is better (max 100).</span> <span id="genDate" style="color:#484f58"></span></p>
+  <p class="legend" data-i18n="legendKinch">Kinch score = average of (WR / personal record × 100) across all 17 events. Missing events count as 0. MBF uses points + time ratio.</p>
+  <p class="legend"><span class="showing-time single" style="font-weight:700;white-space:normal" data-i18n="legendBlue">Blue</span><span data-i18n="legendSingle"> = single solve</span> &nbsp; <span class="showing-time average" style="font-weight:700;white-space:normal" data-i18n="legendGreen">Green</span><span data-i18n="legendAverage"> = average. Click any score to reveal the underlying times.</span></p>
 
   <div class="controls" id="controls" style="display:none">
     <div class="ctrl-row">
       <div class="ctrl-cell">
-        <span class="cg-label">Country / Region</span>
+        <span class="cg-label" data-i18n="countryRegion">Country / Region</span>
         <select id="continentSelect">
-          <option value="__world__">World</option>
+          <option value="__world__" data-i18n="world">World</option>
         </select>
         <select id="countrySelect"></select>
       </div>
       <div class="ctrl-cell">
-        <span class="cg-label">Events</span>
+        <span class="cg-label" data-i18n="events">Events</span>
         <select id="groupSelect">
-          <option value="__all__">All events</option>
-          <option value="nxn">NxN</option>
-          <option value="big">Big cubes</option>
-          <option value="bld">BLD</option>
-          <option value="nonbld">Non-BLD</option>
-          <option value="other">Other events</option>
+          <option value="__all__" data-i18n="allEvents">All events</option>
+          <option value="nxn" data-i18n="nxn">NxN</option>
+          <option value="big" data-i18n="bigCubes">Big cubes</option>
+          <option value="bld" data-i18n="bld">BLD</option>
+          <option value="nonbld" data-i18n="nonBld">Non-BLD</option>
+          <option value="other" data-i18n="otherEvents">Other events</option>
         </select>
       </div>
     </div>
     <div class="ctrl-row">
       <div class="ctrl-cell">
-        <span class="cg-label">Gender</span>
+        <span class="cg-label" data-i18n="gender">Gender</span>
         <select id="genderSelect">
-          <option value="all">All</option>
-          <option value="m">Male</option>
-          <option value="f">Female</option>
+          <option value="all" data-i18n="all">All</option>
+          <option value="m" data-i18n="male">Male</option>
+          <option value="f" data-i18n="female">Female</option>
         </select>
       </div>
       <div class="ctrl-cell">
-        <span class="cg-label">Name</span>
-        <input type="text" id="search" placeholder="Search...">
+        <span class="cg-label" data-i18n="name">Name</span>
+        <input type="text" id="search" data-i18n="searchPlaceholder" placeholder="Search...">
       </div>
     </div>
     <div class="ctrl-row">
       <div class="ctrl-cell">
-        <span class="cg-label">Debut</span>
+        <span class="cg-label" data-i18n="debut">Debut</span>
         <select id="sinceSelect">
-          <option value="0">After</option>
+          <option value="0" data-i18n="after">After</option>
         </select>
         <select id="untilSelect">
-          <option value="9999">Before</option>
+          <option value="9999" data-i18n="before">Before</option>
         </select>
       </div>
       <div class="ctrl-cell">
-        <span class="cg-label">Show</span>
+        <span class="cg-label" data-i18n="show">Show</span>
         <select id="pageSizeSelect">
           <option value="50">50</option>
           <option value="100" selected>100</option>
@@ -173,17 +191,440 @@ body.light .theme-toggle:hover { background: #004494; }
           <option value="500">500</option>
           <option value="1000">1000</option>
         </select>
-        <label class="clock-label">Clock <input type="checkbox" id="includeClock"></label>
+        <label class="clock-label"><span data-i18n="clock">Clock</span> <input type="checkbox" id="includeClock"></label>
       </div>
     </div>
   </div>
-  <div id="status" class="status">Loading data...</div>
+  <div id="status" class="status" data-i18n="loadingData">Loading data...</div>
   <div class="table-wrap" id="tableWrap" style="display:none"></div>
   <div id="pagination" class="pagination" style="display:none"></div>
 </div>
 
 <script src="data.js"></script>
 <script>
+const LANG = {
+  en: {
+    title: "Kinch Ranks",
+    subtitle: "Higher score is better (max 100).",
+    generated: "Generated",
+    legendKinch: "Kinch score = average of (WR / personal record × 100) across all 17 events. Missing events count as 0. MBF uses points + time ratio.",
+    legendBlue: "Blue",
+    legendSingle: " = single solve",
+    legendGreen: "Green",
+    legendAverage: " = average. Click any score to reveal the underlying times.",
+    countryRegion: "Country / Region",
+    events: "Events",
+    gender: "Gender",
+    name: "Name",
+    debut: "Debut",
+    show: "Show",
+    clock: "Clock",
+    searchPlaceholder: "Search...",
+    world: "World",
+    all: "All",
+    male: "Male",
+    female: "Female",
+    allEvents: "All events",
+    nxn: "NxN",
+    bigCubes: "Big cubes",
+    bld: "BLD",
+    nonBld: "Non-BLD",
+    otherEvents: "Other events",
+    after: "After",
+    before: "Before",
+    day: "☀ Day",
+    night: "☾ Night",
+    loadingData: "Loading data...",
+    noData: "No data found.",
+    total: "total",
+    first: "First",
+    prev: "Prev",
+    next: "Next",
+    last: "Last",
+    colRank: "#",
+    colPerson: "Person",
+    colOverall: "Overall",
+    colEvts: "Evts",
+    mbfIn: " in ",
+  },
+  pt: {
+    title: "Kinch Ranks",
+    subtitle: "Quanto maior a pontuação, melhor (máx. 100).",
+    generated: "Gerado em",
+    legendKinch: "Pontuação Kinch = média de (WR / recorde pessoal × 100) nos 17 eventos. Eventos sem resultado contam como 0. MBF usa pontos + razão de tempo.",
+    legendBlue: "Azul",
+    legendSingle: " = single",
+    legendGreen: "Verde",
+    legendAverage: " = média. Clique em qualquer pontuação para ver os tempos.",
+    countryRegion: "País / Região",
+    events: "Eventos",
+    gender: "Gênero",
+    name: "Nome",
+    debut: "Estreia",
+    show: "Exibir",
+    clock: "Clock",
+    searchPlaceholder: "Buscar...",
+    world: "Mundo",
+    all: "Todos",
+    male: "Masculino",
+    female: "Feminino",
+    allEvents: "Todos os eventos",
+    nxn: "NxN",
+    bigCubes: "Cubos grandes",
+    bld: "BLD",
+    nonBld: "Não-BLD",
+    otherEvents: "Outros eventos",
+    after: "Depois de",
+    before: "Antes de",
+    day: "☀ Dia",
+    night: "☾ Noite",
+    loadingData: "Carregando dados...",
+    noData: "Nenhum dado encontrado.",
+    total: "total",
+    first: "Início",
+    prev: "Anterior",
+    next: "Próximo",
+    last: "Fim",
+    colRank: "#",
+    colPerson: "Pessoa",
+    colOverall: "Geral",
+    colEvts: "Evts",
+    mbfIn: " em ",
+  },
+  es: {
+    title: "Kinch Ranks",
+    subtitle: "Mayor puntuación es mejor (máx. 100).",
+    generated: "Generado",
+    legendKinch: "Puntuación Kinch = promedio de (WR / récord personal × 100) en los 17 eventos. Eventos sin resultado cuentan como 0. MBF usa puntos + ratio de tiempo.",
+    legendBlue: "Azul",
+    legendSingle: " = single",
+    legendGreen: "Verde",
+    legendAverage: " = media. Haz clic en cualquier puntuación para ver los tiempos.",
+    countryRegion: "País / Región",
+    events: "Eventos",
+    gender: "Género",
+    name: "Nombre",
+    debut: "Debut",
+    show: "Mostrar",
+    clock: "Clock",
+    searchPlaceholder: "Buscar...",
+    world: "Mundo",
+    all: "Todos",
+    male: "Masculino",
+    female: "Femenino",
+    allEvents: "Todos los eventos",
+    nxn: "NxN",
+    bigCubes: "Cubos grandes",
+    bld: "BLD",
+    nonBld: "No-BLD",
+    otherEvents: "Otros eventos",
+    after: "Después de",
+    before: "Antes de",
+    day: "☀ Día",
+    night: "☾ Noche",
+    loadingData: "Cargando datos...",
+    noData: "No se encontraron datos.",
+    total: "total",
+    first: "Inicio",
+    prev: "Anterior",
+    next: "Siguiente",
+    last: "Final",
+    colRank: "#",
+    colPerson: "Persona",
+    colOverall: "General",
+    colEvts: "Evts",
+    mbfIn: " en ",
+  },
+  de: {
+    title: "Kinch Ranks",
+    subtitle: "Höhere Punktzahl ist besser (max. 100).",
+    generated: "Erstellt",
+    legendKinch: "Kinch-Wertung = Durchschnitt von (WR / persönlicher Rekord × 100) über alle 17 Events. Fehlende Events zählen als 0. MBF nutzt Punkte + Zeitverhältnis.",
+    legendBlue: "Blau",
+    legendSingle: " = Single",
+    legendGreen: "Grün",
+    legendAverage: " = Durchschnitt. Klicke auf eine Wertung, um die Zeiten anzuzeigen.",
+    countryRegion: "Land / Region",
+    events: "Events",
+    gender: "Geschlecht",
+    name: "Name",
+    debut: "Debüt",
+    show: "Anzeigen",
+    clock: "Clock",
+    searchPlaceholder: "Suchen...",
+    world: "Welt",
+    all: "Alle",
+    male: "Männlich",
+    female: "Weiblich",
+    allEvents: "Alle Events",
+    nxn: "NxN",
+    bigCubes: "Große Cubes",
+    bld: "BLD",
+    nonBld: "Nicht-BLD",
+    otherEvents: "Andere Events",
+    after: "Nach",
+    before: "Vor",
+    day: "☀ Tag",
+    night: "☾ Nacht",
+    loadingData: "Daten werden geladen...",
+    noData: "Keine Daten gefunden.",
+    total: "gesamt",
+    first: "Erste",
+    prev: "Zurück",
+    next: "Weiter",
+    last: "Letzte",
+    colRank: "#",
+    colPerson: "Person",
+    colOverall: "Gesamt",
+    colEvts: "Evts",
+    mbfIn: " in ",
+  },
+  it: {
+    title: "Kinch Ranks",
+    subtitle: "Punteggio più alto è migliore (max. 100).",
+    generated: "Generato",
+    legendKinch: "Punteggio Kinch = media di (WR / record personale × 100) su tutti i 17 eventi. Eventi mancanti contano come 0. MBF usa punti + rapporto tempo.",
+    legendBlue: "Blu",
+    legendSingle: " = singolo",
+    legendGreen: "Verde",
+    legendAverage: " = media. Clicca su un punteggio per vedere i tempi.",
+    countryRegion: "Paese / Regione",
+    events: "Eventi",
+    gender: "Genere",
+    name: "Nome",
+    debut: "Debutto",
+    show: "Mostra",
+    clock: "Clock",
+    searchPlaceholder: "Cerca...",
+    world: "Mondo",
+    all: "Tutti",
+    male: "Maschile",
+    female: "Femminile",
+    allEvents: "Tutti gli eventi",
+    nxn: "NxN",
+    bigCubes: "Cubi grandi",
+    bld: "BLD",
+    nonBld: "Non-BLD",
+    otherEvents: "Altri eventi",
+    after: "Dopo",
+    before: "Prima",
+    day: "☀ Giorno",
+    night: "☾ Notte",
+    loadingData: "Caricamento dati...",
+    noData: "Nessun dato trovato.",
+    total: "totale",
+    first: "Inizio",
+    prev: "Prec",
+    next: "Succ",
+    last: "Fine",
+    colRank: "#",
+    colPerson: "Persona",
+    colOverall: "Generale",
+    colEvts: "Evts",
+    mbfIn: " in ",
+  },
+  ca: {
+    title: "Kinch Ranks",
+    subtitle: "Com més alta la puntuació, millor (màx. 100).",
+    generated: "Generat",
+    legendKinch: "Puntuació Kinch = mitjana de (WR / rècord personal × 100) en els 17 esdeveniments. Esdeveniments sense resultat compten com a 0. MBF usa punts + ràtio de temps.",
+    legendBlue: "Blau",
+    legendSingle: " = single",
+    legendGreen: "Verd",
+    legendAverage: " = mitjana. Fes clic en qualsevol puntuació per veure els temps.",
+    countryRegion: "País / Regió",
+    events: "Esdeveniments",
+    gender: "Gènere",
+    name: "Nom",
+    debut: "Debut",
+    show: "Mostra",
+    clock: "Clock",
+    searchPlaceholder: "Cercar...",
+    world: "Món",
+    all: "Tots",
+    male: "Masculí",
+    female: "Femení",
+    allEvents: "Tots els esdeveniments",
+    nxn: "NxN",
+    bigCubes: "Cubs grans",
+    bld: "BLD",
+    nonBld: "No-BLD",
+    otherEvents: "Altres esdeveniments",
+    after: "Després de",
+    before: "Abans de",
+    day: "☀ Dia",
+    night: "☾ Nit",
+    loadingData: "Carregant dades...",
+    noData: "No s'han trobat dades.",
+    total: "total",
+    first: "Inici",
+    prev: "Anterior",
+    next: "Següent",
+    last: "Final",
+    colRank: "#",
+    colPerson: "Persona",
+    colOverall: "General",
+    colEvts: "Evts",
+    mbfIn: " en ",
+  },
+  ko: {
+    title: "Kinch Ranks",
+    subtitle: "점수가 높을수록 좋습니다 (최대 100).",
+    generated: "생성일",
+    legendKinch: "Kinch 점수 = 17개 종목 (WR / 개인 기록 × 100)의 평균. 기록이 없는 종목은 0점. MBF는 점수 + 시간 비율 사용.",
+    legendBlue: "파랑",
+    legendSingle: " = 싱글",
+    legendGreen: "초록",
+    legendAverage: " = 평균. 점수를 클릭하면 기록 시간을 볼 수 있습니다.",
+    countryRegion: "국가 / 지역",
+    events: "종목",
+    gender: "성별",
+    name: "이름",
+    debut: "데뷔",
+    show: "표시",
+    clock: "Clock",
+    searchPlaceholder: "검색...",
+    world: "전체",
+    all: "전체",
+    male: "남성",
+    female: "여성",
+    allEvents: "전체 종목",
+    nxn: "NxN",
+    bigCubes: "큰 큐브",
+    bld: "BLD",
+    nonBld: "비BLD",
+    otherEvents: "기타 종목",
+    after: "이후",
+    before: "이전",
+    day: "☀ 낮",
+    night: "☾ 밤",
+    loadingData: "데이터 로딩 중...",
+    noData: "데이터가 없습니다.",
+    total: "명",
+    first: "처음",
+    prev: "이전",
+    next: "다음",
+    last: "마지막",
+    colRank: "#",
+    colPerson: "선수",
+    colOverall: "종합",
+    colEvts: "종목",
+    mbfIn: " ",
+  },
+  zh: {
+    title: "Kinch Ranks",
+    subtitle: "分数越高越好（最高100）。",
+    generated: "生成于",
+    legendKinch: "Kinch 分数 = 17个项目 (WR / 个人纪录 × 100) 的平均值。无成绩项目计为0。多盲使用分数+时间比率。",
+    legendBlue: "蓝",
+    legendSingle: " = 单次",
+    legendGreen: "绿",
+    legendAverage: " = 平均。点击分数可查看原始成绩。",
+    countryRegion: "国家 / 地区",
+    events: "项目",
+    gender: "性别",
+    name: "姓名",
+    debut: "首次参赛",
+    show: "显示",
+    clock: "Clock",
+    searchPlaceholder: "搜索...",
+    world: "世界",
+    all: "全部",
+    male: "男",
+    female: "女",
+    allEvents: "全部项目",
+    nxn: "NxN",
+    bigCubes: "高阶",
+    bld: "盲拧",
+    nonBld: "非盲",
+    otherEvents: "其他项目",
+    after: "之后",
+    before: "之前",
+    day: "☀ 日间",
+    night: "☾ 夜间",
+    loadingData: "加载数据中...",
+    noData: "未找到数据。",
+    total: "人",
+    first: "首页",
+    prev: "上一页",
+    next: "下一页",
+    last: "末页",
+    colRank: "#",
+    colPerson: "选手",
+    colOverall: "总分",
+    colEvts: "项目",
+    mbfIn: " ",
+  },
+  vi: {
+    title: "Kinch Ranks",
+    subtitle: "Điểm càng cao càng tốt (tối đa 100).",
+    generated: "Tạo lúc",
+    legendKinch: "Điểm Kinch = trung bình của (WR / kỷ lục cá nhân × 100) trên 17 nội dung. Nội dung không có kết quả tính là 0. MBF dùng điểm + tỉ lệ thời gian.",
+    legendBlue: "Xanh dương",
+    legendSingle: " = single",
+    legendGreen: "Xanh lá",
+    legendAverage: " = trung bình. Nhấp vào điểm số để xem thời gian.",
+    countryRegion: "Quốc gia / Khu vực",
+    events: "Nội dung",
+    gender: "Giới tính",
+    name: "Tên",
+    debut: "Ra mắt",
+    show: "Hiển thị",
+    clock: "Clock",
+    searchPlaceholder: "Tìm kiếm...",
+    world: "Thế giới",
+    all: "Tất cả",
+    male: "Nam",
+    female: "Nữ",
+    allEvents: "Tất cả nội dung",
+    nxn: "NxN",
+    bigCubes: "Cube lớn",
+    bld: "BLD",
+    nonBld: "Không BLD",
+    otherEvents: "Nội dung khác",
+    after: "Sau",
+    before: "Trước",
+    day: "☀ Ngày",
+    night: "☾ Đêm",
+    loadingData: "Đang tải dữ liệu...",
+    noData: "Không tìm thấy dữ liệu.",
+    total: "tổng",
+    first: "Đầu",
+    prev: "Trước",
+    next: "Sau",
+    last: "Cuối",
+    colRank: "#",
+    colPerson: "Người",
+    colOverall: "Tổng",
+    colEvts: "ND",
+    mbfIn: " trong ",
+  },
+};
+
+let currentLang = localStorage.getItem("lang") || "en";
+
+function t(key) {
+  return (LANG[currentLang] && LANG[currentLang][key]) || (LANG.en[key] || key);
+}
+
+function applyTranslations() {
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.dataset.i18n;
+    if (el.hasAttribute("placeholder")) el.placeholder = t(key);
+    else el.textContent = t(key);
+  });
+  document.title = t("title");
+  document.getElementById("themeToggle").textContent = document.body.classList.contains("light") ? t("night") : t("day");
+}
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+  applyTranslations();
+  currentPage = 1;
+  renderTable();
+}
+
 const EVENT_IDS = ["333","222","444","555","666","777","333bf","333fm","333oh","minx","pyram","skewb","sq1","444bf","555bf","333mbf"];
 const EVENT_IDS_ALL = ["333","222","444","555","666","777","333bf","333fm","333oh","clock","minx","pyram","skewb","sq1","444bf","555bf","333mbf"];
 const EVENT_LABELS = { "333":"333", "222":"222", "444":"444", "555":"555", "666":"666", "777":"777", "333bf":"333BLD", "333fm":"333FM", "333oh":"333OH", "clock":"Clock", "minx":"Mega", "pyram":"Pyra", "skewb":"Skewb", "sq1":"SQ1", "444bf":"444BLD", "555bf":"555BLD", "333mbf":"333MBLD" };
@@ -198,6 +639,30 @@ const GROUP_EVENTS = {
   "nonbld": ["333","222","444","555","666","777","333fm","333oh","clock","minx","pyram","skewb","sq1"],
   "other": ["clock","minx","pyram","skewb","sq1","333fm"],
 };
+
+function decodeMbfText(wca) {
+  if (wca <= 0) return null;
+  const old = Math.floor(wca / 1000000000) !== 0;
+  let solved, attempted, timeSec;
+  if (old) {
+    timeSec = wca % 100000;
+    wca = Math.floor(wca / 100000);
+    attempted = wca % 100;
+    wca = Math.floor(wca / 100);
+    solved = 99 - (wca % 100);
+  } else {
+    const missed = wca % 100;
+    wca = Math.floor(wca / 100);
+    timeSec = wca % 100000;
+    wca = Math.floor(wca / 100000);
+    const diff = 99 - (wca % 100);
+    solved = diff + missed;
+    attempted = solved + missed;
+  }
+  const min = Math.floor(timeSec / 60);
+  const sec = timeSec % 60;
+  return `${solved}/${attempted}${t("mbfIn")}${min}:${String(sec).padStart(2, "0")}`;
+}
 
 let allData = {};
 let currentCountry = null;
@@ -243,30 +708,6 @@ function formatCenti(c) {
   if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${s.toFixed(2).padStart(5, "0")}`;
   if (m > 0) return `${m}:${s.toFixed(2).padStart(5, "0")}`;
   return s.toFixed(2);
-}
-
-function decodeMbfText(wca) {
-  if (wca <= 0) return null;
-  const old = Math.floor(wca / 1000000000) !== 0;
-  let solved, attempted, timeSec;
-  if (old) {
-    timeSec = wca % 100000;
-    wca = Math.floor(wca / 100000);
-    attempted = wca % 100;
-    wca = Math.floor(wca / 100);
-    solved = 99 - (wca % 100);
-  } else {
-    const missed = wca % 100;
-    wca = Math.floor(wca / 100);
-    timeSec = wca % 100000;
-    wca = Math.floor(wca / 100000);
-    const diff = 99 - (wca % 100);
-    solved = diff + missed;
-    attempted = solved + missed;
-  }
-  const min = Math.floor(timeSec / 60);
-  const sec = timeSec % 60;
-  return `${solved}/${attempted} in ${min}:${String(sec).padStart(2, "0")}`;
 }
 
 function getTimeString(eid, pbs, wr) {
@@ -348,15 +789,18 @@ async function loadData() {
 }
 
 function init() {
+  document.getElementById("langSelect").value = currentLang;
+  applyTranslations();
+
   const countries = Object.keys(allData.countries).sort();
   if (countries.length === 0) {
-    document.getElementById("status").textContent = "No data found.";
+    document.getElementById("status").textContent = t("noData");
     return;
   }
   document.getElementById("controls").style.display = "flex";
   document.getElementById("status").style.display = "none";
   if (allData.generated_at) {
-    document.getElementById("genDate").textContent = "— Generated: " + allData.generated_at;
+    document.getElementById("genDate").textContent = "— " + t("generated") + ": " + allData.generated_at;
   }
 
   const conSel = document.getElementById("continentSelect");
@@ -374,7 +818,7 @@ function init() {
   });
 
   const sel = document.getElementById("countrySelect");
-  sel.add(new Option("World", "__world__"));
+  sel.add(new Option(t("world"), "__world__"));
   sel.addEventListener("change", () => { currentCountry = sel.value; currentPage = 1; renderTable(); });
 
   populateCountries();
@@ -421,7 +865,7 @@ function init() {
 
 function populateCountries() {
   const sel = document.getElementById("countrySelect");
-  sel.innerHTML = '<option value="__world__">World</option>';
+  sel.innerHTML = `<option value="__world__">${t("world")}</option>`;
   const cc = allData.country_continent || {};
   const sorted = Object.keys(allData.countries).sort();
   for (const c of sorted) {
@@ -489,7 +933,13 @@ function renderTable() {
   if (entries.length === 0) { wrap.style.display = "none"; document.getElementById("pagination").style.display = "none"; return; }
 
   const q = document.getElementById("search").value.toLowerCase();
-  if (q) entries = entries.filter(e => e.name.toLowerCase().includes(q));
+  if (q) {
+    const tokens = q.split(/\s+/).filter(Boolean);
+    entries = entries.filter(e => {
+      const name = e.name.toLowerCase();
+      return tokens.every(t => name.includes(t));
+    });
+  }
 
   const activeEvents = getActiveEvents();
   const wr = getWR();
@@ -522,10 +972,10 @@ function renderTable() {
     .map((e, i) => ({ ...e, rank: start + i + 1 }));
 
   let html = "<table><thead><tr>";
-  html += `<th data-col="0">#</th>`;
-  html += `<th data-col="1">Person</th>`;
-  html += `<th data-col="2">Overall</th>`;
-  html += `<th data-col="3">Evts</th>`;
+  html += `<th data-col="0">${t("colRank")}</th>`;
+  html += `<th data-col="1">${t("colPerson")}</th>`;
+  html += `<th data-col="2">${t("colOverall")}</th>`;
+  html += `<th data-col="3">${t("colEvts")}</th>`;
   activeEvents.forEach((eid, i) => html += `<th data-col="${i + 4}">${EVENT_LABELS[eid]}</th>`);
   html += "</tr></thead><tbody>";
 
@@ -554,16 +1004,16 @@ function renderTable() {
   wrap.style.display = "block";
 
   const pagDiv = document.getElementById("pagination");
-  let pagHtml = `<span class="info">${totalEntries} total</span>`;
-  pagHtml += `<button ${currentPage === 1 ? "disabled" : ""} data-page="1">First</button>`;
-  pagHtml += `<button ${currentPage === 1 ? "disabled" : ""} data-page="${currentPage - 1}">Prev</button>`;
+  let pagHtml = `<span class="info">${totalEntries} ${t("total")}</span>`;
+  pagHtml += `<button ${currentPage === 1 ? "disabled" : ""} data-page="1">${t("first")}</button>`;
+  pagHtml += `<button ${currentPage === 1 ? "disabled" : ""} data-page="${currentPage - 1}">${t("prev")}</button>`;
   const startPg = Math.max(1, currentPage - 3);
   const endPg = Math.min(totalPages, currentPage + 3);
   for (let p = startPg; p <= endPg; p++) {
     pagHtml += `<button class="${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
   }
-  pagHtml += `<button ${currentPage === totalPages ? "disabled" : ""} data-page="${currentPage + 1}">Next</button>`;
-  pagHtml += `<button ${currentPage === totalPages ? "disabled" : ""} data-page="${totalPages}">Last</button>`;
+  pagHtml += `<button ${currentPage === totalPages ? "disabled" : ""} data-page="${currentPage + 1}">${t("next")}</button>`;
+  pagHtml += `<button ${currentPage === totalPages ? "disabled" : ""} data-page="${totalPages}">${t("last")}</button>`;
   pagDiv.innerHTML = pagHtml;
   pagDiv.style.display = "flex";
   pagDiv.querySelectorAll("button[data-page]").forEach(btn => {
@@ -607,10 +1057,10 @@ function toggleTheme() {
   document.body.classList.toggle("light");
   const btn = document.getElementById("themeToggle");
   if (document.body.classList.contains("light")) {
-    btn.textContent = "☾ Night";
+    btn.textContent = t("night");
     localStorage.setItem("theme", "light");
   } else {
-    btn.textContent = "☀ Day";
+    btn.textContent = t("day");
     localStorage.setItem("theme", "dark");
   }
 }
@@ -618,7 +1068,7 @@ function toggleTheme() {
 (function() {
   if (localStorage.getItem("theme") === "light") {
     document.body.classList.add("light");
-    document.getElementById("themeToggle").textContent = "☾ Night";
+    document.getElementById("themeToggle").textContent = t("night");
   }
 })();
 
