@@ -17,12 +17,13 @@ Interactive [Kinch rank](https://www.speedsolving.com/wiki/index.php/KinchRanks)
 
 ## How it works
 
-The data pipeline (`build.py`) streams the [WCA developer database dump](https://www.worldcubeassociation.org/export/results), extracts personal bests, computes world/country records, selects top entries per country, and outputs two files:
+The data pipeline (`build.py`) streams the [WCA developer database dump](https://www.worldcubeassociation.org/export/results), extracts personal bests, computes world/country records, selects top entries per country, and outputs three files:
 
-- `1000.js` (~200KB) — top 1000 pre-computed entries with world-record Kinch scores. Loads instantly for the default view.
-- `data.js` (~76MB) — the full dataset loaded asynchronously. Unlocks all filters once ready.
+- `1000.js` (~200KB) — top 1000 pre-computed entries with world-record Kinch scores. Loads synchronously for instant default view.
+- `scores.js` (~30MB) — full dataset for the main table (world/country/continent records, per-country entries with raw times). Loads asynchronously, unlocks all filters.
+- `profiles.js` (~40MB) — profile-only data (competition IDs, NR/CR/WR ranks). Loads asynchronously for progressive enhancement.
 
-The frontend (`index.html`) renders the table immediately from `1000.js` while `data.js` loads in the background. Country, region and debut-year filters are disabled with a "Loading" placeholder until the full dataset arrives. A result cache avoids recomputing Kinch scores for repeated filter combinations.
+The frontend (`index.html`) renders the table immediately from `1000.js` while `scores.js` loads. Country, region and debut-year filters are disabled with a "Loading" placeholder until `scores.js` arrives. Profile details (ranks, competition names) become available when `profiles.js` loads. A result cache avoids recomputing Kinch scores for repeated filter combinations.
 
 No server, no API calls, fully static.
 
@@ -32,4 +33,4 @@ No server, no API calls, fully static.
 2. Copy `.env.example` to `.env` and set your paths
 3. Run `python3 build.py`
 
-This outputs `data.js` and `1000.js`.
+This outputs `scores.js`, `profiles.js`, and `1000.js`.

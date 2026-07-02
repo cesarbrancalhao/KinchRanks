@@ -475,35 +475,39 @@ def main():
         n_events = len(default_nonzero)
 
         entry_pbs = {}
+        entry_pbs_ext = {}
         for event_id in KINCH_EVENTS_ALL:
             vals = events.get(event_id, {})
             if not vals:
                 continue
             pb = {}
+            pb_ext = {}
             s = vals.get("single")
             if s is not None and s > 0:
                 pb["s"] = s
                 if vals.get("single_comp"):
-                    pb["sc"] = vals["single_comp"]
+                    pb_ext["sc"] = vals["single_comp"]
                 if vals.get("sr") is not None:
-                    pb["sr"] = vals["sr"]
+                    pb_ext["sr"] = vals["sr"]
                 if vals.get("swr") is not None:
-                    pb["swr"] = vals["swr"]
+                    pb_ext["swr"] = vals["swr"]
                 if vals.get("scr") is not None:
-                    pb["scr"] = vals["scr"]
+                    pb_ext["scr"] = vals["scr"]
             a = vals.get("average")
             if a is not None and a > 0:
                 pb["a"] = a
                 if vals.get("average_comp"):
-                    pb["ac"] = vals["average_comp"]
+                    pb_ext["ac"] = vals["average_comp"]
                 if vals.get("ar") is not None:
-                    pb["ar"] = vals["ar"]
+                    pb_ext["ar"] = vals["ar"]
                 if vals.get("awr") is not None:
-                    pb["awr"] = vals["awr"]
+                    pb_ext["awr"] = vals["awr"]
                 if vals.get("acr") is not None:
-                    pb["acr"] = vals["acr"]
+                    pb_ext["acr"] = vals["acr"]
             if pb:
                 entry_pbs[event_id] = pb
+            if pb_ext:
+                entry_pbs_ext[event_id] = pb_ext
 
         by_country[cid].append({
             "id": person_id,
@@ -513,6 +517,7 @@ def main():
             "gender": gender,
             "overall": overall,
             "pbs": entry_pbs,
+            "_pbs_ext": entry_pbs_ext,
             "_scores": scores,
             "_n_events": n_events,
         })
@@ -520,6 +525,7 @@ def main():
     print(f"  Computed scores for {sum(len(v) for v in by_country.values())} persons", flush=True)
 
     result = {}
+    profiles_data = {}
     used_comp_ids = set()
 
     for cid, entries in sorted(by_country.items()):
@@ -539,18 +545,32 @@ def main():
         top_entries = [entries[i] for i in sorted(selected)]
         top_entries.sort(key=lambda x: x["overall"], reverse=True)
 
-        for rank, entry in enumerate(top_entries, 1):
-            entry["rank"] = rank
-            for pb in entry.get("pbs", {}).values():
-                if pb.get("sc"):
-                    used_comp_ids.add(pb["sc"])
-                if pb.get("ac"):
-                    used_comp_ids.add(pb["ac"])
+        clean_entries = []
+        for entry in top_entries:
+            wca_id = entry["id"]
+            ext = entry.get("_pbs_ext", {})
+            if ext:
+                profiles_data[wca_id] = {"pbs_ext": ext}
+                for pb in ext.values():
+                    if pb.get("sc"):
+                        used_comp_ids.add(pb["sc"])
+                    if pb.get("ac"):
+                        used_comp_ids.add(pb["ac"])
+
+            clean_entries.append({
+                "id": entry["id"],
+                "name": entry["name"],
+                "country": entry["country"],
+                "continent": entry["continent"],
+                "gender": entry["gender"],
+                "overall": entry["overall"],
+                "pbs": entry["pbs"],
+            })
 
         result[cid] = {
             "name": cid,
-            "count": len(top_entries),
-            "entries": top_entries,
+            "count": len(clean_entries),
+            "entries": clean_entries,
         }
 
     def _filter_wr(w):
@@ -638,12 +658,33 @@ def main():
     print(f"  {len(result)} countries, {total_entries} total entries, {count_200} with 200+ entries", flush=True)
     print(f"  {len(comps_output)} competitions referenced in output", flush=True)
 
-    data_js = os.path.join(os.path.dirname(__file__), "data.js")
-    with open(data_js, "w") as f:
-        f.write("window.KINCH_DATA=")
-        json.dump(output, f, ensure_ascii=False)
+    scores_data = {
+        "generated_at": output["generated_at"],
+        "wr": wr_data,
+        "cwr": cwr_data,
+        "conwr": conwr_data,
+        "country_continent": country_continent,
+        "continents": CONTINENT_NAMES,
+        "countries": result,
+        "precomputed": precomputed,
+    }
+    scores_js = os.path.join(os.path.dirname(__file__), "scores.js")
+    with open(scores_js, "w") as f:
+        f.write("window.KINCH_SCORES=")
+        json.dump(scores_data, f, ensure_ascii=False)
         f.write(";")
-    print(f"Wrote {data_js}", flush=True)
+    print(f"Wrote {scores_js}", flush=True)
+
+    profiles_output = {
+        "competitions": comps_output,
+        "profiles": profiles_data,
+    }
+    profiles_js = os.path.join(os.path.dirname(__file__), "profiles.js")
+    with open(profiles_js, "w") as f:
+        f.write("window.KINCH_PROFILES=")
+        json.dump(profiles_output, f, ensure_ascii=False)
+        f.write(";")
+    print(f"Wrote {profiles_js}", flush=True)
 
     quick_data = {
         "entries": precomputed,

@@ -262,9 +262,13 @@ body.light .profile-events-table .rank-cr { font-weight: 700; color: #1a7f3a; }
 
 <script src="1000.js"></script>
 <script>
-var _dataScript = document.createElement('script');
-_dataScript.src = 'data.js';
-document.head.appendChild(_dataScript);
+var _scoresScript = document.createElement('script');
+_scoresScript.src = 'scores.js';
+document.head.appendChild(_scoresScript);
+
+var _profilesScript = document.createElement('script');
+_profilesScript.src = 'profiles.js';
+document.head.appendChild(_profilesScript);
 
 const LANG = {
   en: {
@@ -1858,8 +1862,8 @@ function getWR() {
 }
 
 function loadData() {
-  if (window.KINCH_DATA) {
-    allData = window.KINCH_DATA;
+  if (window.KINCH_SCORES) {
+    allData = window.KINCH_SCORES;
     personLookup = {};
     for (const c of Object.values(allData.countries)) {
       for (const e of c.entries) {
@@ -1887,7 +1891,7 @@ function init() {
   document.getElementById("langSelect").value = currentLang;
   applyTranslations();
 
-  var hasFullData = !!window.KINCH_DATA;
+  var hasFullData = !!window.KINCH_SCORES;
 
   if (!hasFullData && !(allData.precomputed && allData.precomputed.length)) {
     document.getElementById("status").style.display = "block";
@@ -1985,7 +1989,7 @@ function populateCountries(preserveValue) {
   const prevValue = preserveValue ? sel.value : "__world__";
   sel.innerHTML = `<option value="__world__" data-i18n="world">${t("world")}</option>`;
   var cc = allData.country_continent || {};
-  var hasFullData = !!window.KINCH_DATA;
+  var hasFullData = !!window.KINCH_SCORES;
 
   if (hasFullData) {
     const sorted = Object.keys(allData.countries).sort();
@@ -2529,8 +2533,28 @@ function toggleTheme() {
   }
 })();
 
-function onFullDataLoaded() {
-  allData = window.KINCH_DATA;
+function mergeProfileData() {
+  var profiles = window.KINCH_PROFILES;
+  if (!profiles) return;
+  allData.competitions = profiles.competitions || {};
+  if (profiles.profiles) {
+    for (var wcaId in profiles.profiles) {
+      var person = personLookup[wcaId];
+      if (person && profiles.profiles[wcaId].pbs_ext) {
+        for (var eid in profiles.profiles[wcaId].pbs_ext) {
+          if (!person.pbs) person.pbs = {};
+          if (!person.pbs[eid]) person.pbs[eid] = {};
+          for (var k in profiles.profiles[wcaId].pbs_ext[eid]) {
+            person.pbs[eid][k] = profiles.profiles[wcaId].pbs_ext[eid][k];
+          }
+        }
+      }
+    }
+  }
+}
+
+function onScoresLoaded() {
+  allData = window.KINCH_SCORES;
   resultsCache = { _generated_at: allData.generated_at };
   personLookup = {};
   for (const c of Object.values(allData.countries)) {
@@ -2538,6 +2562,7 @@ function onFullDataLoaded() {
       personLookup[e.id] = e;
     }
   }
+  if (window.KINCH_PROFILES) mergeProfileData();
   document.getElementById("continentSelect").disabled = false;
   document.getElementById("countrySelect").disabled = false;
   document.getElementById("sinceSelect").disabled = false;
@@ -2549,11 +2574,17 @@ function onFullDataLoaded() {
   init();
 }
 
-if (window.KINCH_DATA) {
+function onProfilesLoaded() {
+  if (!window.KINCH_PROFILES) return;
+  mergeProfileData();
+}
+
+if (window.KINCH_SCORES) {
   loadData();
 } else {
   loadData();
-  _dataScript.onload = onFullDataLoaded;
+  _scoresScript.onload = onScoresLoaded;
+  _profilesScript.onload = onProfilesLoaded;
 }
 </script>
 </body>
