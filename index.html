@@ -113,6 +113,66 @@ body.light .theme-toggle { background: #0055A4; border-color: #0055A4; color: #f
 body.light .theme-toggle:hover { background: #004494; }
 body.light #langSelect { background: #0055A4; border-color: #0055A4; color: #fff; }
 body.light #langSelect:hover { background: #004494; }
+
+.profile-header { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px; position: relative; }
+.profile-back { padding: 5px 14px; border: 1px solid #30363d; border-radius: 6px; background: #21262d; color: #c9d1d9; font-size: 13px; cursor: pointer; position: absolute; left: 0; }
+.profile-back:hover { background: #30363d; }
+body.light .profile-back { background: #0055A4; border-color: #0055A4; color: #fff; }
+body.light .profile-back:hover { background: #004494; }
+.profile-name { font-size: 22px; font-weight: 700; margin: 0; text-align: center; }
+.profile-section { margin-bottom: 20px; }
+.profile-section-title { font-size: 13px; color: #8b949e; margin-bottom: 6px; text-align: center; }
+body.light .profile-section-title { color: #111; }
+.profile-info-table { width: auto; margin: 0 auto; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+.profile-info-table, .profile-info-table th, .profile-info-table td { position: static; }
+.profile-info-table th { padding: 6px 10px; text-align: left; font-weight: 600; cursor: default; background: #21262d; color: #8b949e; border-bottom: 1px solid #30363d; }
+.profile-info-table th:hover { color: #8b949e; }
+.profile-info-table td { padding: 6px 10px; text-align: left; color: #c9d1d9; font-weight: 400; background: none; }
+.profile-info-table th:first-child, .profile-info-table td:first-child { position: static; }
+.profile-info-table th:nth-child(2), .profile-info-table td:nth-child(2) { position: static; }
+.profile-info-table tbody tr { background: none; }
+.profile-info-table tbody tr:nth-child(even) { background: none; }
+.profile-info-table tbody tr:hover { background: none; }
+.profile-info-table a { color: #58a6ff; text-decoration: none; }
+.profile-info-table a:hover { text-decoration: underline; }
+body.light .profile-info-table th { background: #0055A4; color: #fff; border-bottom-color: #004494; }
+body.light .profile-info-table td { color: #222; }
+body.light .profile-info-table a { color: #0055A4; }
+.profile-events-table { font-size: 13px; }
+.profile-events-table, .profile-events-table th, .profile-events-table td { position: static; }
+.profile-events-table thead th { cursor: default; position: static; z-index: auto; }
+.profile-events-table thead th:hover { color: inherit; }
+.profile-events-table thead th:first-child, .profile-events-table thead th:nth-child(2) { position: static; z-index: auto; }
+.profile-events-table th, .profile-events-table td { text-align: right; }
+.profile-events-table th:first-child, .profile-events-table td:first-child { text-align: left; position: static; }
+.profile-events-table td:first-child { background: inherit; color: inherit; }
+.profile-events-table th:nth-child(2), .profile-events-table td:nth-child(2) { text-align: left; position: static; background: inherit; }
+.profile-events-table td:first-child { font-weight: 600; }
+.profile-events-table td:nth-child(2) { font-weight: 400; }
+.profile-events-table .comp-col { text-align: left; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+.profile-events-table .rank-col { color: #8b949e; }
+body.light .profile-events-table .rank-col { color: #666; }
+body.light .profile-events-table td:first-child { color: inherit; }
+body.light .profile-events-table td:nth-child(2) { color: inherit; }
+
+.profile-events-table .profile-time { font-weight: 700; color: #f0883e; }
+body.light .profile-events-table .profile-time { font-weight: 700; color: #f4771d; }
+.profile-events-table .profile-time-wr { font-weight: 700; color: #f0c040; }
+body.light .profile-events-table .profile-time-wr { font-weight: 700; color: #d32f2f; }
+.profile-events-table .profile-time-nr { font-weight: 700; color: #58a6ff; }
+body.light .profile-events-table .profile-time-nr { font-weight: 700; color: #0055A4; }
+.profile-events-table .profile-time-cr { font-weight: 700; color: #7ee787; }
+body.light .profile-events-table .profile-time-cr { font-weight: 700; color: #1a7f3a; }
+
+.profile-events-table .rank-bold { font-weight: 700; }
+.profile-events-table .rank-top10 { color: #fff; }
+body.light .profile-events-table .rank-top10 { color: #111; }
+.profile-events-table .rank-wr { font-weight: 700; color: #f0c040; }
+body.light .profile-events-table .rank-wr { font-weight: 700; color: #d32f2f; }
+.profile-events-table .rank-nr { font-weight: 700; color: #58a6ff; }
+body.light .profile-events-table .rank-nr { font-weight: 700; color: #0055A4; }
+.profile-events-table .rank-cr { font-weight: 700; color: #7ee787; }
+body.light .profile-events-table .rank-cr { font-weight: 700; color: #1a7f3a; }
 </style>
 </head>
 <body>
@@ -198,6 +258,7 @@ body.light #langSelect:hover { background: #004494; }
   <div id="status" class="status" data-i18n="loadingData">Loading data...</div>
   <div class="table-wrap" id="tableWrap" style="display:none"></div>
   <div id="pagination" class="pagination" style="display:none"></div>
+  <div id="profileView" style="display:none"></div>
 </div>
 
 <script src="data.js"></script>
@@ -221,6 +282,12 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Search...",
     world: "World",
+    continentAfrica: "Africa",
+    continentAsia: "Asia",
+    continentEurope: "Europe",
+    continentNorthAmerica: "North America",
+    continentSouthAmerica: "South America",
+    continentOceania: "Oceania",
     all: "All",
     male: "Male",
     female: "Female",
@@ -246,6 +313,20 @@ const LANG = {
     colOverall: "Overall",
     colEvts: "Evts",
     mbfIn: " in ",
+    profileBack: "Back to rankings",
+    profileInfo: "Profile",
+    profileResults: "Results",
+    profileWcaId: "WCA ID",
+    profileName: "Name",
+    profileCountry: "Country",
+    profileGender: "Gender",
+    profileEvent: "Event",
+    profileCompetition: "Comp",
+    profileNR: "NR",
+    profileCR: "CR",
+    profileWR: "WR",
+    profileSingle: "Single",
+    profileAverage: "Average",
   },
   pt: {
     title: "Kinch Ranks",
@@ -265,6 +346,12 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Buscar...",
     world: "Mundo",
+    continentAfrica: "África",
+    continentAsia: "Ásia",
+    continentEurope: "Europa",
+    continentNorthAmerica: "América do Norte",
+    continentSouthAmerica: "América do Sul",
+    continentOceania: "Oceania",
     all: "Todos",
     male: "Masculino",
     female: "Feminino",
@@ -309,6 +396,12 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Buscar...",
     world: "Mundo",
+    continentAfrica: "África",
+    continentAsia: "Asia",
+    continentEurope: "Europa",
+    continentNorthAmerica: "Norteamérica",
+    continentSouthAmerica: "Sudamérica",
+    continentOceania: "Oceanía",
     all: "Todos",
     male: "Masculino",
     female: "Femenino",
@@ -353,6 +446,12 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Suchen...",
     world: "Welt",
+    continentAfrica: "Afrika",
+    continentAsia: "Asien",
+    continentEurope: "Europa",
+    continentNorthAmerica: "Nordamerika",
+    continentSouthAmerica: "Südamerika",
+    continentOceania: "Ozeanien",
     all: "Alle",
     male: "Männlich",
     female: "Weiblich",
@@ -397,6 +496,12 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Cerca...",
     world: "Mondo",
+    continentAfrica: "Africa",
+    continentAsia: "Asia",
+    continentEurope: "Europa",
+    continentNorthAmerica: "Nord America",
+    continentSouthAmerica: "Sud America",
+    continentOceania: "Oceania",
     all: "Tutti",
     male: "Maschile",
     female: "Femminile",
@@ -441,6 +546,12 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Cercar...",
     world: "Món",
+    continentAfrica: "Àfrica",
+    continentAsia: "Àsia",
+    continentEurope: "Europa",
+    continentNorthAmerica: "Amèrica del Nord",
+    continentSouthAmerica: "Amèrica del Sud",
+    continentOceania: "Oceania",
     all: "Tots",
     male: "Masculí",
     female: "Femení",
@@ -485,6 +596,12 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "검색...",
     world: "전체",
+    continentAfrica: "아프리카",
+    continentAsia: "아시아",
+    continentEurope: "유럽",
+    continentNorthAmerica: "북아메리카",
+    continentSouthAmerica: "남아메리카",
+    continentOceania: "오세아니아",
     all: "전체",
     male: "남성",
     female: "여성",
@@ -529,6 +646,12 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "搜索...",
     world: "世界",
+    continentAfrica: "非洲",
+    continentAsia: "亚洲",
+    continentEurope: "欧洲",
+    continentNorthAmerica: "北美洲",
+    continentSouthAmerica: "南美洲",
+    continentOceania: "大洋洲",
     all: "全部",
     male: "男",
     female: "女",
@@ -573,6 +696,12 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Tìm kiếm...",
     world: "Thế giới",
+    continentAfrica: "Châu Phi",
+    continentAsia: "Châu Á",
+    continentEurope: "Châu Âu",
+    continentNorthAmerica: "Bắc Mỹ",
+    continentSouthAmerica: "Nam Mỹ",
+    continentOceania: "Châu Đại Dương",
     all: "Tất cả",
     male: "Nam",
     female: "Nữ",
@@ -601,10 +730,930 @@ const LANG = {
   },
 };
 
+const CONTINENT_I18N = {
+  "_Africa": "continentAfrica",
+  "_Asia": "continentAsia",
+  "_Europe": "continentEurope",
+  "_North America": "continentNorthAmerica",
+  "_South America": "continentSouthAmerica",
+  "_Oceania": "continentOceania",
+};
+
+const COUNTRY_NAMES = {
+  pt: {
+    "Afghanistan": "Afeganistão",
+    "Albania": "Albânia",
+    "Algeria": "Argélia",
+    "Antigua and Barbuda": "Antígua e Barbuda",
+    "Armenia": "Armênia",
+    "Australia": "Austrália",
+    "Austria": "Áustria",
+    "Azerbaijan": "Azerbaijão",
+    "Bahrain": "Bahrein",
+    "Belarus": "Bielorrússia",
+    "Belgium": "Bélgica",
+    "Bhutan": "Butão",
+    "Bolivia": "Bolívia",
+    "Bosnia and Herzegovina": "Bósnia e Herzegovina",
+    "Botswana": "Botsuana",
+    "Brazil": "Brasil",
+    "Bulgaria": "Bulgária",
+    "Cambodia": "Camboja",
+    "Cameroon": "Camarões",
+    "Canada": "Canadá",
+    "Colombia": "Colômbia",
+    "Cote d_Ivoire": "Costa do Marfim",
+    "Croatia": "Croácia",
+    "Cyprus": "Chipre",
+    "Czech Republic": "República Checa",
+    "Democratic Republic of the Congo": "República Democrática do Congo",
+    "Denmark": "Dinamarca",
+    "Dominican Republic": "República Dominicana",
+    "Ecuador": "Equador",
+    "Egypt": "Egito",
+    "Eritrea": "Eritreia",
+    "Estonia": "Estônia",
+    "Ethiopia": "Etiópia",
+    "Finland": "Finlândia",
+    "France": "França",
+    "Georgia": "Geórgia",
+    "Germany": "Alemanha",
+    "Ghana": "Gana",
+    "Greece": "Grécia",
+    "Grenada": "Granada",
+    "Guyana": "Guiana",
+    "Hungary": "Hungria",
+    "Iceland": "Islândia",
+    "India": "Índia",
+    "Indonesia": "Indonésia",
+    "Iran": "Irã",
+    "Iraq": "Iraque",
+    "Ireland": "Irlanda",
+    "Italy": "Itália",
+    "Japan": "Japão",
+    "Jordan": "Jordânia",
+    "Kazakhstan": "Cazaquistão",
+    "Kenya": "Quênia",
+    "Korea": "Coreia do Sul",
+    "Kyrgyzstan": "Quirguistão",
+    "Latvia": "Letônia",
+    "Lebanon": "Líbano",
+    "Lesotho": "Lesoto",
+    "Libya": "Líbia",
+    "Lithuania": "Lituânia",
+    "Luxembourg": "Luxemburgo",
+    "Malaysia": "Malásia",
+    "Maldives": "Maldivas",
+    "Mauritania": "Mauritânia",
+    "Mauritius": "Maurício",
+    "Mexico": "México",
+    "Moldova": "Moldávia",
+    "Monaco": "Mônaco",
+    "Mongolia": "Mongólia",
+    "Morocco": "Marrocos",
+    "Mozambique": "Moçambique",
+    "Namibia": "Namíbia",
+    "Netherlands": "Países Baixos",
+    "New Zealand": "Nova Zelândia",
+    "Nicaragua": "Nicarágua",
+    "Nigeria": "Nigéria",
+    "North Macedonia": "Macedônia do Norte",
+    "Norway": "Noruega",
+    "Oman": "Omã",
+    "Pakistan": "Paquistão",
+    "Palestine": "Palestina",
+    "Panama": "Panamá",
+    "Papua New Guinea": "Papua-Nova Guiné",
+    "Paraguay": "Paraguai",
+    "Philippines": "Filipinas",
+    "Poland": "Polônia",
+    "Qatar": "Catar",
+    "Romania": "Romênia",
+    "Russia": "Rússia",
+    "Rwanda": "Ruanda",
+    "Saint Kitts and Nevis": "São Cristóvão e Nevis",
+    "Saint Lucia": "Santa Lúcia",
+    "Saudi Arabia": "Arábia Saudita",
+    "Serbia": "Sérvia",
+    "Singapore": "Singapura",
+    "Slovakia": "Eslováquia",
+    "Slovenia": "Eslovênia",
+    "Somalia": "Somália",
+    "South Africa": "África do Sul",
+    "Spain": "Espanha",
+    "Sudan": "Sudão",
+    "Sweden": "Suécia",
+    "Switzerland": "Suíça",
+    "Syria": "Síria",
+    "Tajikistan": "Tajiquistão",
+    "Tanzania": "Tanzânia",
+    "Thailand": "Tailândia",
+    "Trinidad and Tobago": "Trindade e Tobago",
+    "Tunisia": "Tunísia",
+    "Turkey": "Turquia",
+    "Turkmenistan": "Turcomenistão",
+    "USA": "EUA",
+    "Ukraine": "Ucrânia",
+    "United Arab Emirates": "Emirados Árabes Unidos",
+    "United Kingdom": "Reino Unido",
+    "Uruguay": "Uruguai",
+    "Uzbekistan": "Uzbequistão",
+    "Vietnam": "Vietnã",
+    "Yemen": "Iêmen",
+    "Zambia": "Zâmbia",
+    "Zimbabwe": "Zimbábue",
+  },
+  es: {
+    "Afghanistan": "Afganistán",
+    "Algeria": "Argelia",
+    "Antigua and Barbuda": "Antigua y Barbuda",
+    "Azerbaijan": "Azerbaiyán",
+    "Bahrain": "Baréin",
+    "Bangladesh": "Bangladés",
+    "Belarus": "Bielorrusia",
+    "Belgium": "Bélgica",
+    "Belize": "Belice",
+    "Bhutan": "Bután",
+    "Bosnia and Herzegovina": "Bosnia y Herzegovina",
+    "Botswana": "Botsuana",
+    "Brazil": "Brasil",
+    "Brunei": "Brunéi",
+    "Cambodia": "Camboya",
+    "Cameroon": "Camerún",
+    "Canada": "Canadá",
+    "Cote d_Ivoire": "Costa de Marfil",
+    "Croatia": "Croacia",
+    "Cyprus": "Chipre",
+    "Czech Republic": "República Checa",
+    "Democratic Republic of the Congo": "República Democrática del Congo",
+    "Denmark": "Dinamarca",
+    "Dominican Republic": "República Dominicana",
+    "Egypt": "Egipto",
+    "Ethiopia": "Etiopía",
+    "Fiji": "Fiyi",
+    "Finland": "Finlandia",
+    "France": "Francia",
+    "Germany": "Alemania",
+    "Greece": "Grecia",
+    "Grenada": "Granada",
+    "Haiti": "Haití",
+    "Hungary": "Hungría",
+    "Iceland": "Islandia",
+    "Iran": "Irán",
+    "Iraq": "Irak",
+    "Ireland": "Irlanda",
+    "Italy": "Italia",
+    "Japan": "Japón",
+    "Jordan": "Jordania",
+    "Kazakhstan": "Kazajistán",
+    "Kenya": "Kenia",
+    "Korea": "Corea del Sur",
+    "Kyrgyzstan": "Kirguistán",
+    "Latvia": "Letonia",
+    "Lebanon": "Líbano",
+    "Lesotho": "Lesoto",
+    "Libya": "Libia",
+    "Lithuania": "Lituania",
+    "Luxembourg": "Luxemburgo",
+    "Macau": "Macao",
+    "Malawi": "Malaui",
+    "Malaysia": "Malasia",
+    "Maldives": "Maldivas",
+    "Mauritius": "Mauricio",
+    "Mexico": "México",
+    "Moldova": "Moldavia",
+    "Monaco": "Mónaco",
+    "Morocco": "Marruecos",
+    "Netherlands": "Países Bajos",
+    "New Zealand": "Nueva Zelanda",
+    "North Macedonia": "Macedonia del Norte",
+    "Norway": "Noruega",
+    "Oman": "Omán",
+    "Pakistan": "Pakistán",
+    "Palestine": "Palestina",
+    "Panama": "Panamá",
+    "Papua New Guinea": "Papúa Nueva Guinea",
+    "Peru": "Perú",
+    "Philippines": "Filipinas",
+    "Poland": "Polonia",
+    "Qatar": "Catar",
+    "Romania": "Rumanía",
+    "Russia": "Rusia",
+    "Rwanda": "Ruanda",
+    "Saint Kitts and Nevis": "San Cristóbal y Nieves",
+    "Saint Lucia": "Santa Lucía",
+    "Saudi Arabia": "Arabia Saudita",
+    "Singapore": "Singapur",
+    "Slovakia": "Eslovaquia",
+    "Slovenia": "Eslovenia",
+    "South Africa": "Sudáfrica",
+    "Spain": "España",
+    "Sudan": "Sudán",
+    "Suriname": "Surinam",
+    "Sweden": "Suecia",
+    "Switzerland": "Suiza",
+    "Syria": "Siria",
+    "Taiwan": "Taiwán",
+    "Tajikistan": "Tayikistán",
+    "Thailand": "Tailandia",
+    "Trinidad and Tobago": "Trinidad y Tobago",
+    "Tunisia": "Túnez",
+    "Turkey": "Turquía",
+    "Turkmenistan": "Turkmenistán",
+    "USA": "EE. UU.",
+    "Ukraine": "Ucrania",
+    "United Arab Emirates": "Emiratos Árabes Unidos",
+    "United Kingdom": "Reino Unido",
+    "Uzbekistan": "Uzbekistán",
+    "Zimbabwe": "Zimbabue",
+  },
+  de: {
+    "Albania": "Albanien",
+    "Algeria": "Algerien",
+    "Antigua and Barbuda": "Antigua und Barbuda",
+    "Argentina": "Argentinien",
+    "Armenia": "Armenien",
+    "Australia": "Australien",
+    "Austria": "Österreich",
+    "Azerbaijan": "Aserbaidschan",
+    "Bangladesh": "Bangladesch",
+    "Belgium": "Belgien",
+    "Bolivia": "Bolivien",
+    "Bosnia and Herzegovina": "Bosnien und Herzegowina",
+    "Brazil": "Brasilien",
+    "Bulgaria": "Bulgarien",
+    "Cabo Verde": "Kap Verde",
+    "Cambodia": "Kambodscha",
+    "Cameroon": "Kamerun",
+    "Canada": "Kanada",
+    "Colombia": "Kolumbien",
+    "Congo": "Kongo",
+    "Cote d_Ivoire": "Elfenbeinküste",
+    "Croatia": "Kroatien",
+    "Cuba": "Kuba",
+    "Cyprus": "Zypern",
+    "Czech Republic": "Tschechien",
+    "Democratic Republic of the Congo": "Demokratische Republik Kongo",
+    "Denmark": "Dänemark",
+    "Dominican Republic": "Dominikanische Republik",
+    "Egypt": "Ägypten",
+    "Estonia": "Estland",
+    "Ethiopia": "Äthiopien",
+    "Fiji": "Fidschi",
+    "Finland": "Finnland",
+    "France": "Frankreich",
+    "Georgia": "Georgien",
+    "Germany": "Deutschland",
+    "Greece": "Griechenland",
+    "Hong Kong": "Hongkong",
+    "Hungary": "Ungarn",
+    "Iceland": "Island",
+    "India": "Indien",
+    "Indonesia": "Indonesien",
+    "Iraq": "Irak",
+    "Ireland": "Irland",
+    "Italy": "Italien",
+    "Jamaica": "Jamaika",
+    "Jordan": "Jordanien",
+    "Kazakhstan": "Kasachstan",
+    "Kenya": "Kenia",
+    "Korea": "Südkorea",
+    "Kyrgyzstan": "Kirgisistan",
+    "Latvia": "Lettland",
+    "Lebanon": "Libanon",
+    "Libya": "Libyen",
+    "Lithuania": "Litauen",
+    "Luxembourg": "Luxemburg",
+    "Madagascar": "Madagaskar",
+    "Maldives": "Malediven",
+    "Mauritania": "Mauretanien",
+    "Mexico": "Mexiko",
+    "Moldova": "Moldau",
+    "Mongolia": "Mongolei",
+    "Morocco": "Marokko",
+    "Mozambique": "Mosambik",
+    "Netherlands": "Niederlande",
+    "New Zealand": "Neuseeland",
+    "North Macedonia": "Nordmazedonien",
+    "Norway": "Norwegen",
+    "Palestine": "Palästina",
+    "Papua New Guinea": "Papua-Neuguinea",
+    "Philippines": "Philippinen",
+    "Poland": "Polen",
+    "Qatar": "Katar",
+    "Romania": "Rumänien",
+    "Russia": "Russland",
+    "Rwanda": "Ruanda",
+    "Saint Kitts and Nevis": "St. Kitts und Nevis",
+    "Saint Lucia": "St. Lucia",
+    "Saudi Arabia": "Saudi-Arabien",
+    "Serbia": "Serbien",
+    "Singapore": "Singapur",
+    "Slovakia": "Slowakei",
+    "Slovenia": "Slowenien",
+    "South Africa": "Südafrika",
+    "Spain": "Spanien",
+    "Sweden": "Schweden",
+    "Switzerland": "Schweiz",
+    "Syria": "Syrien",
+    "Tajikistan": "Tadschikistan",
+    "Tanzania": "Tansania",
+    "Trinidad and Tobago": "Trinidad und Tobago",
+    "Tunisia": "Tunesien",
+    "Turkey": "Türkei",
+    "United Arab Emirates": "Vereinigte Arabische Emirate",
+    "United Kingdom": "Vereinigtes Königreich",
+    "Uzbekistan": "Usbekistan",
+    "Yemen": "Jemen",
+    "Zambia": "Sambia",
+    "Zimbabwe": "Simbabwe",
+  },
+  it: {
+    "Antigua and Barbuda": "Antigua e Barbuda",
+    "Azerbaijan": "Azerbaigian",
+    "Bahrain": "Bahrein",
+    "Belarus": "Bielorussia",
+    "Belgium": "Belgio",
+    "Bosnia and Herzegovina": "Bosnia ed Erzegovina",
+    "Brazil": "Brasile",
+    "Cabo Verde": "Capo Verde",
+    "Cambodia": "Cambogia",
+    "Cameroon": "Camerun",
+    "Chile": "Cile",
+    "China": "Cina",
+    "Cote d_Ivoire": "Costa d'Avorio",
+    "Croatia": "Croazia",
+    "Cyprus": "Cipro",
+    "Czech Republic": "Repubblica Ceca",
+    "Democratic Republic of the Congo": "Repubblica Democratica del Congo",
+    "Denmark": "Danimarca",
+    "Dominican Republic": "Repubblica Dominicana",
+    "Egypt": "Egitto",
+    "Ethiopia": "Etiopia",
+    "Fiji": "Figi",
+    "Finland": "Finlandia",
+    "France": "Francia",
+    "Germany": "Germania",
+    "Greece": "Grecia",
+    "Hungary": "Ungheria",
+    "Iceland": "Islanda",
+    "Ireland": "Irlanda",
+    "Israel": "Israele",
+    "Italy": "Italia",
+    "Jamaica": "Giamaica",
+    "Japan": "Giappone",
+    "Jordan": "Giordania",
+    "Kazakhstan": "Kazakistan",
+    "Korea": "Corea del Sud",
+    "Kyrgyzstan": "Kirghizistan",
+    "Latvia": "Lettonia",
+    "Lebanon": "Libano",
+    "Libya": "Libia",
+    "Lithuania": "Lituania",
+    "Luxembourg": "Lussemburgo",
+    "Macau": "Macao",
+    "Malaysia": "Malesia",
+    "Maldives": "Maldive",
+    "Mexico": "Messico",
+    "Moldova": "Moldavia",
+    "Morocco": "Marocco",
+    "Mozambique": "Mozambico",
+    "Netherlands": "Paesi Bassi",
+    "New Zealand": "Nuova Zelanda",
+    "North Macedonia": "Macedonia del Nord",
+    "Norway": "Norvegia",
+    "Palestine": "Palestina",
+    "Papua New Guinea": "Papua Nuova Guinea",
+    "Peru": "Perù",
+    "Philippines": "Filippine",
+    "Poland": "Polonia",
+    "Portugal": "Portogallo",
+    "Rwanda": "Ruanda",
+    "Saint Kitts and Nevis": "Saint Kitts e Nevis",
+    "Saint Lucia": "Santa Lucia",
+    "Saudi Arabia": "Arabia Saudita",
+    "Slovakia": "Slovacchia",
+    "South Africa": "Sudafrica",
+    "Spain": "Spagna",
+    "Sweden": "Svezia",
+    "Switzerland": "Svizzera",
+    "Syria": "Siria",
+    "Tajikistan": "Tagikistan",
+    "Thailand": "Thailandia",
+    "Trinidad and Tobago": "Trinidad e Tobago",
+    "Turkey": "Turchia",
+    "Ukraine": "Ucraina",
+    "United Arab Emirates": "Emirati Arabi Uniti",
+    "United Kingdom": "Regno Unito",
+  },
+  ca: {
+    "Afghanistan": "Afganistan",
+    "Albania": "Albània",
+    "Algeria": "Algèria",
+    "Antigua and Barbuda": "Antigua i Barbuda",
+    "Armenia": "Armènia",
+    "Australia": "Austràlia",
+    "Austria": "Àustria",
+    "Azerbaijan": "Azerbaidjan",
+    "Bahamas": "Bahames",
+    "Belarus": "Bielorússia",
+    "Belgium": "Bèlgica",
+    "Bolivia": "Bolívia",
+    "Bosnia and Herzegovina": "Bòsnia i Hercegovina",
+    "Brazil": "Brasil",
+    "Bulgaria": "Bulgària",
+    "Cabo Verde": "Cap Verd",
+    "Cambodia": "Cambodja",
+    "Cameroon": "Camerun",
+    "Canada": "Canadà",
+    "Chile": "Xile",
+    "China": "Xina",
+    "Colombia": "Colòmbia",
+    "Cote d_Ivoire": "Costa d'Ivori",
+    "Croatia": "Croàcia",
+    "Cyprus": "Xipre",
+    "Czech Republic": "República Txeca",
+    "Democratic Republic of the Congo": "República Democràtica del Congo",
+    "Denmark": "Dinamarca",
+    "Dominican Republic": "República Dominicana",
+    "Ecuador": "Equador",
+    "Egypt": "Egipte",
+    "Estonia": "Estònia",
+    "Ethiopia": "Etiòpia",
+    "Finland": "Finlàndia",
+    "France": "França",
+    "Georgia": "Geòrgia",
+    "Germany": "Alemanya",
+    "Greece": "Grècia",
+    "Haiti": "Haití",
+    "Honduras": "Hondures",
+    "Hungary": "Hongria",
+    "Iceland": "Islàndia",
+    "India": "Índia",
+    "Indonesia": "Indonèsia",
+    "Ireland": "Irlanda",
+    "Italy": "Itàlia",
+    "Japan": "Japó",
+    "Jordan": "Jordània",
+    "Korea": "Corea del Sud",
+    "Kyrgyzstan": "Kirguizistan",
+    "Latvia": "Letònia",
+    "Lebanon": "Líban",
+    "Libya": "Líbia",
+    "Lithuania": "Lituània",
+    "Luxembourg": "Luxemburg",
+    "Malaysia": "Malàisia",
+    "Mauritania": "Mauritània",
+    "Mauritius": "Maurici",
+    "Mexico": "Mèxic",
+    "Moldova": "Moldàvia",
+    "Monaco": "Mònaco",
+    "Mongolia": "Mongòlia",
+    "Morocco": "Marroc",
+    "Mozambique": "Moçambic",
+    "Namibia": "Namíbia",
+    "Netherlands": "Països Baixos",
+    "New Zealand": "Nova Zelanda",
+    "Nigeria": "Nigèria",
+    "North Macedonia": "Macedònia del Nord",
+    "Norway": "Noruega",
+    "Palestine": "Palestina",
+    "Panama": "Panamà",
+    "Papua New Guinea": "Papua Nova Guinea",
+    "Paraguay": "Paraguai",
+    "Peru": "Perú",
+    "Philippines": "Filipines",
+    "Poland": "Polònia",
+    "Russia": "Rússia",
+    "Rwanda": "Ruanda",
+    "Saint Kitts and Nevis": "Saint Kitts i Nevis",
+    "Saudi Arabia": "Aràbia Saudita",
+    "Serbia": "Sèrbia",
+    "Singapore": "Singapur",
+    "Slovakia": "Eslovàquia",
+    "Slovenia": "Eslovènia",
+    "Somalia": "Somàlia",
+    "South Africa": "Sud-àfrica",
+    "Spain": "Espanya",
+    "Suriname": "Surinam",
+    "Sweden": "Suècia",
+    "Switzerland": "Suïssa",
+    "Syria": "Síria",
+    "Tajikistan": "Tadjikistan",
+    "Tanzania": "Tanzània",
+    "Thailand": "Tailàndia",
+    "Trinidad and Tobago": "Trinitat i Tobago",
+    "Tunisia": "Tunísia",
+    "Turkey": "Turquia",
+    "USA": "EUA",
+    "Ukraine": "Ucraïna",
+    "United Arab Emirates": "Emirats Àrabs Units",
+    "United Kingdom": "Regne Unit",
+    "Uruguay": "Uruguai",
+    "Venezuela": "Veneçuela",
+    "Yemen": "Iemen",
+    "Zambia": "Zàmbia",
+    "Zimbabwe": "Zimbàbue",
+  },
+  ko: {
+    "Afghanistan": "아프가니스탄",
+    "Albania": "알바니아",
+    "Algeria": "알제리",
+    "Andorra": "안도라",
+    "Angola": "앙골라",
+    "Antigua and Barbuda": "앤티가 바부다",
+    "Argentina": "아르헨티나",
+    "Armenia": "아르메니아",
+    "Australia": "오스트레일리아",
+    "Austria": "오스트리아",
+    "Azerbaijan": "아제르바이잔",
+    "Bahamas": "바하마",
+    "Bahrain": "바레인",
+    "Bangladesh": "방글라데시",
+    "Barbados": "바베이도스",
+    "Belarus": "벨라루스",
+    "Belgium": "벨기에",
+    "Belize": "벨리즈",
+    "Bhutan": "부탄",
+    "Bolivia": "볼리비아",
+    "Bosnia and Herzegovina": "보스니아 헤르체고비나",
+    "Botswana": "보츠와나",
+    "Brazil": "브라질",
+    "Brunei": "브루나이",
+    "Bulgaria": "불가리아",
+    "Cabo Verde": "카보베르데",
+    "Cambodia": "캄보디아",
+    "Cameroon": "카메룬",
+    "Canada": "캐나다",
+    "Chile": "칠레",
+    "China": "중국",
+    "Colombia": "콜롬비아",
+    "Congo": "콩고",
+    "Costa Rica": "코스타리카",
+    "Cote d_Ivoire": "코트디부아르",
+    "Croatia": "크로아티아",
+    "Cuba": "쿠바",
+    "Cyprus": "키프로스",
+    "Czech Republic": "체코",
+    "Democratic Republic of the Congo": "콩고 민주 공화국",
+    "Denmark": "덴마크",
+    "Dominican Republic": "도미니카 공화국",
+    "Ecuador": "에콰도르",
+    "Egypt": "이집트",
+    "El Salvador": "엘살바도르",
+    "Eritrea": "에리트레아",
+    "Estonia": "에스토니아",
+    "Ethiopia": "에티오피아",
+    "Fiji": "피지",
+    "Finland": "핀란드",
+    "France": "프랑스",
+    "Georgia": "조지아",
+    "Germany": "독일",
+    "Ghana": "가나",
+    "Greece": "그리스",
+    "Grenada": "그레나다",
+    "Guatemala": "과테말라",
+    "Guyana": "가이아나",
+    "Haiti": "아이티",
+    "Honduras": "온두라스",
+    "Hong Kong": "홍콩",
+    "Hungary": "헝가리",
+    "Iceland": "아이슬란드",
+    "India": "인도",
+    "Indonesia": "인도네시아",
+    "Iran": "이란",
+    "Iraq": "이라크",
+    "Ireland": "아일랜드",
+    "Israel": "이스라엘",
+    "Italy": "이탈리아",
+    "Jamaica": "자메이카",
+    "Japan": "일본",
+    "Jordan": "요르단",
+    "Kazakhstan": "카자흐스탄",
+    "Kenya": "케냐",
+    "Korea": "대한민국",
+    "Kosovo": "코소보",
+    "Kuwait": "쿠웨이트",
+    "Kyrgyzstan": "키르기스스탄",
+    "Laos": "라오스",
+    "Latvia": "라트비아",
+    "Lebanon": "레바논",
+    "Lesotho": "레소토",
+    "Libya": "리비아",
+    "Liechtenstein": "리히텐슈타인",
+    "Lithuania": "리투아니아",
+    "Luxembourg": "룩셈부르크",
+    "Macau": "마카오",
+    "Madagascar": "마다가스카르",
+    "Malawi": "말라위",
+    "Malaysia": "말레이시아",
+    "Maldives": "몰디브",
+    "Malta": "몰타",
+    "Mauritania": "모리타니",
+    "Mauritius": "모리셔스",
+    "Mexico": "멕시코",
+    "Moldova": "몰도바",
+    "Monaco": "모나코",
+    "Mongolia": "몽골",
+    "Montenegro": "몬테네그로",
+    "Morocco": "모로코",
+    "Mozambique": "모잠비크",
+    "Myanmar": "미얀마",
+    "Namibia": "나미비아",
+    "Nepal": "네팔",
+    "Netherlands": "네덜란드",
+    "New Zealand": "뉴질랜드",
+    "Nicaragua": "니카라과",
+    "Nigeria": "나이지리아",
+    "North Macedonia": "북마케도니아",
+    "Norway": "노르웨이",
+    "Oman": "오만",
+    "Pakistan": "파키스탄",
+    "Palestine": "팔레스타인",
+    "Panama": "파나마",
+    "Papua New Guinea": "파푸아뉴기니",
+    "Paraguay": "파라과이",
+    "Peru": "페루",
+    "Philippines": "필리핀",
+    "Poland": "폴란드",
+    "Portugal": "포르투갈",
+    "Qatar": "카타르",
+    "Romania": "루마니아",
+    "Russia": "러시아",
+    "Rwanda": "르완다",
+    "Saint Kitts and Nevis": "세인트키츠 네비스",
+    "Saint Lucia": "세인트루시아",
+    "Samoa": "사모아",
+    "San Marino": "산마리노",
+    "Saudi Arabia": "사우디아라비아",
+    "Senegal": "세네갈",
+    "Serbia": "세르비아",
+    "Singapore": "싱가포르",
+    "Slovakia": "슬로바키아",
+    "Slovenia": "슬로베니아",
+    "Somalia": "소말리아",
+    "South Africa": "남아프리카 공화국",
+    "Spain": "스페인",
+    "Sri Lanka": "스리랑카",
+    "Sudan": "수단",
+    "Suriname": "수리남",
+    "Sweden": "스웨덴",
+    "Switzerland": "스위스",
+    "Syria": "시리아",
+    "Taiwan": "대만",
+    "Tajikistan": "타지키스탄",
+    "Tanzania": "탄자니아",
+    "Thailand": "태국",
+    "Togo": "토고",
+    "Tonga": "통가",
+    "Trinidad and Tobago": "트리니다드 토바고",
+    "Tunisia": "튀니지",
+    "Turkey": "터키",
+    "Turkmenistan": "투르크메니스탄",
+    "USA": "미국",
+    "Uganda": "우간다",
+    "Ukraine": "우크라이나",
+    "United Arab Emirates": "아랍에미리트",
+    "United Kingdom": "영국",
+    "Uruguay": "우루과이",
+    "Uzbekistan": "우즈베키스탄",
+    "Venezuela": "베네수엘라",
+    "Vietnam": "베트남",
+    "Yemen": "예멘",
+    "Zambia": "잠비아",
+    "Zimbabwe": "짐바브웨",
+  },
+  zh: {
+    "Afghanistan": "阿富汗",
+    "Albania": "阿尔巴尼亚",
+    "Algeria": "阿尔及利亚",
+    "Andorra": "安道尔",
+    "Angola": "安哥拉",
+    "Antigua and Barbuda": "安提瓜和巴布达",
+    "Argentina": "阿根廷",
+    "Armenia": "亚美尼亚",
+    "Australia": "澳大利亚",
+    "Austria": "奥地利",
+    "Azerbaijan": "阿塞拜疆",
+    "Bahamas": "巴哈马",
+    "Bahrain": "巴林",
+    "Bangladesh": "孟加拉国",
+    "Barbados": "巴巴多斯",
+    "Belarus": "白俄罗斯",
+    "Belgium": "比利时",
+    "Belize": "伯利兹",
+    "Bhutan": "不丹",
+    "Bolivia": "玻利维亚",
+    "Bosnia and Herzegovina": "波斯尼亚和黑塞哥维那",
+    "Botswana": "博茨瓦纳",
+    "Brazil": "巴西",
+    "Brunei": "文莱",
+    "Bulgaria": "保加利亚",
+    "Cabo Verde": "佛得角",
+    "Cambodia": "柬埔寨",
+    "Cameroon": "喀麦隆",
+    "Canada": "加拿大",
+    "Chile": "智利",
+    "China": "中国",
+    "Colombia": "哥伦比亚",
+    "Congo": "刚果",
+    "Costa Rica": "哥斯达黎加",
+    "Cote d_Ivoire": "科特迪瓦",
+    "Croatia": "克罗地亚",
+    "Cuba": "古巴",
+    "Cyprus": "塞浦路斯",
+    "Czech Republic": "捷克",
+    "Democratic Republic of the Congo": "刚果民主共和国",
+    "Denmark": "丹麦",
+    "Dominican Republic": "多米尼加共和国",
+    "Ecuador": "厄瓜多尔",
+    "Egypt": "埃及",
+    "El Salvador": "萨尔瓦多",
+    "Eritrea": "厄立特里亚",
+    "Estonia": "爱沙尼亚",
+    "Ethiopia": "埃塞俄比亚",
+    "Fiji": "斐济",
+    "Finland": "芬兰",
+    "France": "法国",
+    "Georgia": "格鲁吉亚",
+    "Germany": "德国",
+    "Ghana": "加纳",
+    "Greece": "希腊",
+    "Grenada": "格林纳达",
+    "Guatemala": "危地马拉",
+    "Guyana": "圭亚那",
+    "Haiti": "海地",
+    "Honduras": "洪都拉斯",
+    "Hong Kong": "香港",
+    "Hungary": "匈牙利",
+    "Iceland": "冰岛",
+    "India": "印度",
+    "Indonesia": "印度尼西亚",
+    "Iran": "伊朗",
+    "Iraq": "伊拉克",
+    "Ireland": "爱尔兰",
+    "Israel": "以色列",
+    "Italy": "意大利",
+    "Jamaica": "牙买加",
+    "Japan": "日本",
+    "Jordan": "约旦",
+    "Kazakhstan": "哈萨克斯坦",
+    "Kenya": "肯尼亚",
+    "Korea": "韩国",
+    "Kosovo": "科索沃",
+    "Kuwait": "科威特",
+    "Kyrgyzstan": "吉尔吉斯斯坦",
+    "Laos": "老挝",
+    "Latvia": "拉脱维亚",
+    "Lebanon": "黎巴嫩",
+    "Lesotho": "莱索托",
+    "Libya": "利比亚",
+    "Liechtenstein": "列支敦士登",
+    "Lithuania": "立陶宛",
+    "Luxembourg": "卢森堡",
+    "Macau": "澳门",
+    "Madagascar": "马达加斯加",
+    "Malawi": "马拉维",
+    "Malaysia": "马来西亚",
+    "Maldives": "马尔代夫",
+    "Malta": "马耳他",
+    "Mauritania": "毛里塔尼亚",
+    "Mauritius": "毛里求斯",
+    "Mexico": "墨西哥",
+    "Moldova": "摩尔多瓦",
+    "Monaco": "摩纳哥",
+    "Mongolia": "蒙古",
+    "Montenegro": "黑山",
+    "Morocco": "摩洛哥",
+    "Mozambique": "莫桑比克",
+    "Myanmar": "缅甸",
+    "Namibia": "纳米比亚",
+    "Nepal": "尼泊尔",
+    "Netherlands": "荷兰",
+    "New Zealand": "新西兰",
+    "Nicaragua": "尼加拉瓜",
+    "Nigeria": "尼日利亚",
+    "North Macedonia": "北马其顿",
+    "Norway": "挪威",
+    "Oman": "阿曼",
+    "Pakistan": "巴基斯坦",
+    "Palestine": "巴勒斯坦",
+    "Panama": "巴拿马",
+    "Papua New Guinea": "巴布亚新几内亚",
+    "Paraguay": "巴拉圭",
+    "Peru": "秘鲁",
+    "Philippines": "菲律宾",
+    "Poland": "波兰",
+    "Portugal": "葡萄牙",
+    "Qatar": "卡塔尔",
+    "Romania": "罗马尼亚",
+    "Russia": "俄罗斯",
+    "Rwanda": "卢旺达",
+    "Saint Kitts and Nevis": "圣基茨和尼维斯",
+    "Saint Lucia": "圣卢西亚",
+    "Samoa": "萨摩亚",
+    "San Marino": "圣马力诺",
+    "Saudi Arabia": "沙特阿拉伯",
+    "Senegal": "塞内加尔",
+    "Serbia": "塞尔维亚",
+    "Singapore": "新加坡",
+    "Slovakia": "斯洛伐克",
+    "Slovenia": "斯洛文尼亚",
+    "Somalia": "索马里",
+    "South Africa": "南非",
+    "Spain": "西班牙",
+    "Sri Lanka": "斯里兰卡",
+    "Sudan": "苏丹",
+    "Suriname": "苏里南",
+    "Sweden": "瑞典",
+    "Switzerland": "瑞士",
+    "Syria": "叙利亚",
+    "Taiwan": "台湾",
+    "Tajikistan": "塔吉克斯坦",
+    "Tanzania": "坦桑尼亚",
+    "Thailand": "泰国",
+    "Togo": "多哥",
+    "Tonga": "汤加",
+    "Trinidad and Tobago": "特立尼达和多巴哥",
+    "Tunisia": "突尼斯",
+    "Turkey": "土耳其",
+    "Turkmenistan": "土库曼斯坦",
+    "USA": "美国",
+    "Uganda": "乌干达",
+    "Ukraine": "乌克兰",
+    "United Arab Emirates": "阿联酋",
+    "United Kingdom": "英国",
+    "Uruguay": "乌拉圭",
+    "Uzbekistan": "乌兹别克斯坦",
+    "Venezuela": "委内瑞拉",
+    "Vietnam": "越南",
+    "Yemen": "也门",
+    "Zambia": "赞比亚",
+    "Zimbabwe": "津巴布韦",
+  },
+  vi: {
+    "Algeria": "Algérie",
+    "Antigua and Barbuda": "Antigua và Barbuda",
+    "Australia": "Úc",
+    "Austria": "Áo",
+    "Belgium": "Bỉ",
+    "Bosnia and Herzegovina": "Bosna và Hercegovina",
+    "Brazil": "Brasil",
+    "Cambodia": "Campuchia",
+    "China": "Trung Quốc",
+    "Cote d_Ivoire": "Bờ Biển Ngà",
+    "Cyprus": "Síp",
+    "Czech Republic": "Cộng hòa Séc",
+    "Democratic Republic of the Congo": "CHDC Congo",
+    "Denmark": "Đan Mạch",
+    "Dominican Republic": "Cộng hòa Dominica",
+    "Egypt": "Ai Cập",
+    "Finland": "Phần Lan",
+    "France": "Pháp",
+    "Germany": "Đức",
+    "Greece": "Hy Lạp",
+    "Hong Kong": "Hồng Kông",
+    "India": "Ấn Độ",
+    "Italy": "Ý",
+    "Japan": "Nhật Bản",
+    "Korea": "Hàn Quốc",
+    "Laos": "Lào",
+    "Lithuania": "Litva",
+    "Macau": "Ma Cao",
+    "Mongolia": "Mông Cổ",
+    "Morocco": "Maroc",
+    "Netherlands": "Hà Lan",
+    "North Macedonia": "Bắc Macedonia",
+    "Norway": "Na Uy",
+    "Poland": "Ba Lan",
+    "Portugal": "Bồ Đào Nha",
+    "Russia": "Nga",
+    "Saint Kitts and Nevis": "Saint Kitts và Nevis",
+    "Saudi Arabia": "Ả Rập Saudi",
+    "South Africa": "Nam Phi",
+    "Spain": "Tây Ban Nha",
+    "Sweden": "Thụy Điển",
+    "Switzerland": "Thụy Sĩ",
+    "Taiwan": "Đài Loan",
+    "Thailand": "Thái Lan",
+    "Trinidad and Tobago": "Trinidad và Tobago",
+    "Turkey": "Thổ Nhĩ Kỳ",
+    "USA": "Mỹ",
+    "Ukraine": "Ukraina",
+    "United Arab Emirates": "UAE",
+    "United Kingdom": "Anh",
+    "Vietnam": "Việt Nam",
+  },
+};
+
 let currentLang = localStorage.getItem("lang") || "en";
 
 function t(key) {
   return (LANG[currentLang] && LANG[currentLang][key]) || (LANG.en[key] || key);
+}
+
+function getCountryName(countryKey) {
+  return (COUNTRY_NAMES[currentLang] && COUNTRY_NAMES[currentLang][countryKey]) || countryKey;
 }
 
 function applyTranslations() {
@@ -621,6 +1670,7 @@ function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem("lang", lang);
   applyTranslations();
+  populateCountries(true);
   currentPage = 1;
   renderTable();
 }
@@ -665,6 +1715,7 @@ function decodeMbfText(wca) {
 }
 
 let allData = {};
+let personLookup = {};
 let currentCountry = null;
 let currentContinent = "__world__";
 let currentGender = "all";
@@ -785,6 +1836,12 @@ function getWR() {
 
 async function loadData() {
   allData = window.KINCH_DATA;
+  personLookup = {};
+  for (const c of Object.values(allData.countries)) {
+    for (const e of c.entries) {
+      personLookup[e.id] = e;
+    }
+  }
   init();
 }
 
@@ -806,7 +1863,12 @@ function init() {
   const conSel = document.getElementById("continentSelect");
   if (allData.continents) {
     for (const [id, name] of Object.entries(allData.continents)) {
-      conSel.add(new Option(name, id));
+      const i18nKey = CONTINENT_I18N[id] || id;
+      const opt = document.createElement("option");
+      opt.value = id;
+      opt.textContent = t(i18nKey);
+      opt.dataset.i18n = i18nKey;
+      conSel.add(opt);
     }
   }
   conSel.addEventListener("change", () => {
@@ -863,18 +1925,20 @@ function init() {
   renderTable();
 }
 
-function populateCountries() {
+function populateCountries(preserveValue) {
   const sel = document.getElementById("countrySelect");
-  sel.innerHTML = `<option value="__world__">${t("world")}</option>`;
+  const prevValue = preserveValue ? sel.value : "__world__";
+  sel.innerHTML = `<option value="__world__" data-i18n="world">${t("world")}</option>`;
   const cc = allData.country_continent || {};
   const sorted = Object.keys(allData.countries).sort();
   for (const c of sorted) {
     if (currentContinent === "__world__" || cc[c] === currentContinent) {
-      sel.add(new Option(`${c} (${allData.countries[c].count})`, c));
+      const name = getCountryName(c);
+      sel.add(new Option(`${name} (${allData.countries[c].count})`, c));
     }
   }
-  sel.value = "__world__";
-  currentCountry = "__world__";
+  sel.value = prevValue;
+  currentCountry = prevValue;
 }
 
 function populateSince() {
@@ -983,7 +2047,7 @@ function renderTable() {
     html += "<tr>";
     html += `<td>${e.rank}</td>`;
     const flag = currentCountry === "__world__" ? ` <span style="color:#8b949e;font-size:11px">${esc(e.country)}</span>` : "";
-    html += `<td><a href="https://www.worldcubeassociation.org/persons/${esc(e.id)}" target="_blank" class="person-link">${esc(e.name)}</a>${flag}</td>`;
+    html += `<td><a href="javascript:void(0)" class="person-link" data-wca-id="${esc(e.id)}" onclick="showProfile('${esc(e.id)}');return false">${esc(e.name)}</a>${flag}</td>`;
     html += `<td>${e.overall.toFixed(2)}</td>`;
     const evtCount = activeEvents.filter(eid => e.events[eid] > 0).length;
     html += `<td>${evtCount}</td>`;
@@ -1049,6 +2113,149 @@ function renderTable() {
       });
     });
   });
+}
+
+function showProfile(wcaId) {
+  const person = personLookup[wcaId];
+  if (!person) return;
+
+  document.getElementById("controls").style.display = "none";
+  document.getElementById("status").style.display = "none";
+  document.getElementById("tableWrap").style.display = "none";
+  document.getElementById("pagination").style.display = "none";
+
+  const profileDiv = document.getElementById("profileView");
+  profileDiv.style.display = "block";
+  profileDiv.scrollTop = 0;
+  window.scrollTo(0, 0);
+
+  renderProfile(person);
+}
+
+function hideProfile() {
+  document.getElementById("profileView").style.display = "none";
+  document.getElementById("controls").style.display = "flex";
+  document.getElementById("tableWrap").style.display = "block";
+  document.getElementById("pagination").style.display = "flex";
+}
+
+function renderProfile(person) {
+  const compNames = allData.competitions || {};
+
+  let html = `<div class="profile-header">`;
+  html += `<button class="profile-back" onclick="hideProfile()">←</button>`;
+  html += `<span class="profile-name">${esc(person.name)}</span>`;
+  html += `</div>`;
+
+  html += `<div class="profile-section">`;
+  html += `<div class="profile-section-title">${t("profileInfo")}</div>`;
+  html += `<table class="profile-info-table"><thead><tr>`;
+  html += `<th>${t("profileWcaId")}</th><th>${t("profileName")}</th><th>${t("profileCountry")}</th><th>${t("profileGender")}</th>`;
+  html += `</tr></thead><tbody><tr>`;
+  html += `<td><a href="https://www.worldcubeassociation.org/persons/${esc(person.id)}" target="_blank">${esc(person.id)}</a></td>`;
+  html += `<td>${esc(person.name)}</td>`;
+  html += `<td>${esc(getCountryName(person.country))}</td>`;
+  html += `<td>${person.gender === "m" ? t("male") : person.gender === "f" ? t("female") : t("all")}</td>`;
+  html += `</tr></tbody></table>`;
+  html += `</div>`;
+
+  html += `<div class="profile-section">`;
+  html += `<div class="profile-section-title">${t("profileResults")}</div>`;
+  html += `<div class="table-wrap" style="margin-top:4px">`;
+  html += `<table class="profile-events-table"><thead><tr>`;
+  html += `<th>${t("profileEvent")}</th>`;
+  html += `<th class="comp-col">${t("profileCompetition")}</th>`;
+  html += `<th>${t("profileNR")}</th>`;
+  html += `<th>${t("profileCR")}</th>`;
+  html += `<th>${t("profileWR")}</th>`;
+  html += `<th>${t("profileSingle")}</th>`;
+  html += `<th>${t("profileAverage")}</th>`;
+  html += `<th>${t("profileWR")}</th>`;
+  html += `<th>${t("profileCR")}</th>`;
+  html += `<th>${t("profileNR")}</th>`;
+  html += `<th class="comp-col">${t("profileCompetition")}</th>`;
+  html += `</tr></thead><tbody>`;
+
+  const eventsOrder = ["333","222","444","555","666","777","333bf","333fm","333oh","clock","minx","pyram","skewb","sq1","444bf","555bf","333mbf"];
+
+  for (const eid of eventsOrder) {
+    const pb = person.pbs && person.pbs[eid];
+    if (!pb) continue;
+
+    const sComp = pb.sc ? (compNames[pb.sc] || pb.sc) : "-";
+    const aComp = pb.ac ? (compNames[pb.ac] || pb.ac) : "-";
+    const sr = pb.sr, scr = pb.scr, swr = pb.swr;
+    const ar = pb.ar, acr = pb.acr, awr = pb.awr;
+    const nrS = sr != null ? sr : "-";
+    const crS = scr != null ? scr : "-";
+    const wrS = swr != null ? swr : "-";
+    const nrA = ar != null ? ar : "-";
+    const crA = acr != null ? acr : "-";
+    const wrA = awr != null ? awr : "-";
+
+    function rcls(val, swr, scr, sr, type) {
+      if (val == null || val === "-") return "rank-col";
+      let cls = "rank-col";
+      if (val <= 20) cls += " rank-bold";
+      if (val <= 10) cls += " rank-top10";
+      if (val === 1) {
+        if (swr === 1) cls += " rank-wr";
+        else if (type !== "wr" && scr === 1) cls += " rank-cr";
+        else if (type === "nr") cls += " rank-nr";
+        else if (type === "cr") cls += " rank-cr";
+        else if (type === "wr") cls += " rank-wr";
+      }
+      return cls;
+    }
+
+    function tcls(wr, nr, cr) {
+      if (wr === 1) return "profile-time profile-time-wr";
+      if (cr === 1) return "profile-time profile-time-cr";
+      if (nr === 1) return "profile-time profile-time-nr";
+      return "profile-time";
+    }
+
+    let singleStr = "-";
+    let sCls = "";
+    if (pb.s != null) {
+      if (eid === "333mbf") {
+        singleStr = decodeMbfText(pb.s) || "-";
+      } else if (eid === "333fm") {
+        singleStr = pb.s.toString();
+      } else {
+        singleStr = formatCenti(pb.s);
+      }
+      sCls = tcls(swr, sr, scr);
+    }
+
+    let averageStr = "-";
+    let aCls = "";
+    if (pb.a != null) {
+      if (eid === "333fm") {
+        averageStr = (pb.a / 100).toFixed(2);
+      } else if (eid !== "333mbf") {
+        averageStr = formatCenti(pb.a);
+      }
+      aCls = tcls(awr, ar, acr);
+    }
+
+    html += `<tr>`;
+    html += `<td>${EVENT_LABELS[eid] || eid}</td>`;
+    html += `<td class="comp-col">${esc(sComp)}</td>`;
+    html += `<td class="${rcls(sr, swr, scr, sr, "nr")}">${nrS}</td>`;
+    html += `<td class="${rcls(scr, swr, scr, sr, "cr")}">${crS}</td>`;
+    html += `<td class="${rcls(swr, swr, scr, sr, "wr")}">${wrS}</td>`;
+    html += `<td class="${sCls}">${singleStr}</td>`;
+    html += `<td class="${aCls}">${averageStr}</td>`;
+    html += `<td class="${rcls(awr, awr, acr, ar, "wr")}">${wrA}</td>`;
+    html += `<td class="${rcls(acr, awr, acr, ar, "cr")}">${crA}</td>`;
+    html += `<td class="${rcls(ar, awr, acr, ar, "nr")}">${nrA}</td>`;
+    html += `<td class="comp-col">${esc(aComp)}</td>`;
+    html += `</tr>`;
+  }
+
+  html += `</tbody></table></div></div>`;
+  document.getElementById("profileView").innerHTML = html;
 }
 
 function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
