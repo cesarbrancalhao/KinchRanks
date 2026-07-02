@@ -540,7 +540,8 @@ def main():
             indexed = list(enumerate(entries))
             indexed.sort(key=lambda x: x[1]["_scores"].get(event_id, 0.0), reverse=True)
             for i, _ in indexed[:TOP_PER_EVENT]:
-                selected.add(i)
+                if entries[i]["_scores"].get(event_id, 0.0) > 0:
+                    selected.add(i)
 
         top_entries = [entries[i] for i in sorted(selected)]
         top_entries.sort(key=lambda x: x["overall"], reverse=True)
@@ -666,7 +667,6 @@ def main():
         "country_continent": country_continent,
         "continents": CONTINENT_NAMES,
         "countries": result,
-        "precomputed": precomputed,
     }
     scores_js = os.path.join(os.path.dirname(__file__), "scores.js")
     with open(scores_js, "w") as f:
