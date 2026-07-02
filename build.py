@@ -38,9 +38,9 @@ AVERAGE_EVENTS = {"333", "222", "444", "555", "666", "777", "333oh", "clock", "m
 BETTER_OF_EVENTS = {"333bf", "444bf", "555bf", "333fm"}
 MBF_EVENT = "333mbf"
 
-MIN_EVENTS = 5
-TOP_OVERALL = 200
-TOP_PER_EVENT = 50
+MIN_EVENTS = 1
+TOP_OVERALL = 1000
+TOP_PER_EVENT = 200
 
 CONTINENT_NAMES = {
     "_Africa": "Africa",

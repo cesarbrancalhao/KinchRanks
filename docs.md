@@ -65,9 +65,9 @@ Events are grouped by how their Kinch score is derived:
 
 ### Selection tuning
 
-- `MIN_EVENTS = 5` — persons must have at least this many non-zero Kinch scores to be included. Prevents 1–2 event specialists from cluttering rankings.
-- `TOP_OVERALL = 200` — guarantee top N by overall score per country.
-- `TOP_PER_EVENT = 50` — guarantee top N per individual event per country.
+- `MIN_EVENTS = 1` — persons must have at least this many non-zero Kinch scores to be included.
+- `TOP_OVERALL = 1000` — guarantee top N by overall score per country.
+- `TOP_PER_EVENT = 200` — guarantee top N per individual event per country.
 - Final set is the UNION of both guarantees so event specialists (e.g. a 5BLD ace with low overall) are never omitted.
 
 ### Key functions
@@ -90,8 +90,8 @@ Events are grouped by how their Kinch score is derived:
 
 For each country:
 1. Build the set of person indices to include.
-2. Top 200 overall: only persons with ≥ `MIN_EVENTS` qualify.
-3. Top 50 per event: anyone with a score in that event qualifies.
+2. Top 1000 overall: only persons with ≥ `MIN_EVENTS` qualify.
+3. Top 200 per event: anyone with a score in that event qualifies.
 4. Union both sets.
 5. Sort by overall score, assign ranks.
 
