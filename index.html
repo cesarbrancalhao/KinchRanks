@@ -2220,6 +2220,7 @@ function renderTable() {
           const k = computeKinch(e.pbs, wr, activeEvents);
           return { ...e, overall: k.overall, events: k.scores };
         });
+        entries = entries.filter(e => activeEvents.some(eid => e.events[eid] > 0));
         entries.sort((a, b) => b.overall - a.overall);
       }
     }
@@ -2247,6 +2248,9 @@ function renderTable() {
 
   const activeEvents = getActiveEvents();
   const wr = getWR();
+
+  entries = entries.filter(e => activeEvents.some(eid => e.events[eid] > 0));
+  if (entries.length === 0) { const tw = document.getElementById("tableWrap"); tw.style.display = "none"; const pd = document.getElementById("pagination"); pd.style.display = "none"; return; }
 
   entries = [...entries].sort((a, b) => {
     let va, vb;
