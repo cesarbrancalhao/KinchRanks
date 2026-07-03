@@ -2,6 +2,8 @@
 
 import json
 import os
+import sqlite3
+import gzip
 from collections import defaultdict
 from datetime import datetime, timezone
 
@@ -171,6 +173,295 @@ def _compute_rank(sorted_items):
         prev_val = val
         result[pid] = actual_rank
     return result
+
+
+def _write_sqlite(persons, wr, cwr, conwr, by_country, result, country_continent, used_comp_ids, comp_names):
+    db_path = os.path.join(os.path.dirname(__file__), "data.db")
+    if os.path.exists(db_path):
+        os.remove(db_path)
+
+    conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA journal_mode=OFF")
+    conn.execute("PRAGMA synchronous=OFF")
+    cur = conn.cursor()
+
+    cur.execute("""
+        CREATE TABLE persons (
+            wca_id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            country TEXT NOT NULL,
+            continent TEXT NOT NULL,
+            gender TEXT NOT NULL,
+            debut_year INTEGER NOT NULL
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE event_scores (
+            wca_id TEXT NOT NULL,
+            event_id TEXT NOT NULL,
+            best_single INTEGER,
+            best_average INTEGER,
+            mbf_raw_score REAL,
+            single_comp TEXT,
+            average_comp TEXT,
+            nr_single INTEGER,
+            nr_average INTEGER,
+            cr_single INTEGER,
+            cr_average INTEGER,
+            wr_single INTEGER,
+            wr_average INTEGER,
+            PRIMARY KEY (wca_id, event_id)
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE records (
+            scope TEXT NOT NULL,
+            gender TEXT NOT NULL DEFAULT 'all',
+            event_id TEXT NOT NULL,
+            record_single INTEGER,
+            record_average INTEGER,
+            mbf_score REAL,
+            PRIMARY KEY (scope, gender, event_id)
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE competitions (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE meta (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    """)
+
+    generated_at = datetime.now(timezone.utc).strftime("%Y/%m/%d")
+    cur.execute("INSERT INTO meta VALUES ('generated_at', ?)", (generated_at,))
+
+    selected_ids = set()
+    for cdata in result.values():
+        for entry in cdata["entries"]:
+            selected_ids.add(entry["id"])
+
+    person_rows = []
+    event_rows = []
+    person_count = 0
+
+    for cid, entries in by_country.items():
+        conid = country_continent.get(cid, "")
+
+        for entry in entries:
+            wca_id = entry["id"]
+            if wca_id not in selected_ids:
+                continue
+
+            person = persons.get(wca_id)
+            if not person:
+                continue
+
+            debut_year = int(wca_id[:4]) if wca_id and len(wca_id) >= 4 and wca_id[:4].isdigit() else 0
+
+            person_rows.append((
+                wca_id, person["name"], cid, conid,
+                person["gender"], debut_year,
+            ))
+            person_count += 1
+
+            pbs_full = entry.get("pbs", {})
+            pbs_ext = entry.get("_pbs_ext", {})
+
+            for eid in KINCH_EVENTS_ALL:
+                pb = pbs_full.get(eid, {})
+                ext = pbs_ext.get(eid, {})
+                if not pb:
+                    continue
+
+                mbf_raw = None
+                if eid == MBF_EVENT:
+                    sv = pb.get("s")
+                    if sv is not None:
+                        raw = compute_kinch_mbf(sv)
+                        if raw is not None:
+                            mbf_raw = raw
+
+                event_rows.append((
+                    wca_id, eid,
+                    pb.get("s"), pb.get("a"),
+                    mbf_raw,
+                    ext.get("sc"), ext.get("ac"),
+                    ext.get("sr"), ext.get("ar"),
+                    ext.get("scr"), ext.get("acr"),
+                    ext.get("swr"), ext.get("awr"),
+                ))
+
+    cur.executemany(
+        "INSERT OR IGNORE INTO persons VALUES (?,?,?,?,?,?)",
+        person_rows,
+    )
+    cur.executemany(
+        "INSERT OR IGNORE INTO event_scores VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        event_rows,
+    )
+
+    wr_rows = []
+    for gk in ("all", "m", "f"):
+        w = wr.get(gk, {})
+        for eid in KINCH_EVENTS_ALL:
+            rs = w["single"].get(eid) if "single" in w else None
+            ra = w["average"].get(eid) if "average" in w else None
+            mbf = w.get("mbf_score") if eid == MBF_EVENT else None
+            wr_rows.append(("world", gk, eid, rs, ra, mbf))
+    for cid in result:
+        cw = cwr.get(cid, {})
+        for gk in ("all", "m", "f"):
+            w = cw.get(gk, {})
+            for eid in KINCH_EVENTS_ALL:
+                rs = w["single"].get(eid) if "single" in w else None
+                ra = w["average"].get(eid) if "average" in w else None
+                mbf = w.get("mbf_score") if eid == MBF_EVENT else None
+                if rs or ra or (mbf is not None and eid == MBF_EVENT):
+                    wr_rows.append((cid, gk, eid, rs, ra, mbf))
+    for confid in conwr:
+        if confid in CONTINENT_NAMES:
+            cw = conwr[confid]
+            for gk in ("all", "m", "f"):
+                w = cw.get(gk, {})
+                for eid in KINCH_EVENTS_ALL:
+                    rs = w["single"].get(eid) if "single" in w else None
+                    ra = w["average"].get(eid) if "average" in w else None
+                    mbf = w.get("mbf_score") if eid == MBF_EVENT else None
+                    if rs or ra or (mbf is not None and eid == MBF_EVENT):
+                        wr_rows.append((confid, gk, eid, rs, ra, mbf))
+
+    cur.executemany(
+        "INSERT OR IGNORE INTO records VALUES (?,?,?,?,?,?)",
+        wr_rows,
+    )
+
+    comp_rows = [(cid, comp_names[cid]) for cid in used_comp_ids if cid in comp_names]
+    cur.executemany(
+        "INSERT OR IGNORE INTO competitions VALUES (?,?)",
+        comp_rows,
+    )
+
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_es_wca ON event_scores(wca_id)")
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_es_event ON event_scores(event_id)")
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_p_country ON persons(country)")
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_p_continent ON persons(continent)")
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_p_gender ON persons(gender)")
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_p_debut ON persons(debut_year)")
+
+    print("  Computing precomputed rankings...", flush=True)
+    cur.execute("""
+        CREATE TABLE precomputed (
+            gender TEXT NOT NULL,
+            event_group TEXT NOT NULL,
+            include_clock INTEGER NOT NULL,
+            rank INTEGER NOT NULL,
+            wca_id TEXT NOT NULL,
+            overall REAL NOT NULL,
+            PRIMARY KEY (gender, event_group, include_clock, rank)
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE precomputed_totals (
+            gender TEXT NOT NULL,
+            event_group TEXT NOT NULL,
+            include_clock INTEGER NOT NULL,
+            total_count INTEGER NOT NULL,
+            PRIMARY KEY (gender, event_group, include_clock)
+        )
+    """)
+
+    GROUP_EVENTS_PY = {
+        "__all__": KINCH_EVENTS,
+        "nxn": ["333","222","444","555","666","777","333oh"],
+        "big": ["444","555","666","777"],
+        "bld": ["333bf","444bf","555bf","333mbf"],
+        "nonbld": ["333","222","444","555","666","777","333fm","333oh","clock","minx","pyram","skewb","sq1"],
+        "other": ["clock","minx","pyram","skewb","sq1","333fm"],
+    }
+
+    event_kinch = {}
+    for cid, entries in by_country.items():
+        for entry in entries:
+            wca_id = entry["id"]
+            if wca_id not in selected_ids:
+                continue
+            pbs = entry.get("pbs", {})
+            scores = {}
+            for eid in KINCH_EVENTS_ALL:
+                pb = pbs.get(eid, {})
+                s = 0.0
+                if eid == MBF_EVENT:
+                    sv = pb.get("s")
+                    if sv is not None and wr["all"]["mbf_score"] and wr["all"]["mbf_score"] > 0:
+                        raw = compute_kinch_mbf(sv)
+                        if raw is not None:
+                            s = round(min(raw / wr["all"]["mbf_score"] * 100, 100.0), 2)
+                elif eid in AVERAGE_EVENTS:
+                    av = pb.get("a")
+                    wv = wr["all"]["average"].get(eid)
+                    if av is not None and av > 0 and wv and wv > 0:
+                        s = round(min(wv / av * 100, 100.0), 2)
+                elif eid in BETTER_OF_EVENTS:
+                    sv = pb.get("s")
+                    av = pb.get("a")
+                    ks = 0.0
+                    ka = 0.0
+                    wvs = wr["all"]["single"].get(eid)
+                    wva = wr["all"]["average"].get(eid)
+                    if sv is not None and sv > 0 and wvs and wvs > 0:
+                        ks = wvs / sv * 100
+                    if av is not None and av > 0 and wva and wva > 0:
+                        ka = wva / av * 100
+                    s = round(min(max(ks, ka), 100.0), 2)
+                scores[eid] = s
+            event_kinch[wca_id] = scores
+
+    precomp_rows = []
+    precomp_total_rows = []
+    for g in ("all", "m", "f"):
+        for gk, g_events in GROUP_EVENTS_PY.items():
+            for inc_clock in (0, 1):
+                events = list(g_events)
+                if inc_clock and "clock" not in events:
+                    events.append("clock")
+                n = len(events)
+                ranked = []
+                for wca_id, scores in event_kinch.items():
+                    p_entry = persons.get(wca_id)
+                    if not p_entry:
+                        continue
+                    if g != "all" and p_entry["gender"] != g:
+                        continue
+                    overall = sum(scores.get(eid, 0) for eid in events) / n
+                    if overall > 0:
+                        ranked.append((overall, wca_id))
+                ranked.sort(key=lambda x: x[0], reverse=True)
+                precomp_total_rows.append((g, gk, inc_clock, len(ranked)))
+                for rank, (overall, wca_id) in enumerate(ranked[:500], 1):
+                    precomp_rows.append((g, gk, inc_clock, rank, wca_id, round(overall, 2)))
+
+    cur.executemany(
+        "INSERT OR IGNORE INTO precomputed VALUES (?,?,?,?,?,?)",
+        precomp_rows,
+    )
+    cur.executemany(
+        "INSERT OR IGNORE INTO precomputed_totals VALUES (?,?,?,?)",
+        precomp_total_rows,
+    )
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_pc_lookup ON precomputed(gender, event_group, include_clock)")
+    print(f"    {len(precomp_rows)} precomputed rows across all combinations", flush=True)
+
+    conn.commit()
+    conn.close()
+
+    db_size = os.path.getsize(db_path)
+    print(f"Wrote {db_path} ({db_size / 1024 / 1024:.1f} MB)", flush=True)
+    print(f"  {person_count} persons, {len(event_rows)} event scores, {len(wr_rows)} records, {len(comp_rows)} comps", flush=True)
 
 
 def main():
@@ -675,42 +966,6 @@ def main():
     print(f"  {len(result)} countries, {total_entries} total entries, {count_200} with 200+ entries", flush=True)
     print(f"  {len(comps_output)} competitions referenced in output", flush=True)
 
-    scores_data = {
-        "generated_at": output["generated_at"],
-        "wr": wr_data,
-        "cwr": cwr_data,
-        "conwr": conwr_data,
-        "country_continent": country_continent,
-        "continents": CONTINENT_NAMES,
-        "countries": result,
-    }
-    scores_js = os.path.join(os.path.dirname(__file__), "scores.js")
-    with open(scores_js, "w") as f:
-        f.write("window.KINCH_SCORES=")
-        json.dump(scores_data, f, ensure_ascii=False)
-        f.write(";")
-    print(f"Wrote {scores_js}", flush=True)
-
-    profiles_output = {
-        "competitions": comps_output,
-        "profiles": profiles_data,
-    }
-    profiles_js = os.path.join(os.path.dirname(__file__), "profiles.js")
-    with open(profiles_js, "w") as f:
-        f.write("window.KINCH_PROFILES=")
-        json.dump(profiles_output, f, ensure_ascii=False)
-        f.write(";")
-    print(f"Wrote {profiles_js}", flush=True)
-
-    clock_output = {"pbs": clock_pbs, "pbs_ext": clock_pbs_ext}
-    clock_js = os.path.join(os.path.dirname(__file__), "clock.js")
-    with open(clock_js, "w") as f:
-        f.write("window.KINCH_CLOCK=")
-        json.dump(clock_output, f, ensure_ascii=False)
-        f.write(";")
-    print(f"Wrote {clock_js}", flush=True)
-    print(f"  {len(clock_pbs)} clock PB entries", flush=True)
-
     quick_data = {
         "entries": precomputed,
         "wr": wr_data["all"],
@@ -722,6 +977,21 @@ def main():
         json.dump(quick_data, f, ensure_ascii=False)
         f.write(";")
     print(f"Wrote {quick_js}", flush=True)
+
+    print("Writing SQLite database...", flush=True)
+    _write_sqlite(persons, wr, cwr, conwr, by_country, result, country_continent, used_comp_ids, comp_names)
+
+    db_path = os.path.join(os.path.dirname(__file__), "data.db")
+    gz_path = db_path + ".gz"
+    with open(db_path, "rb") as f_in:
+        with gzip.open(gz_path, "wb", compresslevel=9) as f_out:
+            while True:
+                chunk = f_in.read(1 << 20)
+                if not chunk:
+                    break
+                f_out.write(chunk)
+    gz_size = os.path.getsize(gz_path)
+    print(f"Compressed data.db.gz ({gz_size / 1024 / 1024:.1f} MB)", flush=True)
 
 
 if __name__ == "__main__":

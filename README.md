@@ -5,30 +5,29 @@ Interactive [Kinch rank](https://www.speedsolving.com/wiki/index.php/KinchRanks)
 ## Features
 
 - **Full Kinch scoring** — event scores computed as WR / personal record × 100, capped at 100
-- **Instant load** — top 1000 pre-computed rankings render immediately; full dataset loads in background
-- **Lazy Clock** — Clock event data loaded on demand only when toggled, keeping default payload light
-- **Region & country views** — filter rankings against world or local records
+- **Instant load** — top 1000 from `1000.js` renders immediately; `data.db.gz` (~24 MB) loads async via [sql.js](https://github.com/sql-js/sql.js/)
+- **IndexedDB cache** — subsequent visits load the DB from local storage, zero network transfer
+- **Precomputed rankings** — top 500 per gender/event-group/clock combo served from a `precomputed` table, instant for most filter combinations
+- **Region & country views** — filter rankings against world, country, or continent records
 - **Gender & debut year filters** — drill down by male/female and WCA ID year
 - **Event grouping** — NxN, big cubes, BLD, non-BLD, other
-- **Search & sort** — search by name, sort by any column
-- **Profile view** — click any name for detailed event-by-event results with NR/CR/WR ranks
+- **Search & sort** — search by name (pushed to SQL), sort by any column (via SQL ORDER BY)
+- **Profile view** — click any name for detailed event-by-event results with NR/CR/WR ranks, all from the DB
 - **Dark/light mode** — night theme (default) and WCA-inspired day theme
 - **9 languages** — English, Portuguese, Spanish, German, Italian, Catalan, Korean, Chinese, Vietnamese
 
 ## How it works
 
-The data pipeline (`build.py`) streams the [WCA developer database dump](https://www.worldcubeassociation.org/export/results), extracts personal bests, computes world/country records, selects top entries per country, and outputs four files:
+The data pipeline (`build.py`) streams the [WCA developer database dump](https://www.worldcubeassociation.org/export/results), extracts personal bests, computes world/country/continent records, selects top entries per country, and outputs:
 
-- `1000.js` (~200KB) — top 1000 pre-computed entries with world-record Kinch scores. Loads synchronously for instant default view.
-- `scores.js` (~30MB) — full dataset for the main table (world/country/continent records, per-country entries with light PBs — only raw times, no clock). Loads asynchronously, unlocks all filters.
-- `profiles.js` (~40MB) — profile-only data (competition names, NR/CR/WR ranks for all events including clock). Loads asynchronously for progressive enhancement.
-- `clock.js` (< 1MB) — Clock event times. Loaded on demand only when the user toggles the Clock checkbox.
+- `1000.js` (~200 KB) — top 1000 pre-computed entries for the default view. Loads synchronously for instant render.
+- `data.db.gz` (~24 MB compressed) — gzipped SQLite database deployed to GitHub Pages. The frontend decompresses it in-browser via `DecompressionStream`, then queries with sql.js. Contains all data: persons, event scores (PBs, ranks, competition IDs, MBF raw scores), records (WR/CWR/conWR baselines), competitions, and precomputed top-500 rankings per filter combination.
 
-The frontend (`index.html`) renders the table immediately from `1000.js` while `scores.js` loads. Country, region and debut-year filters are disabled with a "Loading" placeholder until `scores.js` arrives. Profile details (ranks, competition names) become available when `profiles.js` loads. Clock data is fetched lazily on first toggle. A result cache avoids recomputing Kinch scores for repeated filter combinations.
+The frontend (`index.html`) renders the table immediately from `1000.js` while `data.db.gz` loads asynchronously. On subsequent visits the decompressed DB is served from IndexedDB. Kinch scores are computed on the fly in SQL — no stored columns. Clock is a regular event; toggling it just adds/removes it from the event list.
 
-Entries with zero results in all active events are automatically excluded from the table.
+All sorting (including per-event columns), pagination, and search are pushed to SQL. PBs and per-event scores are loaded only for the visible page entries (not all 71k), keeping RAM usage minimal.
 
-No server, no API calls, fully static.
+No server, no API calls, fully static. Deploys to GitHub Pages.
 
 ## Setup (generate your own data)
 
@@ -36,4 +35,4 @@ No server, no API calls, fully static.
 2. Copy `.env.example` to `.env` and set your paths
 3. Run `python3 build.py`
 
-This outputs `scores.js`, `profiles.js`, `clock.js`, and `1000.js`.
+This outputs `data.db`, `data.db.gz`, and `1000.js`.

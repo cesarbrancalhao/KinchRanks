@@ -22,6 +22,16 @@ h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; }
 .controls input[type="text"] { width: 100%; min-width: 80px; }
 .clock-label { font-size: 11px; color: #6e7681; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 4px; white-space: nowrap; margin-left: 12px; }
 
+.db-loading-overlay { position: absolute; inset: 0; background: rgba(22,27,34,0.92); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; border-radius: 8px; z-index: 10; }
+body.light .db-loading-overlay { background: rgba(255,255,255,0.92); }
+.db-loading-spinner { width: 28px; height: 28px; border: 3px solid #30363d; border-top-color: #58a6ff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+body.light .db-loading-spinner { border-color: #ccc; border-top-color: #0055A4; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.db-loading-text { font-size: 14px; color: #8b949e; }
+body.light .db-loading-text { color: #555; }
+.db-loading-sub { font-size: 11px; color: #484f58; }
+body.light .db-loading-sub { color: #888; }
+
 .table-wrap { overflow-x: auto; border: 1px solid #30363d; border-radius: 8px; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
 th, td { padding: 6px 10px; text-align: right; }
@@ -195,7 +205,12 @@ body.light .profile-events-table .rank-cr { font-weight: 700; color: #1a7f3a; }
   <p class="legend" id="legendKinch" data-i18n="legendKinch">Kinch score = average of (WR / personal record × 100) across all 17 events. Missing events count as 0. MBF uses points + time ratio.</p>
   <p class="legend" id="legendColors"><span class="showing-time single" style="font-weight:700;white-space:normal" data-i18n="legendBlue">Blue</span><span data-i18n="legendSingle"> = single solve</span> &nbsp; <span class="showing-time average" style="font-weight:700;white-space:normal" data-i18n="legendGreen">Green</span><span data-i18n="legendAverage"> = average. Click any score to reveal the underlying times.</span></p>
 
-  <div class="controls" id="controls">
+  <div class="controls" id="controls" style="position:relative">
+    <div class="db-loading-overlay" id="dbLoadingOverlay">
+      <div class="db-loading-spinner"></div>
+      <div class="db-loading-text">Loading data...</div>
+      <div class="db-loading-sub">Top 1000 displayed &mdash; full dataset incoming</div>
+    </div>
     <div class="ctrl-row">
       <div class="ctrl-cell">
         <span class="cg-label" data-i18n="countryRegion">Region / Country</span>
@@ -248,7 +263,6 @@ body.light .profile-events-table .rank-cr { font-weight: 700; color: #1a7f3a; }
           <option value="200">200</option>
           <option value="300">300</option>
           <option value="500">500</option>
-          <option value="1000">1000</option>
         </select>
         <label class="clock-label"><span data-i18n="clock">Clock</span> <input type="checkbox" id="includeClock"></label>
       </div>
@@ -261,14 +275,9 @@ body.light .profile-events-table .rank-cr { font-weight: 700; color: #1a7f3a; }
 </div>
 
 <script src="1000.js"></script>
+<script src="https://sql.js.org/dist/sql-wasm.js"></script>
 <script>
-var _scoresScript = document.createElement('script');
-_scoresScript.src = 'scores.js';
-document.head.appendChild(_scoresScript);
-
-var _profilesScript = document.createElement('script');
-_profilesScript.src = 'profiles.js';
-document.head.appendChild(_profilesScript);
+let DB_CACHE = 'kinch_db_v2';
 
 const LANG = {
   en: {
@@ -1838,6 +1847,8 @@ function decodeMbfText(wca) {
 
 let allData = {};
 let personLookup = {};
+let db = null;
+let dbLoaded = false;
 let currentCountry = null;
 let currentContinent = "__world__";
 let currentGender = "all";
@@ -1849,7 +1860,6 @@ let pageSize = 100;
 let sortCol = 2;
 let sortDir = -1;
 let includeClock = false;
-let clockData = null;
 let _lastEntries = null;
 let _lastActiveEvents = null;
 let _lastWR = null;
@@ -1857,6 +1867,7 @@ let _nextPageHTML = null;
 let _preRenderedPage = 0;
 let _pendingFullRefresh = false;
 let _currentProfileId = null;
+let _precomputedTotal = 0;
 
 function isDefaultFilters() {
   return (currentCountry === null || currentCountry === "__world__") &&
@@ -1963,48 +1974,139 @@ function computeKinch(pbs, wr, activeEvents) {
 }
 
 function getWR() {
-  let src;
-  if (currentCountry && currentCountry !== "__world__") {
-    src = (allData.cwr && allData.cwr[currentCountry]) || allData.wr;
-  } else if (currentContinent && currentContinent !== "__world__") {
-    src = (allData.conwr && allData.conwr[currentContinent]) || allData.wr;
-  } else {
-    src = allData.wr;
+  if (dbLoaded && currentCountry && currentCountry !== "__world__") {
+    return queryWrFromDb(currentCountry, currentGender);
+  } else if (dbLoaded && currentContinent && currentContinent !== "__world__") {
+    return queryWrFromDb(currentContinent, currentGender);
+  } else if (dbLoaded) {
+    return queryWrFromDb("world", currentGender);
   }
+  let src = allData.wr;
   return src[currentGender] || src["all"];
 }
 
-function loadData() {
-  if (window.KINCH_SCORES) {
-    allData = window.KINCH_SCORES;
-    personLookup = {};
-    for (const c of Object.values(allData.countries)) {
-      for (const e of c.entries) {
-        personLookup[e.id] = e;
-      }
+function queryWrFromDb(scope, gender) {
+  let genderKey = gender || "all";
+  let rows = queryAll("SELECT event_id, record_single, record_average, mbf_score FROM records WHERE scope=? AND gender=?", [scope, genderKey]);
+  if (!rows.length) rows = queryAll("SELECT event_id, record_single, record_average, mbf_score FROM records WHERE scope=? AND gender='all'", [scope]);
+  if (!rows.length) rows = queryAll("SELECT event_id, record_single, record_average, mbf_score FROM records WHERE scope='world' AND gender=?", [genderKey]);
+  if (!rows.length) rows = queryAll("SELECT event_id, record_single, record_average, mbf_score FROM records WHERE scope='world' AND gender='all'", []);
+  let single = {}, average = {}, mbf_score = null;
+  rows.forEach(function(r) {
+    if (r.record_single) single[r.event_id] = r.record_single;
+    if (r.record_average) average[r.event_id] = r.record_average;
+    if (r.mbf_score != null) mbf_score = r.mbf_score;
+  });
+  return { single: single, average: average, mbf_score: mbf_score };
+}
+
+function queryAll(sql, params) {
+  if (!db) return [];
+  try {
+    let stmt = db.prepare(sql);
+    if (params && params.length) stmt.bind(params);
+    let rows = [];
+    while (stmt.step()) {
+      rows.push(stmt.getAsObject());
     }
-  } else if (window.KINCH_QUICK) {
-    var q = window.KINCH_QUICK;
+    stmt.free();
+    return rows;
+  } catch(e) { console.error('SQL error:', e, sql); return []; }
+}
+
+function queryOne(sql, params) {
+  let rows = queryAll(sql, params);
+  return rows.length ? rows[0] : null;
+}
+
+function getDbFromCache() {
+  return new Promise(function(resolve) {
+    let req = indexedDB.open(DB_CACHE, 1);
+    req.onupgradeneeded = function(e) {
+      e.target.result.createObjectStore('dbs');
+    };
+    req.onsuccess = function(e) {
+      let tx = e.target.result.transaction('dbs', 'readonly');
+      let store = tx.objectStore('dbs');
+      let get = store.get('data');
+      get.onsuccess = function() { resolve(get.result || null); };
+      get.onerror = function() { resolve(null); };
+    };
+    req.onerror = function() { resolve(null); };
+  });
+}
+
+function putDbToCache(buf) {
+  let req = indexedDB.open(DB_CACHE, 1);
+  req.onsuccess = function(e) {
+    let tx = e.target.result.transaction('dbs', 'readwrite');
+    tx.objectStore('dbs').put(buf, 'data');
+  };
+}
+
+async function loadDb() {
+  let overlay = document.getElementById("dbLoadingOverlay");
+  overlay.querySelector(".db-loading-text").textContent = "Loading data...";
+  try {
+    let SQL = await initSqlJs({ locateFile: function(f) { return 'https://sql.js.org/dist/' + f; } });
+    let buf;
+    let cached = await getDbFromCache();
+    if (cached) {
+      buf = cached;
+    } else {
+      let resp = await fetch('data.db.gz');
+      let blob = await resp.blob();
+      let ds = new DecompressionStream('gzip');
+      let decompressedStream = blob.stream().pipeThrough(ds);
+      let decompressedResp = new Response(decompressedStream);
+      buf = await decompressedResp.arrayBuffer();
+      putDbToCache(buf);
+    }
+    db = new SQL.Database(new Uint8Array(buf));
+    dbLoaded = true;
+  } catch(e) {
+    console.error('DB load failed:', e);
+    overlay.querySelector(".db-loading-spinner").style.display = "none";
+    overlay.querySelector(".db-loading-text").textContent = "Failed to load data.";
+    overlay.querySelector(".db-loading-sub").textContent = "Top 1000 only. Refresh to retry.";
+    return;
+  }
+  onDbLoaded();
+}
+
+function loadData() {
+  if (window.KINCH_QUICK) {
+    let q = window.KINCH_QUICK;
     allData = {
       precomputed: q.entries,
       wr: { all: q.wr },
-      cwr: {},
-      conwr: {},
-      countries: {},
-      country_continent: {},
-      continents: {},
-      competitions: {},
       generated_at: q.generated_at
     };
   }
   init();
+  if (!window.KINCH_QUICK) return;
+  loadDb();
+}
+
+function queryCountriesByContinent(con) {
+  if (!dbLoaded) return [];
+  if (con === '__world__') {
+    return queryAll("SELECT country, COUNT(*) as cnt FROM persons GROUP BY country ORDER BY country");
+  }
+  return queryAll("SELECT country, COUNT(*) as cnt FROM persons WHERE continent=? GROUP BY country ORDER BY country", [con]);
+}
+
+function queryDebutYears() {
+  if (!dbLoaded) return [];
+  let rows = queryAll("SELECT DISTINCT debut_year FROM persons WHERE debut_year >= 2000 ORDER BY debut_year");
+  return rows.map(function(r) { return r.debut_year; });
 }
 
 function init() {
   document.getElementById("langSelect").value = currentLang;
   applyTranslations();
 
-  var hasFullData = !!window.KINCH_SCORES;
+  let hasFullData = dbLoaded;
 
   if (!hasFullData && !(allData.precomputed && allData.precomputed.length)) {
     document.getElementById("status").style.display = "block";
@@ -2012,20 +2114,25 @@ function init() {
     return;
   }
 
-  if (document.getElementById("profileView").style.display !== "block") {
-    document.getElementById("controls").style.display = "flex";
-  }
+  document.getElementById("controls").style.display = "flex";
   document.getElementById("status").style.display = "none";
+
+  if (!hasFullData) {
+    document.getElementById("dbLoadingOverlay").style.display = "flex";
+  }
+
   if (allData.generated_at) {
     document.getElementById("genDate").textContent = "\u2014 " + t("generated") + ": " + allData.generated_at;
   }
 
-  var conSel = document.getElementById("continentSelect");
+  let conSel = document.getElementById("continentSelect");
   while (conSel.options.length > 1) conSel.remove(1);
-  if (hasFullData && allData.continents) {
-    for (const [id, name] of Object.entries(allData.continents)) {
-      const i18nKey = CONTINENT_I18N[id] || id;
-      const opt = document.createElement("option");
+  if (hasFullData) {
+    let continentKeys = ["_Africa", "_Asia", "_Europe", "_North America", "_South America", "_Oceania"];
+    for (let ci = 0; ci < continentKeys.length; ci++) {
+      let id = continentKeys[ci];
+      let i18nKey = CONTINENT_I18N[id] || id;
+      let opt = document.createElement("option");
       opt.value = id;
       opt.textContent = t(i18nKey);
       opt.dataset.i18n = i18nKey;
@@ -2041,7 +2148,7 @@ function init() {
     renderTable();
   });
 
-  var sel = document.getElementById("countrySelect");
+  let sel = document.getElementById("countrySelect");
   sel.innerHTML = "";
   sel.add(new Option(t("world"), "__world__"));
   sel.onchange = null;
@@ -2050,50 +2157,33 @@ function init() {
   populateCountries();
   if (hasFullData) populateSince();
 
-  var searchEl = document.getElementById("search");
+  let searchEl = document.getElementById("search");
   searchEl.oninput = null;
   searchEl.addEventListener("input", function() { currentPage = 1; renderTable(); });
 
-  var clockEl = document.getElementById("includeClock");
+  let clockEl = document.getElementById("includeClock");
   clockEl.onchange = null;
   clockEl.addEventListener("change", function() {
-    if (this.checked && !clockData) {
-      this.checked = false;
-      this.disabled = true;
-      var s = document.createElement('script');
-      s.src = 'clock.js';
-      s.onload = function() {
-        clockData = window.KINCH_CLOCK;
-        mergeClockData();
-        clockEl.disabled = false;
-        clockEl.checked = true;
-        includeClock = true;
-        currentPage = 1;
-        renderTable();
-      };
-      document.head.appendChild(s);
-      return;
-    }
     includeClock = this.checked; currentPage = 1; renderTable();
   });
 
-  var genderEl = document.getElementById("genderSelect");
+  let genderEl = document.getElementById("genderSelect");
   genderEl.onchange = null;
   genderEl.addEventListener("change", function() { currentGender = this.value; currentPage = 1; renderTable(); });
 
-  var groupEl = document.getElementById("groupSelect");
+  let groupEl = document.getElementById("groupSelect");
   groupEl.onchange = null;
   groupEl.addEventListener("change", function() { currentGroup = this.value; currentPage = 1; renderTable(); });
 
-  var sinceEl = document.getElementById("sinceSelect");
+  let sinceEl = document.getElementById("sinceSelect");
   sinceEl.onchange = null;
   sinceEl.addEventListener("change", function() { currentSince = parseInt(this.value); currentPage = 1; renderTable(); });
 
-  var untilEl = document.getElementById("untilSelect");
+  let untilEl = document.getElementById("untilSelect");
   untilEl.onchange = null;
   untilEl.addEventListener("change", function() { currentUntil = parseInt(this.value); currentPage = 1; renderTable(); });
 
-  var psEl = document.getElementById("pageSizeSelect");
+  let psEl = document.getElementById("pageSizeSelect");
   psEl.onchange = null;
   psEl.addEventListener("change", function() { pageSize = parseInt(this.value); currentPage = 1; renderTable(); });
 
@@ -2111,31 +2201,42 @@ function init() {
     document.getElementById("sinceSelect").options[0].textContent = "Loading";
     document.getElementById("untilSelect").disabled = true;
     document.getElementById("untilSelect").options[0].textContent = "Loading";
+  } else {
+    document.getElementById("continentSelect").disabled = false;
+    document.getElementById("continentSelect").options[0].textContent = t("world");
+    document.getElementById("countrySelect").disabled = false;
+    document.getElementById("sinceSelect").disabled = false;
+    document.getElementById("sinceSelect").options[0].textContent = t("after");
+    document.getElementById("untilSelect").disabled = false;
+    document.getElementById("untilSelect").options[0].textContent = t("before");
   }
 
   renderTable();
 }
 
 function populateCountries(preserveValue) {
-  const sel = document.getElementById("countrySelect");
-  const prevValue = preserveValue ? sel.value : "__world__";
-  sel.innerHTML = `<option value="__world__" data-i18n="world">${t("world")}</option>`;
-  var cc = allData.country_continent || {};
-  var hasFullData = !!window.KINCH_SCORES;
+  let sel = document.getElementById("countrySelect");
+  let prevValue = preserveValue ? sel.value : "__world__";
+  sel.innerHTML = '<option value="__world__" data-i18n="world">' + t("world") + '</option>';
+  let cc = allData.country_continent || {};
 
-  if (hasFullData) {
-    const sorted = Object.keys(allData.countries).sort();
-    for (const c of sorted) {
-      if (currentContinent === "__world__" || cc[c] === currentContinent) {
-        const name = getCountryName(c);
-        sel.add(new Option(name + " (" + allData.countries[c].count + ")", c));
+  if (dbLoaded) {
+    let rows = queryCountriesByContinent(currentContinent);
+    for (let i = 0; i < rows.length; i++) {
+      let c = rows[i].country;
+      let name = getCountryName(c);
+      sel.add(new Option(name + " (" + rows[i].cnt + ")", c));
+    }
+    if (!cc || Object.keys(cc).length === 0) {
+      for (let j = 0; j < rows.length; j++) {
+        cc[rows[j].country] = "";
       }
     }
   } else if (allData.precomputed) {
-    var seen = {};
-    var countries = [];
-    for (var i = 0; i < allData.precomputed.length; i++) {
-      var e = allData.precomputed[i];
+    let seen = {};
+    let countries = [];
+    for (let i = 0; i < allData.precomputed.length; i++) {
+      let e = allData.precomputed[i];
       if (!seen[e.country]) {
         seen[e.country] = true;
         countries.push(e.country);
@@ -2143,8 +2244,8 @@ function populateCountries(preserveValue) {
       }
     }
     countries.sort();
-    for (var j = 0; j < countries.length; j++) {
-      var c = countries[j];
+    for (let j = 0; j < countries.length; j++) {
+      let c = countries[j];
       if (currentContinent === "__world__" || cc[c] === currentContinent) {
         sel.add(new Option(getCountryName(c), c));
       }
@@ -2156,163 +2257,257 @@ function populateCountries(preserveValue) {
 }
 
 function populateSince() {
-  const selAfter = document.getElementById("sinceSelect");
-  const selUntil = document.getElementById("untilSelect");
-  const years = new Set();
-  for (const c of Object.values(allData.countries)) {
-    for (const e of c.entries) {
-      const y = parseInt((e.id || "").substring(0, 4));
-      if (!isNaN(y) && y >= 2000) years.add(y);
+  let selAfter = document.getElementById("sinceSelect");
+  let selUntil = document.getElementById("untilSelect");
+  let years;
+  if (dbLoaded) {
+    years = queryDebutYears();
+  } else {
+    years = [];
+    for (let c in allData.countries) {
+      for (let i = 0; i < allData.countries[c].entries.length; i++) {
+        let y = parseInt((allData.countries[c].entries[i].id || "").substring(0, 4));
+        if (!isNaN(y) && y >= 2000) years.push(y);
+      }
     }
+    years = [...new Set(years)].sort();
   }
-  const sorted = [...years].sort();
-  for (const y of sorted) {
-    selAfter.add(new Option(y, y));
-    selUntil.add(new Option(y, y));
+  for (let i = 0; i < years.length; i++) {
+    selAfter.add(new Option(years[i], years[i]));
+    selUntil.add(new Option(years[i], years[i]));
   }
 }
 
+function getRecordScope() {
+  if (currentCountry && currentCountry !== "__world__") return currentCountry;
+  if (currentContinent && currentContinent !== "__world__") return currentContinent;
+  return "world";
+}
+
+function buildKinchExpr(eventId) {
+  if (eventId === "333mbf") {
+    return "CASE WHEN es.mbf_raw_score IS NOT NULL AND COALESCE(r.mbf_score, rw.mbf_score) > 0 THEN MIN(100.0, es.mbf_raw_score * 100.0 / COALESCE(r.mbf_score, rw.mbf_score)) ELSE 0 END";
+  }
+  if (AVERAGE_EVENTS.has(eventId)) {
+    return "CASE WHEN es.best_average > 0 AND COALESCE(r.record_average, rw.record_average) > 0 THEN MIN(100.0, COALESCE(r.record_average, rw.record_average) * 100.0 / es.best_average) ELSE 0 END";
+  }
+  return "MIN(100.0, MAX(" +
+    "CASE WHEN es.best_single > 0 AND COALESCE(r.record_single, rw.record_single) > 0 THEN COALESCE(r.record_single, rw.record_single) * 100.0 / es.best_single ELSE 0 END," +
+    "CASE WHEN es.best_average > 0 AND COALESCE(r.record_average, rw.record_average) > 0 THEN COALESCE(r.record_average, rw.record_average) * 100.0 / es.best_average ELSE 0 END))";
+}
+
+function canUsePrecomputed() {
+  if (!dbLoaded) return false;
+  if (currentCountry && currentCountry !== "__world__") return false;
+  if (currentContinent && currentContinent !== "__world__") return false;
+  if (currentSince > 0 || currentUntil < 9999) return false;
+  if (document.getElementById("search").value.trim()) return false;
+  if (sortCol !== 0 && sortCol !== 2 && sortCol !== 3) return false;
+  return true;
+}
+
+function getPrecomputedEntries() {
+  let gender = currentGender || "all";
+  let group = currentGroup || "__all__";
+  let clock = includeClock ? 1 : 0;
+
+  let sql = 'SELECT pc.wca_id, p.name, p.country, p.continent, p.gender, pc.overall ' +
+    'FROM precomputed pc ' +
+    'JOIN persons p ON p.wca_id = pc.wca_id ' +
+    'WHERE pc.gender = ? AND pc.event_group = ? AND pc.include_clock = ? ' +
+    'ORDER BY pc.rank';
+  let rows = queryAll(sql, [gender, group, clock]);
+  return rows.map(function(r) {
+    return { id: r.wca_id, name: r.name, country: r.country, continent: r.continent,
+             gender: r.gender, overall: r.overall, pbs: {}, events: {} };
+  });
+}
+
+function getPrecomputedTotal() {
+  let gender = currentGender || "all";
+  let group = currentGroup || "__all__";
+  let clock = includeClock ? 1 : 0;
+  let rows = queryAll("SELECT total_count FROM precomputed_totals WHERE gender=? AND event_group=? AND include_clock=?", [gender, group, clock]);
+  return rows.length ? rows[0].total_count : 0;
+}
+
 function getEntries() {
-  let all = [];
-  if (currentCountry && currentCountry !== "__world__") {
-    all = (allData.countries[currentCountry] && allData.countries[currentCountry].entries) || [];
-  } else {
-    for (const c of Object.values(allData.countries)) {
-      for (const e of c.entries) {
-        if (currentContinent !== "__world__" && e.continent !== currentContinent) continue;
-        all.push(e);
-      }
+  if (!dbLoaded && allData.precomputed) return allData.precomputed;
+  if (!dbLoaded) return [];
+
+  if (canUsePrecomputed()) {
+    let rows = getPrecomputedEntries();
+    if (rows.length) {
+      let total = getPrecomputedTotal();
+      _precomputedTotal = total;
+      let offsetNeeded = (currentPage - 1) * pageSize;
+      if (offsetNeeded < rows.length) return rows;
     }
   }
-  if (currentGender !== "all") {
-    all = all.filter(e => e.gender === currentGender);
+
+  let activeEvents = getActiveEvents();
+  let scope = getRecordScope();
+  let gender = currentGender;
+  let numEvents = activeEvents.length;
+  let evPlaceholders = activeEvents.map(function() { return '?'; }).join(',');
+
+  let kinchCases = activeEvents.map(function(eid) {
+    return "WHEN es.event_id = '" + eid + "' THEN (" + buildKinchExpr(eid) + ")";
+  });
+  let kinchSum = 'SUM(CASE ' + kinchCases.join(' ') + ' ELSE 0 END)';
+
+  let sql = 'SELECT p.wca_id, p.name, p.country, p.continent, p.gender, ' +
+    'ROUND(' + kinchSum + ' / ?, 2) AS overall ' +
+    'FROM persons p ' +
+    'JOIN event_scores es ON p.wca_id = es.wca_id ' +
+    'LEFT JOIN records r ON r.event_id = es.event_id AND r.scope = ? AND r.gender = ? ' +
+    'LEFT JOIN records rw ON rw.event_id = es.event_id AND rw.scope = \'world\' AND rw.gender = ? ' +
+    'WHERE es.event_id IN (' + evPlaceholders + ')';
+  let params = [numEvents, scope, gender, gender].concat(activeEvents);
+
+  if (currentCountry && currentCountry !== "__world__") {
+    sql += ' AND p.country=?'; params.push(currentCountry);
+  } else if (currentContinent && currentContinent !== "__world__") {
+    sql += ' AND p.continent=?'; params.push(currentContinent);
   }
-  if (currentSince > 0 || currentUntil < 9999) {
-    all = all.filter(e => {
-      const y = parseInt((e.id || "").substring(0, 4));
-      if (isNaN(y)) return true;
-      return y >= currentSince && y <= currentUntil;
+  if (currentGender !== "all") { sql += ' AND p.gender=?'; params.push(currentGender); }
+  if (currentSince > 0) { sql += ' AND p.debut_year>=?'; params.push(currentSince); }
+  if (currentUntil < 9999) { sql += ' AND p.debut_year<=?'; params.push(currentUntil); }
+  let searchTerm = document.getElementById("search").value.trim().toLowerCase();
+  if (searchTerm) { sql += ' AND p.name LIKE ?'; params.push('%' + searchTerm + '%'); }
+
+  sql += ' GROUP BY p.wca_id';
+  sql += ' HAVING overall > 0';
+
+  if (sortCol === 0 || sortCol === 2 || sortCol === 3) {
+    sql += ' ORDER BY overall ' + (sortDir === -1 ? 'DESC' : 'ASC');
+  } else if (sortCol === 1) {
+    sql += ' ORDER BY p.name ' + (sortDir === 1 ? 'ASC' : 'DESC');
+  } else {
+    let sortEid = activeEvents[sortCol - 4];
+    sql += ' ORDER BY SUM(CASE WHEN es.event_id = \'' + sortEid + '\' THEN (' + buildKinchExpr(sortEid) + ') ELSE 0 END) ' + (sortDir === -1 ? 'DESC' : 'ASC');
+  }
+
+  let rows = queryAll(sql, params);
+  return rows.map(function(r) {
+    return { id: r.wca_id, name: r.name, country: r.country, continent: r.continent,
+             gender: r.gender, overall: r.overall, pbs: {}, events: {} };
+  });
+}
+
+function loadPbsForEntries(entries, activeEvents, wr) {
+  if (!entries.length || !dbLoaded) return;
+  var maxPerBatch = 980 - activeEvents.length;
+  var evPlaceholders = activeEvents.map(function() { return '?'; }).join(',');
+
+  var pbsMap = {};
+  entries.forEach(function(e) { pbsMap[e.id] = e; });
+
+  for (var b = 0; b < entries.length; b += maxPerBatch) {
+    var batch = entries.slice(b, b + maxPerBatch);
+    var wcaIds = batch.map(function(e) { return e.id; });
+    var idPlaceholders = wcaIds.map(function() { return '?'; }).join(',');
+
+    var sql = 'SELECT wca_id, event_id, best_single, best_average, mbf_raw_score FROM event_scores ' +
+      'WHERE wca_id IN (' + idPlaceholders + ') AND event_id IN (' + evPlaceholders + ')';
+    var params = wcaIds.concat(activeEvents);
+    var rows = queryAll(sql, params);
+
+    rows.forEach(function(r) {
+      var entry = pbsMap[r.wca_id];
+      if (!entry) return;
+      if (!entry.pbs) entry.pbs = {};
+      entry.pbs[r.event_id] = {};
+      if (r.best_single) entry.pbs[r.event_id].s = r.best_single;
+      if (r.best_average) entry.pbs[r.event_id].a = r.best_average;
+      if (r.mbf_raw_score != null) entry.pbs[r.event_id]._mbf = r.mbf_raw_score;
     });
   }
-  return all;
 }
 
 function getActiveEvents() {
   let events = GROUP_EVENTS[currentGroup] || EVENT_IDS;
-  if (!clockData) {
-    events = events.filter(function(e) { return e !== "clock"; });
-  } else if (includeClock && !events.includes("clock")) {
-    events = [...events, "clock"];
-  }
+  if (includeClock && !events.includes("clock")) return events.concat(["clock"]);
   return events;
 }
 
 function renderTable() {
-  const wrap = document.getElementById("tableWrap");
-
+  let wrap = document.getElementById("tableWrap");
   let entries;
-  if (isDefaultFilters() && allData.precomputed) {
+  let quickMode = !dbLoaded;
+
+  if (quickMode) {
     entries = allData.precomputed;
   } else {
     entries = getEntries();
-    if (entries.length === 0) {
+    if (!entries.length) {
       if (allData.precomputed) {
         entries = allData.precomputed.filter(function(e) {
           if (currentCountry !== null && currentCountry !== "__world__" && e.country !== currentCountry) return false;
           if (currentContinent !== "__world__" && e.continent !== currentContinent) return false;
           if (currentGender !== "all" && e.gender !== currentGender) return false;
           if (currentSince > 0 || currentUntil < 9999) {
-            var y = parseInt((e.id || "").substring(0, 4));
+            let y = parseInt((e.id || "").substring(0, 4));
             if (!isNaN(y) && (y < currentSince || y > currentUntil)) return false;
           }
           return true;
         });
-      } else {
-        wrap.style.display = "none";
-        document.getElementById("pagination").style.display = "none";
-        return;
       }
-    } else {
-      const activeEvents = getActiveEvents();
-      const wr = getWR();
-      entries = entries.map(e => {
-        const k = computeKinch(e.pbs, wr, activeEvents);
-        return { ...e, overall: k.overall, events: k.scores };
-      });
-      entries = entries.filter(e => activeEvents.some(eid => e.events[eid] > 0));
-      entries.sort((a, b) => b.overall - a.overall);
     }
   }
 
-  if (entries.length === 0) { wrap.style.display = "none"; document.getElementById("pagination").style.display = "none"; return; }
+  if (!entries.length) { wrap.style.display = "none"; document.getElementById("pagination").style.display = "none"; return; }
 
-  entries = entries.map(e => {
-    if (!e.pbs) {
-      const person = personLookup[e.id];
-      return { ...e, pbs: person ? person.pbs || {} : {} };
-    }
-    return e;
-  });
-
-  const q = document.getElementById("search").value.toLowerCase();
-  if (q) {
-    const tokens = q.split(/\s+/).filter(Boolean);
-    entries = entries.filter(e => {
-      const name = e.name.toLowerCase();
-      return tokens.every(t => name.includes(t));
-    });
-  }
-
-  const activeEvents = getActiveEvents();
-  const wr = getWR();
-
-  entries = entries.filter(e => activeEvents.some(eid => e.events[eid] > 0));
-  if (entries.length === 0) { const tw = document.getElementById("tableWrap"); tw.style.display = "none"; const pd = document.getElementById("pagination"); pd.style.display = "none"; return; }
-
-  entries = [...entries].sort((a, b) => {
-    let va, vb;
-    if (sortCol === 0) { va = a.overall; vb = b.overall; }
-    else if (sortCol === 1) { va = a.name; vb = b.name; return sortDir * va.localeCompare(vb); }
-    else if (sortCol === 2) { va = a.overall; vb = b.overall; }
-    else if (sortCol === 3) {
-      va = activeEvents.filter(eid => a.events[eid] > 0).length;
-      vb = activeEvents.filter(eid => b.events[eid] > 0).length;
-    }
-    else { const eid = activeEvents[sortCol - 4]; va = a.events[eid] || 0; vb = b.events[eid] || 0; }
-    return sortDir * (va - vb);
-  });
-
-  const totalEntries = entries.length;
-  const totalPages = Math.max(1, Math.ceil(totalEntries / pageSize));
+  let totalEntries = _precomputedTotal > 0 ? _precomputedTotal : entries.length;
+  _precomputedTotal = 0;
+  let totalPages = Math.max(1, Math.ceil(totalEntries / pageSize));
   if (currentPage > totalPages) currentPage = totalPages;
-  const start = (currentPage - 1) * pageSize;
-  const pageEntries = entries.slice(start, start + pageSize)
-    .map((e, i) => ({ ...e, rank: start + i + 1 }));
+  let start = (currentPage - 1) * pageSize;
+  let pageEntries = entries.slice(start, start + pageSize)
+    .map(function(e, i) { return Object.assign({}, e, { rank: start + i + 1 }); });
+
+  if (!quickMode && pageEntries.length) {
+    let activeEvents = getActiveEvents();
+    let wr = getWR();
+    loadPbsForEntries(pageEntries, activeEvents, wr);
+    for (let i = 0; i < pageEntries.length; i++) {
+      let k = computeKinch(pageEntries[i].pbs, wr, activeEvents);
+      pageEntries[i].overall = k.overall;
+      pageEntries[i].events = k.scores;
+    }
+  } else {
+    for (let i = 0; i < pageEntries.length; i++) {
+      if (!pageEntries[i].pbs) pageEntries[i].pbs = {};
+    }
+  }
+
+  let activeEvents = getActiveEvents();
+  let wr = getWR();
 
   let html = "<table><thead><tr>";
-  html += `<th data-col="0">${t("colRank")}</th>`;
-  html += `<th data-col="1">${t("colPerson")}</th>`;
-  html += `<th data-col="2">${t("colOverall")}</th>`;
-  html += `<th data-col="3">${t("colEvts")}</th>`;
-  activeEvents.forEach((eid, i) => html += `<th data-col="${i + 4}">${EVENT_LABELS[eid]}</th>`);
+  html += '<th data-col="0">' + t("colRank") + '</th>';
+  html += '<th data-col="1">' + t("colPerson") + '</th>';
+  html += '<th data-col="2">' + t("colOverall") + '</th>';
+  html += '<th data-col="3">' + t("colEvts") + '</th>';
+  activeEvents.forEach(function(eid, i) { html += '<th data-col="' + (i + 4) + '">' + EVENT_LABELS[eid] + '</th>'; });
   html += "</tr></thead><tbody>";
 
-  pageEntries.forEach(e => {
+  pageEntries.forEach(function(e) {
     html += "<tr>";
-    html += `<td>${e.rank}</td>`;
-    const flag = currentCountry === "__world__" ? ` <span style="color:#8b949e;font-size:11px">${esc(e.country)}</span>` : "";
-    html += `<td><a href="javascript:void(0)" class="person-link" data-wca-id="${esc(e.id)}" onclick="showProfile('${esc(e.id)}');return false">${esc(e.name)}</a>${flag}</td>`;
-    html += `<td>${e.overall.toFixed(2)}</td>`;
-    const evtCount = activeEvents.filter(eid => e.events[eid] > 0).length;
-    html += `<td>${evtCount}</td>`;
-    activeEvents.forEach(eid => {
-      const v = e.events[eid] || 0;
+    html += '<td>' + e.rank + '</td>';
+    let flag = currentCountry === "__world__" ? ' <span style="color:#8b949e;font-size:11px">' + esc(e.country) + '</span>' : "";
+    html += '<td><a href="javascript:void(0)" class="person-link" data-wca-id="' + esc(e.id) + '" onclick="showProfile(\'' + esc(e.id) + '\');return false">' + esc(e.name) + '</a>' + flag + '</td>';
+    html += '<td>' + e.overall.toFixed(2) + '</td>';
+    let evtCount = activeEvents.filter(function(eid) { return e.events[eid] > 0; }).length;
+    html += '<td>' + evtCount + '</td>';
+    activeEvents.forEach(function(eid) {
+      let v = e.events[eid] || 0;
       if (v > 0) {
-        const cls = (v >= 100 ? "score-100" : v >= 90 ? "score-90" : "") + " score-cell";
-        const info = getTimeString(eid, e.pbs, wr);
-        html += `<td class="${cls}" data-time="${esc(info ? info.text : "")}" data-type="${info ? info.type : ""}">${v.toFixed(2)}</td>`;
+        let cls = (v >= 100 ? "score-100" : v >= 90 ? "score-90" : "") + " score-cell";
+        let info = getTimeString(eid, e.pbs, wr);
+        html += '<td class="' + cls + '" data-time="' + esc(info ? info.text : "") + '" data-type="' + (info ? info.type : "") + '">' + v.toFixed(2) + '</td>';
       } else {
-        html += `<td>-</td>`;
+        html += '<td>-</td>';
       }
     });
     html += "</tr>";
@@ -2321,45 +2516,40 @@ function renderTable() {
   wrap.innerHTML = html;
   wrap.style.display = "block";
 
-  const pagDiv = document.getElementById("pagination");
-  let pagHtml = `<span class="info">${totalEntries} ${t("total")}</span>`;
-  pagHtml += `<button ${currentPage === 1 ? "disabled" : ""} data-page="1">${t("first")}</button>`;
-  pagHtml += `<button ${currentPage === 1 ? "disabled" : ""} data-page="${currentPage - 1}">${t("prev")}</button>`;
-  const startPg = Math.max(1, currentPage - 3);
-  const endPg = Math.min(totalPages, currentPage + 3);
+  let pagDiv = document.getElementById("pagination");
+  let pagHtml = '<span class="info">' + totalEntries + ' ' + t("total") + '</span>';
+  pagHtml += '<button ' + (currentPage === 1 ? "disabled" : "") + ' data-page="1">' + t("first") + '</button>';
+  pagHtml += '<button ' + (currentPage === 1 ? "disabled" : "") + ' data-page="' + (currentPage - 1) + '">' + t("prev") + '</button>';
+  let startPg = Math.max(1, currentPage - 3);
+  let endPg = Math.min(totalPages, currentPage + 3);
   for (let p = startPg; p <= endPg; p++) {
-    pagHtml += `<button class="${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
+    pagHtml += '<button class="' + (p === currentPage ? 'active' : '') + '" data-page="' + p + '">' + p + '</button>';
   }
-  pagHtml += `<button ${currentPage === totalPages ? "disabled" : ""} data-page="${currentPage + 1}">${t("next")}</button>`;
-  pagHtml += `<button ${currentPage === totalPages ? "disabled" : ""} data-page="${totalPages}">${t("last")}</button>`;
+  pagHtml += '<button ' + (currentPage === totalPages ? "disabled" : "") + ' data-page="' + (currentPage + 1) + '">' + t("next") + '</button>';
+  pagHtml += '<button ' + (currentPage === totalPages ? "disabled" : "") + ' data-page="' + totalPages + '">' + t("last") + '</button>';
   pagDiv.innerHTML = pagHtml;
   pagDiv.style.display = "flex";
-  pagDiv.querySelectorAll("button[data-page]").forEach(btn => {
-    btn.addEventListener("click", () => {
+  pagDiv.querySelectorAll("button[data-page]").forEach(function(btn) {
+    btn.addEventListener("click", function() {
       currentPage = parseInt(btn.dataset.page);
-      if (_lastEntries && _lastActiveEvents) {
-        renderPage();
-      } else {
-        renderTable();
-      }
+      renderTable();
     });
   });
 
-  wrap.querySelectorAll("thead th").forEach(th => {
-    th.addEventListener("click", () => {
-      const col = parseInt(th.dataset.col);
+  wrap.querySelectorAll("thead th").forEach(function(th) {
+    th.addEventListener("click", function() {
+      let col = parseInt(th.dataset.col);
       if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = col === 1 ? 1 : -1; }
       renderTable();
     });
   });
 
-  wrap.querySelectorAll("td.score-cell").forEach(td => {
-    td.addEventListener("click", () => {
-      const colIdx = td.cellIndex;
-      const allCells = wrap.querySelectorAll(`tr td:nth-child(${colIdx + 1}).score-cell`);
-      const showing = td.classList.contains("showing-time");
-
-      allCells.forEach(cell => {
+  wrap.querySelectorAll("td.score-cell").forEach(function(td) {
+    td.addEventListener("click", function() {
+      let colIdx = td.cellIndex;
+      let allCells = wrap.querySelectorAll("tr td:nth-child(" + (colIdx + 1) + ").score-cell");
+      let showing = td.classList.contains("showing-time");
+      allCells.forEach(function(cell) {
         if (showing) {
           cell.textContent = cell.dataset.score;
           cell.classList.remove("showing-time", "single", "average");
@@ -2372,28 +2562,24 @@ function renderTable() {
     });
   });
 
-  _lastEntries = entries;
-  _lastActiveEvents = activeEvents;
-  _lastWR = wr;
-  _nextPageHTML = null;
-  _preRenderedPage = 0;
+  _lastEntries = null;
 }
 
 function renderPage() {
-  var entries = _lastEntries;
-  var activeEvents = _lastActiveEvents;
-  var wr = _lastWR;
-  var totalEntries = entries.length;
-  var totalPages = Math.max(1, Math.ceil(totalEntries / pageSize));
+  let entries = _lastEntries;
+  let activeEvents = _lastActiveEvents;
+  let wr = _lastWR;
+  let totalEntries = entries.length;
+  let totalPages = Math.max(1, Math.ceil(totalEntries / pageSize));
   if (currentPage > totalPages) currentPage = totalPages;
-  var start = (currentPage - 1) * pageSize;
-  var pageEntries = entries.slice(start, start + pageSize).map(function(e, i) { return { ...e, rank: start + i + 1 }; });
+  let start = (currentPage - 1) * pageSize;
+  let pageEntries = entries.slice(start, start + pageSize).map(function(e, i) { return { ...e, rank: start + i + 1 }; });
 
-  var wrap = document.getElementById("tableWrap");
-  var tbody = wrap.querySelector("tbody");
+  let wrap = document.getElementById("tableWrap");
+  let tbody = wrap.querySelector("tbody");
   if (!tbody) return renderTable();
 
-  var html = "";
+  let html = "";
   if (currentPage === _preRenderedPage && _nextPageHTML) {
     html = _nextPageHTML;
     _nextPageHTML = null;
@@ -2402,16 +2588,16 @@ function renderPage() {
     pageEntries.forEach(function(e) {
       html += "<tr>";
       html += "<td>" + e.rank + "</td>";
-      var flag = currentCountry === "__world__" ? " <span style=\"color:#8b949e;font-size:11px\">" + esc(e.country) + "</span>" : "";
+      let flag = currentCountry === "__world__" ? " <span style=\"color:#8b949e;font-size:11px\">" + esc(e.country) + "</span>" : "";
       html += "<td><a href=\"javascript:void(0)\" class=\"person-link\" data-wca-id=\"" + esc(e.id) + "\" onclick=\"showProfile('" + esc(e.id) + "');return false\">" + esc(e.name) + "</a>" + flag + "</td>";
       html += "<td>" + e.overall.toFixed(2) + "</td>";
-      var evtCount = activeEvents.filter(function(eid) { return e.events[eid] > 0; }).length;
+      let evtCount = activeEvents.filter(function(eid) { return e.events[eid] > 0; }).length;
       html += "<td>" + evtCount + "</td>";
       activeEvents.forEach(function(eid) {
-        var v = e.events[eid] || 0;
+        let v = e.events[eid] || 0;
         if (v > 0) {
-          var cls = (v >= 100 ? "score-100" : v >= 90 ? "score-90" : "") + " score-cell";
-          var info = getTimeString(eid, e.pbs, wr);
+          let cls = (v >= 100 ? "score-100" : v >= 90 ? "score-90" : "") + " score-cell";
+          let info = getTimeString(eid, e.pbs, wr);
           html += "<td class=\"" + cls + "\" data-time=\"" + esc(info ? info.text : "") + "\" data-type=\"" + (info ? info.type : "") + "\">" + v.toFixed(2) + "</td>";
         } else {
           html += "<td>-</td>";
@@ -2422,13 +2608,13 @@ function renderPage() {
   }
   tbody.innerHTML = html;
 
-  var pagDiv = document.getElementById("pagination");
-  var pagHtml = "<span class=\"info\">" + totalEntries + " " + t("total") + "</span>";
+  let pagDiv = document.getElementById("pagination");
+  let pagHtml = "<span class=\"info\">" + totalEntries + " " + t("total") + "</span>";
   pagHtml += "<button " + (currentPage === 1 ? "disabled" : "") + " data-page=\"1\">" + t("first") + "</button>";
   pagHtml += "<button " + (currentPage === 1 ? "disabled" : "") + " data-page=\"" + (currentPage - 1) + "\">" + t("prev") + "</button>";
-  var startPg = Math.max(1, currentPage - 3);
-  var endPg = Math.min(totalPages, currentPage + 3);
-  for (var p = startPg; p <= endPg; p++) {
+  let startPg = Math.max(1, currentPage - 3);
+  let endPg = Math.min(totalPages, currentPage + 3);
+  for (let p = startPg; p <= endPg; p++) {
     pagHtml += "<button class=\"" + (p === currentPage ? "active" : "") + "\" data-page=\"" + p + "\">" + p + "</button>";
   }
   pagHtml += "<button " + (currentPage === totalPages ? "disabled" : "") + " data-page=\"" + (currentPage + 1) + "\">" + t("next") + "</button>";
@@ -2445,9 +2631,9 @@ function renderPage() {
 
   wrap.querySelectorAll("td.score-cell").forEach(function(td) {
     td.addEventListener("click", function() {
-      var colIdx = td.cellIndex;
-      var allCells = wrap.querySelectorAll("tr td:nth-child(" + (colIdx + 1) + ").score-cell");
-      var showing = td.classList.contains("showing-time");
+      let colIdx = td.cellIndex;
+      let allCells = wrap.querySelectorAll("tr td:nth-child(" + (colIdx + 1) + ").score-cell");
+      let showing = td.classList.contains("showing-time");
       allCells.forEach(function(cell) {
         if (showing) {
           cell.textContent = cell.dataset.score;
@@ -2462,24 +2648,24 @@ function renderPage() {
   });
 
   if (currentPage < totalPages) {
-    var _n = currentPage + 1;
-    var _ns = (_n - 1) * pageSize;
-    var _ne = entries.slice(_ns, _ns + pageSize);
+    let _n = currentPage + 1;
+    let _ns = (_n - 1) * pageSize;
+    let _ne = entries.slice(_ns, _ns + pageSize);
     setTimeout(function() {
       _nextPageHTML = "";
       _ne.forEach(function(e, idx) {
-        var rank = _ns + idx + 1;
+        let rank = _ns + idx + 1;
         _nextPageHTML += "<tr><td>" + rank + "</td>";
-        var flag2 = currentCountry === "__world__" ? " <span style=\"color:#8b949e;font-size:11px\">" + esc(e.country) + "</span>" : "";
+        let flag2 = currentCountry === "__world__" ? " <span style=\"color:#8b949e;font-size:11px\">" + esc(e.country) + "</span>" : "";
         _nextPageHTML += "<td><a href=\"javascript:void(0)\" class=\"person-link\" data-wca-id=\"" + esc(e.id) + "\" onclick=\"showProfile('" + esc(e.id) + "');return false\">" + esc(e.name) + "</a>" + flag2 + "</td>";
         _nextPageHTML += "<td>" + e.overall.toFixed(2) + "</td>";
-        var ec = activeEvents.filter(function(eid) { return e.events[eid] > 0; }).length;
+        let ec = activeEvents.filter(function(eid) { return e.events[eid] > 0; }).length;
         _nextPageHTML += "<td>" + ec + "</td>";
         activeEvents.forEach(function(eid) {
-          var v2 = e.events[eid] || 0;
+          let v2 = e.events[eid] || 0;
           if (v2 > 0) {
-            var cls2 = (v2 >= 100 ? "score-100" : v2 >= 90 ? "score-90" : "") + " score-cell";
-            var info2 = getTimeString(eid, e.pbs, wr);
+            let cls2 = (v2 >= 100 ? "score-100" : v2 >= 90 ? "score-90" : "") + " score-cell";
+            let info2 = getTimeString(eid, e.pbs, wr);
             _nextPageHTML += "<td class=\"" + cls2 + "\" data-time=\"" + esc(info2 ? info2.text : "") + "\" data-type=\"" + (info2 ? info2.type : "") + "\">" + v2.toFixed(2) + "</td>";
           } else {
             _nextPageHTML += "<td>-</td>";
@@ -2492,8 +2678,34 @@ function renderPage() {
   }
 }
 
+function ensurePersonInLookup(wcaId) {
+  if (personLookup[wcaId]) return;
+  if (!dbLoaded || !db) return;
+  let rows = queryAll("SELECT wca_id, name, country, continent, gender FROM persons WHERE wca_id=?", [wcaId]);
+  if (!rows.length) return;
+  let p = rows[0];
+  let entry = { id: p.wca_id, name: p.name, country: p.country, continent: p.continent, gender: p.gender, pbs: {} };
+  let pbRows = queryAll("SELECT event_id, best_single, best_average, mbf_raw_score, single_comp, average_comp, nr_single, nr_average, cr_single, cr_average, wr_single, wr_average FROM event_scores WHERE wca_id=?", [wcaId]);
+  pbRows.forEach(function(r) {
+    entry.pbs[r.event_id] = {};
+    if (r.best_single) entry.pbs[r.event_id].s = r.best_single;
+    if (r.best_average) entry.pbs[r.event_id].a = r.best_average;
+    if (r.mbf_raw_score != null) entry.pbs[r.event_id]._mbf = r.mbf_raw_score;
+    if (r.single_comp) entry.pbs[r.event_id].sc = r.single_comp;
+    if (r.average_comp) entry.pbs[r.event_id].ac = r.average_comp;
+    if (r.nr_single != null) entry.pbs[r.event_id].sr = r.nr_single;
+    if (r.nr_average != null) entry.pbs[r.event_id].ar = r.nr_average;
+    if (r.cr_single != null) entry.pbs[r.event_id].scr = r.cr_single;
+    if (r.cr_average != null) entry.pbs[r.event_id].acr = r.cr_average;
+    if (r.wr_single != null) entry.pbs[r.event_id].swr = r.wr_single;
+    if (r.wr_average != null) entry.pbs[r.event_id].awr = r.wr_average;
+  });
+  personLookup[wcaId] = entry;
+}
+
 function showProfile(wcaId) {
-  const person = personLookup[wcaId];
+  ensurePersonInLookup(wcaId);
+  let person = personLookup[wcaId];
   if (!person) return;
 
   _currentProfileId = wcaId;
@@ -2530,7 +2742,11 @@ function hideProfile() {
 }
 
 function renderProfile(person) {
-  const compNames = allData.competitions || {};
+  let compNames = {};
+  if (dbLoaded && db) {
+    let compRows = queryAll("SELECT id, name FROM competitions");
+    compRows.forEach(function(r) { compNames[r.id] = r.name; });
+  }
 
   let html = `<div class="profile-header">`;
   html += `<button class="profile-back" onclick="hideProfile()">← ${t("profileBack")}</button>`;
@@ -2626,7 +2842,7 @@ function renderProfile(person) {
       aCls = tcls(awr, ar, acr);
     }
 
-    var row = "<tr>";
+    let row = "<tr>";
     row += "<td>" + (EVENT_LABELS[eid] || eid) + "</td>";
     row += "<td class=\"comp-col\">" + esc(sComp) + "</td>";
     row += "<td class=\"" + rcls(sr, swr, scr, sr, "nr") + "\">" + nrS + "</td>";
@@ -2648,45 +2864,20 @@ function renderProfile(person) {
     html += renderEventRow(pb, eid, compNames);
   }
 
-  var clockPb = person.pbs && person.pbs.clock;
-  if (clockPb) {
-    html += renderEventRow(clockPb, "clock", compNames);
-  } else if (!clockData) {
-    html += '<tr><td colspan="11" style="text-align:center;cursor:pointer;color:#58a6ff" onclick="loadClockForProfile()">Load clock times...</td></tr>';
+  let hasClock = person.pbs && person.pbs.clock;
+  if (hasClock) {
+    html += renderEventRow(person.pbs.clock, "clock", compNames);
   }
 
   html += `</tbody></table></div></div>`;
   document.getElementById("profileView").innerHTML = html;
 }
 
-function loadClockForProfile() {
-  if (clockData) {
-    mergeClockData();
-    if (_currentProfileId) {
-      var person = personLookup[_currentProfileId];
-      if (person) renderProfile(person);
-    }
-    return;
-  }
-  var s = document.createElement('script');
-  s.src = 'clock.js';
-  s.onload = function() {
-    clockData = window.KINCH_CLOCK;
-    mergeClockData();
-    document.getElementById("includeClock").disabled = false;
-    if (_currentProfileId) {
-      var person = personLookup[_currentProfileId];
-      if (person) renderProfile(person);
-    }
-  };
-  document.head.appendChild(s);
-}
-
 function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
 function toggleTheme() {
   document.body.classList.toggle("light");
-  const btn = document.getElementById("themeToggle");
+  let btn = document.getElementById("themeToggle");
   if (document.body.classList.contains("light")) {
     btn.textContent = t("night");
     localStorage.setItem("theme", "light");
@@ -2703,66 +2894,9 @@ function toggleTheme() {
   }
 })();
 
-function mergeClockData() {
-  if (!clockData) return;
-  if (clockData.pbs) {
-    for (var wcaId in clockData.pbs) {
-      var person = personLookup[wcaId];
-      if (person) {
-        if (!person.pbs) person.pbs = {};
-        person.pbs.clock = clockData.pbs[wcaId];
-      }
-    }
-  }
-  if (clockData.pbs_ext) {
-    for (var wcaId in clockData.pbs_ext) {
-      var person = personLookup[wcaId];
-      if (person) {
-        if (!person.pbs) person.pbs = {};
-        if (!person.pbs.clock) person.pbs.clock = {};
-        var ext = clockData.pbs_ext[wcaId];
-        for (var k in ext) {
-          person.pbs.clock[k] = ext[k];
-        }
-      }
-    }
-  }
-}
-
-function mergeProfileData() {
-  var profiles = window.KINCH_PROFILES;
-  if (!profiles) return;
-  allData.competitions = profiles.competitions || {};
-  if (profiles.profiles) {
-    for (var wcaId in profiles.profiles) {
-      var person = personLookup[wcaId];
-      if (person && profiles.profiles[wcaId].pbs_ext) {
-        for (var eid in profiles.profiles[wcaId].pbs_ext) {
-          if (!person.pbs) person.pbs = {};
-          if (!person.pbs[eid]) person.pbs[eid] = {};
-          for (var k in profiles.profiles[wcaId].pbs_ext[eid]) {
-            person.pbs[eid][k] = profiles.profiles[wcaId].pbs_ext[eid][k];
-          }
-        }
-      }
-    }
-  }
-}
-
-function onScoresLoaded() {
-  allData = window.KINCH_SCORES;
-  personLookup = {};
-  for (const c of Object.values(allData.countries)) {
-    for (const e of c.entries) {
-      personLookup[e.id] = e;
-    }
-  }
-  if (window.KINCH_PROFILES) mergeProfileData();
-  if (clockData) mergeClockData();
-  document.getElementById("continentSelect").disabled = false;
-  document.getElementById("countrySelect").disabled = false;
-  document.getElementById("sinceSelect").disabled = false;
-  document.getElementById("untilSelect").disabled = false;
+function onDbLoaded() {
+  document.getElementById("dbLoadingOverlay").style.display = "none";
+  document.getElementById("controls").style.display = "flex";
   if (document.getElementById("profileView").style.display === "block") {
     _pendingFullRefresh = true;
     return;
@@ -2770,17 +2904,10 @@ function onScoresLoaded() {
   init();
 }
 
-function onProfilesLoaded() {
-  if (!window.KINCH_PROFILES) return;
-  mergeProfileData();
-}
-
-if (window.KINCH_SCORES) {
+if (window.KINCH_QUICK) {
   loadData();
 } else {
   loadData();
-  _scoresScript.onload = onScoresLoaded;
-  _profilesScript.onload = onProfilesLoaded;
 }
 </script>
 </body>
