@@ -526,6 +526,8 @@ def main():
 
     result = {}
     profiles_data = {}
+    clock_pbs = {}
+    clock_pbs_ext = {}
     used_comp_ids = set()
 
     for cid, entries in sorted(by_country.items()):
@@ -550,13 +552,27 @@ def main():
         for entry in top_entries:
             wca_id = entry["id"]
             ext = entry.get("_pbs_ext", {})
-            if ext:
-                profiles_data[wca_id] = {"pbs_ext": ext}
-                for pb in ext.values():
-                    if pb.get("sc"):
-                        used_comp_ids.add(pb["sc"])
-                    if pb.get("ac"):
-                        used_comp_ids.add(pb["ac"])
+            ext_no_clock = {}
+            for eid, pb_ext in ext.items():
+                if eid == "clock":
+                    clock_pbs_ext[wca_id] = pb_ext
+                    if pb_ext.get("sc"):
+                        used_comp_ids.add(pb_ext["sc"])
+                    if pb_ext.get("ac"):
+                        used_comp_ids.add(pb_ext["ac"])
+                else:
+                    ext_no_clock[eid] = pb_ext
+                    if pb_ext.get("sc"):
+                        used_comp_ids.add(pb_ext["sc"])
+                    if pb_ext.get("ac"):
+                        used_comp_ids.add(pb_ext["ac"])
+            if ext_no_clock:
+                profiles_data[wca_id] = {"pbs_ext": ext_no_clock}
+
+            pbs = entry["pbs"]
+            if "clock" in pbs:
+                clock_pbs[wca_id] = pbs["clock"]
+                pbs = {k: v for k, v in pbs.items() if k != "clock"}
 
             clean_entries.append({
                 "id": entry["id"],
@@ -565,7 +581,7 @@ def main():
                 "continent": entry["continent"],
                 "gender": entry["gender"],
                 "overall": entry["overall"],
-                "pbs": entry["pbs"],
+                "pbs": pbs,
             })
 
         result[cid] = {
@@ -685,6 +701,15 @@ def main():
         json.dump(profiles_output, f, ensure_ascii=False)
         f.write(";")
     print(f"Wrote {profiles_js}", flush=True)
+
+    clock_output = {"pbs": clock_pbs, "pbs_ext": clock_pbs_ext}
+    clock_js = os.path.join(os.path.dirname(__file__), "clock.js")
+    with open(clock_js, "w") as f:
+        f.write("window.KINCH_CLOCK=")
+        json.dump(clock_output, f, ensure_ascii=False)
+        f.write(";")
+    print(f"Wrote {clock_js}", flush=True)
+    print(f"  {len(clock_pbs)} clock PB entries", flush=True)
 
     quick_data = {
         "entries": precomputed,

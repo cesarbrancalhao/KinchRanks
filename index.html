@@ -1849,13 +1849,14 @@ let pageSize = 100;
 let sortCol = 2;
 let sortDir = -1;
 let includeClock = false;
-let resultsCache = {};
+let clockData = null;
 let _lastEntries = null;
 let _lastActiveEvents = null;
 let _lastWR = null;
 let _nextPageHTML = null;
 let _preRenderedPage = 0;
 let _pendingFullRefresh = false;
+let _currentProfileId = null;
 
 function isDefaultFilters() {
   return (currentCountry === null || currentCountry === "__world__") &&
@@ -2055,7 +2056,26 @@ function init() {
 
   var clockEl = document.getElementById("includeClock");
   clockEl.onchange = null;
-  clockEl.addEventListener("change", function() { includeClock = this.checked; currentPage = 1; renderTable(); });
+  clockEl.addEventListener("change", function() {
+    if (this.checked && !clockData) {
+      this.checked = false;
+      this.disabled = true;
+      var s = document.createElement('script');
+      s.src = 'clock.js';
+      s.onload = function() {
+        clockData = window.KINCH_CLOCK;
+        mergeClockData();
+        clockEl.disabled = false;
+        clockEl.checked = true;
+        includeClock = true;
+        currentPage = 1;
+        renderTable();
+      };
+      document.head.appendChild(s);
+      return;
+    }
+    includeClock = this.checked; currentPage = 1; renderTable();
+  });
 
   var genderEl = document.getElementById("genderSelect");
   genderEl.onchange = null;
@@ -2179,7 +2199,9 @@ function getEntries() {
 
 function getActiveEvents() {
   let events = GROUP_EVENTS[currentGroup] || EVENT_IDS;
-  if (includeClock && !events.includes("clock")) {
+  if (!clockData) {
+    events = events.filter(function(e) { return e !== "clock"; });
+  } else if (includeClock && !events.includes("clock")) {
     events = [...events, "clock"];
   }
   return events;
@@ -2188,43 +2210,38 @@ function getActiveEvents() {
 function renderTable() {
   const wrap = document.getElementById("tableWrap");
 
-  const filterKey = `${currentCountry || "__world__"}|${currentContinent}|${currentGender}|${currentGroup}|${includeClock}|${currentSince}|${currentUntil}`;
-  let entries = resultsCache[filterKey];
-
-  if (!entries) {
-    if (isDefaultFilters() && allData.precomputed) {
-      entries = allData.precomputed;
-    } else {
-      entries = getEntries();
-      if (entries.length === 0) {
-        if (allData.precomputed) {
-          entries = allData.precomputed.filter(function(e) {
-            if (currentCountry !== null && currentCountry !== "__world__" && e.country !== currentCountry) return false;
-            if (currentContinent !== "__world__" && e.continent !== currentContinent) return false;
-            if (currentGender !== "all" && e.gender !== currentGender) return false;
-            if (currentSince > 0 || currentUntil < 9999) {
-              var y = parseInt((e.id || "").substring(0, 4));
-              if (!isNaN(y) && (y < currentSince || y > currentUntil)) return false;
-            }
-            return true;
-          });
-        } else {
-          wrap.style.display = "none";
-          document.getElementById("pagination").style.display = "none";
-          return;
-        }
-      } else {
-        const activeEvents = getActiveEvents();
-        const wr = getWR();
-        entries = entries.map(e => {
-          const k = computeKinch(e.pbs, wr, activeEvents);
-          return { ...e, overall: k.overall, events: k.scores };
+  let entries;
+  if (isDefaultFilters() && allData.precomputed) {
+    entries = allData.precomputed;
+  } else {
+    entries = getEntries();
+    if (entries.length === 0) {
+      if (allData.precomputed) {
+        entries = allData.precomputed.filter(function(e) {
+          if (currentCountry !== null && currentCountry !== "__world__" && e.country !== currentCountry) return false;
+          if (currentContinent !== "__world__" && e.continent !== currentContinent) return false;
+          if (currentGender !== "all" && e.gender !== currentGender) return false;
+          if (currentSince > 0 || currentUntil < 9999) {
+            var y = parseInt((e.id || "").substring(0, 4));
+            if (!isNaN(y) && (y < currentSince || y > currentUntil)) return false;
+          }
+          return true;
         });
-        entries = entries.filter(e => activeEvents.some(eid => e.events[eid] > 0));
-        entries.sort((a, b) => b.overall - a.overall);
+      } else {
+        wrap.style.display = "none";
+        document.getElementById("pagination").style.display = "none";
+        return;
       }
+    } else {
+      const activeEvents = getActiveEvents();
+      const wr = getWR();
+      entries = entries.map(e => {
+        const k = computeKinch(e.pbs, wr, activeEvents);
+        return { ...e, overall: k.overall, events: k.scores };
+      });
+      entries = entries.filter(e => activeEvents.some(eid => e.events[eid] > 0));
+      entries.sort((a, b) => b.overall - a.overall);
     }
-    resultsCache[filterKey] = entries;
   }
 
   if (entries.length === 0) { wrap.style.display = "none"; document.getElementById("pagination").style.display = "none"; return; }
@@ -2479,6 +2496,8 @@ function showProfile(wcaId) {
   const person = personLookup[wcaId];
   if (!person) return;
 
+  _currentProfileId = wcaId;
+
   document.getElementById("controls").style.display = "none";
   document.getElementById("status").style.display = "none";
   document.getElementById("tableWrap").style.display = "none";
@@ -2496,6 +2515,7 @@ function showProfile(wcaId) {
 }
 
 function hideProfile() {
+  _currentProfileId = null;
   document.getElementById("profileView").style.display = "none";
   document.getElementById("controls").style.display = "flex";
   document.getElementById("tableWrap").style.display = "block";
@@ -2546,12 +2566,31 @@ function renderProfile(person) {
   html += `<th class="comp-col">${t("profileCompetition")}</th>`;
   html += `</tr></thead><tbody>`;
 
-  const eventsOrder = ["333","222","444","555","666","777","333bf","333fm","333oh","clock","minx","pyram","skewb","sq1","444bf","555bf","333mbf"];
+  const eventsOrder = ["333","222","444","555","666","777","333bf","333fm","333oh","minx","pyram","skewb","sq1","444bf","555bf","333mbf"];
 
-  for (const eid of eventsOrder) {
-    const pb = person.pbs && person.pbs[eid];
-    if (!pb) continue;
+  function rcls(val, swr, scr, sr, type) {
+    if (val == null || val === "-") return "rank-col";
+    let cls = "rank-col";
+    if (val <= 20) cls += " rank-bold";
+    if (val <= 10) cls += " rank-top10";
+    if (val === 1) {
+      if (swr === 1) cls += " rank-wr";
+      else if (type !== "wr" && scr === 1) cls += " rank-cr";
+      else if (type === "nr") cls += " rank-nr";
+      else if (type === "cr") cls += " rank-cr";
+      else if (type === "wr") cls += " rank-wr";
+    }
+    return cls;
+  }
 
+  function tcls(wr, nr, cr) {
+    if (wr === 1) return "profile-time profile-time-wr";
+    if (cr === 1) return "profile-time profile-time-cr";
+    if (nr === 1) return "profile-time profile-time-nr";
+    return "profile-time";
+  }
+
+  function renderEventRow(pb, eid, compNames) {
     const sComp = pb.sc ? (compNames[pb.sc] || pb.sc) : "-";
     const aComp = pb.ac ? (compNames[pb.ac] || pb.ac) : "-";
     const sr = pb.sr, scr = pb.scr, swr = pb.swr;
@@ -2562,28 +2601,6 @@ function renderProfile(person) {
     const nrA = ar != null ? ar : "-";
     const crA = acr != null ? acr : "-";
     const wrA = awr != null ? awr : "-";
-
-    function rcls(val, swr, scr, sr, type) {
-      if (val == null || val === "-") return "rank-col";
-      let cls = "rank-col";
-      if (val <= 20) cls += " rank-bold";
-      if (val <= 10) cls += " rank-top10";
-      if (val === 1) {
-        if (swr === 1) cls += " rank-wr";
-        else if (type !== "wr" && scr === 1) cls += " rank-cr";
-        else if (type === "nr") cls += " rank-nr";
-        else if (type === "cr") cls += " rank-cr";
-        else if (type === "wr") cls += " rank-wr";
-      }
-      return cls;
-    }
-
-    function tcls(wr, nr, cr) {
-      if (wr === 1) return "profile-time profile-time-wr";
-      if (cr === 1) return "profile-time profile-time-cr";
-      if (nr === 1) return "profile-time profile-time-nr";
-      return "profile-time";
-    }
 
     let singleStr = "-";
     let sCls = "";
@@ -2609,23 +2626,60 @@ function renderProfile(person) {
       aCls = tcls(awr, ar, acr);
     }
 
-    html += `<tr>`;
-    html += `<td>${EVENT_LABELS[eid] || eid}</td>`;
-    html += `<td class="comp-col">${esc(sComp)}</td>`;
-    html += `<td class="${rcls(sr, swr, scr, sr, "nr")}">${nrS}</td>`;
-    html += `<td class="${rcls(scr, swr, scr, sr, "cr")}">${crS}</td>`;
-    html += `<td class="${rcls(swr, swr, scr, sr, "wr")}">${wrS}</td>`;
-    html += `<td class="${sCls}">${singleStr}</td>`;
-    html += `<td class="${aCls}">${averageStr}</td>`;
-    html += `<td class="${rcls(awr, awr, acr, ar, "wr")}">${wrA}</td>`;
-    html += `<td class="${rcls(acr, awr, acr, ar, "cr")}">${crA}</td>`;
-    html += `<td class="${rcls(ar, awr, acr, ar, "nr")}">${nrA}</td>`;
-    html += `<td class="comp-col">${esc(aComp)}</td>`;
-    html += `</tr>`;
+    var row = "<tr>";
+    row += "<td>" + (EVENT_LABELS[eid] || eid) + "</td>";
+    row += "<td class=\"comp-col\">" + esc(sComp) + "</td>";
+    row += "<td class=\"" + rcls(sr, swr, scr, sr, "nr") + "\">" + nrS + "</td>";
+    row += "<td class=\"" + rcls(scr, swr, scr, sr, "cr") + "\">" + crS + "</td>";
+    row += "<td class=\"" + rcls(swr, swr, scr, sr, "wr") + "\">" + wrS + "</td>";
+    row += "<td class=\"" + sCls + "\">" + singleStr + "</td>";
+    row += "<td class=\"" + aCls + "\">" + averageStr + "</td>";
+    row += "<td class=\"" + rcls(awr, awr, acr, ar, "wr") + "\">" + wrA + "</td>";
+    row += "<td class=\"" + rcls(acr, awr, acr, ar, "cr") + "\">" + crA + "</td>";
+    row += "<td class=\"" + rcls(ar, awr, acr, ar, "nr") + "\">" + nrA + "</td>";
+    row += "<td class=\"comp-col\">" + esc(aComp) + "</td>";
+    row += "</tr>";
+    return row;
+  }
+
+  for (const eid of eventsOrder) {
+    const pb = person.pbs && person.pbs[eid];
+    if (!pb) continue;
+    html += renderEventRow(pb, eid, compNames);
+  }
+
+  var clockPb = person.pbs && person.pbs.clock;
+  if (clockPb) {
+    html += renderEventRow(clockPb, "clock", compNames);
+  } else if (!clockData) {
+    html += '<tr><td colspan="11" style="text-align:center;cursor:pointer;color:#58a6ff" onclick="loadClockForProfile()">Load clock times...</td></tr>';
   }
 
   html += `</tbody></table></div></div>`;
   document.getElementById("profileView").innerHTML = html;
+}
+
+function loadClockForProfile() {
+  if (clockData) {
+    mergeClockData();
+    if (_currentProfileId) {
+      var person = personLookup[_currentProfileId];
+      if (person) renderProfile(person);
+    }
+    return;
+  }
+  var s = document.createElement('script');
+  s.src = 'clock.js';
+  s.onload = function() {
+    clockData = window.KINCH_CLOCK;
+    mergeClockData();
+    document.getElementById("includeClock").disabled = false;
+    if (_currentProfileId) {
+      var person = personLookup[_currentProfileId];
+      if (person) renderProfile(person);
+    }
+  };
+  document.head.appendChild(s);
 }
 
 function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
@@ -2649,6 +2703,32 @@ function toggleTheme() {
   }
 })();
 
+function mergeClockData() {
+  if (!clockData) return;
+  if (clockData.pbs) {
+    for (var wcaId in clockData.pbs) {
+      var person = personLookup[wcaId];
+      if (person) {
+        if (!person.pbs) person.pbs = {};
+        person.pbs.clock = clockData.pbs[wcaId];
+      }
+    }
+  }
+  if (clockData.pbs_ext) {
+    for (var wcaId in clockData.pbs_ext) {
+      var person = personLookup[wcaId];
+      if (person) {
+        if (!person.pbs) person.pbs = {};
+        if (!person.pbs.clock) person.pbs.clock = {};
+        var ext = clockData.pbs_ext[wcaId];
+        for (var k in ext) {
+          person.pbs.clock[k] = ext[k];
+        }
+      }
+    }
+  }
+}
+
 function mergeProfileData() {
   var profiles = window.KINCH_PROFILES;
   if (!profiles) return;
@@ -2671,7 +2751,6 @@ function mergeProfileData() {
 
 function onScoresLoaded() {
   allData = window.KINCH_SCORES;
-  resultsCache = { _generated_at: allData.generated_at };
   personLookup = {};
   for (const c of Object.values(allData.countries)) {
     for (const e of c.entries) {
@@ -2679,6 +2758,7 @@ function onScoresLoaded() {
     }
   }
   if (window.KINCH_PROFILES) mergeProfileData();
+  if (clockData) mergeClockData();
   document.getElementById("continentSelect").disabled = false;
   document.getElementById("countrySelect").disabled = false;
   document.getElementById("sinceSelect").disabled = false;
