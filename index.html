@@ -20,7 +20,11 @@ h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; }
 .controls select:disabled { opacity: 0.45; cursor: not-allowed; }
 .controls select:focus, .controls input[type="text"]:focus { border-color: #58a6ff; }
 .controls input[type="text"] { width: 100%; min-width: 80px; }
+.search-btn { padding: 5px 12px; border: 1px solid #30363d; border-radius: 4px; background: #21262d; color: #c9d1d9; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.search-btn:hover { background: #30363d; }
 .clock-label { font-size: 11px; color: #6e7681; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 4px; white-space: nowrap; margin-left: 12px; }
+.retired-section { border: 1px solid #30363d; border-radius: 4px; padding: 1px 8px; margin-left: 12px; display: inline-flex; align-items: center; gap: 4px; }
+.retired-label { font-size: 11px; color: #6e7681; text-transform: uppercase; white-space: nowrap; margin-right: 2px; }
 
 .db-loading-overlay { position: absolute; inset: 0; background: rgba(22,27,34,0.92); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; border-radius: 8px; z-index: 10; }
 body.light .db-loading-overlay { background: rgba(255,255,255,0.92); }
@@ -92,8 +96,12 @@ body.light .ctrl-row .ctrl-cell:first-child { background: #e8f0ff; border-radius
 body.light .ctrl-row .ctrl-cell:last-child { background: #e6ffe6; border-radius: 4px; }
 body.light .cg-label { color: #555; }
 body.light .controls select, body.light .controls input[type="text"] { background: #fff; border-color: #ccc; color: #222; }
+body.light .search-btn { background: #0055A4; border-color: #0055A4; color: #fff; }
+body.light .search-btn:hover { background: #004494; }
 body.light .controls select:focus, body.light .controls input[type="text"]:focus { border-color: #0055A4; }
 body.light .clock-label { color: #555; }
+body.light .retired-section { border-color: #ccc; }
+body.light .retired-label { color: #555; }
 
 body.light .table-wrap { border-color: #ddd; }
 body.light thead th { background: #0055A4; color: #fff; border-bottom-color: #004494; font-weight: 700; }
@@ -228,6 +236,7 @@ body.light .profile-events-table .rank-cr { font-weight: 700; color: #1a7f3a; }
           <option value="bld" data-i18n="bld">BLD</option>
           <option value="nonbld" data-i18n="nonBld">Non-BLD</option>
           <option value="other" data-i18n="otherEvents">Other events</option>
+          <option value="removed" data-i18n="removed">Removed</option>
         </select>
       </div>
     </div>
@@ -243,6 +252,7 @@ body.light .profile-events-table .rank-cr { font-weight: 700; color: #1a7f3a; }
       <div class="ctrl-cell">
         <span class="cg-label" data-i18n="name">Name</span>
         <input type="text" id="search" data-i18n="searchPlaceholder" placeholder="Search...">
+        <button id="searchBtn" class="search-btn" data-i18n="search">Search</button>
       </div>
     </div>
     <div class="ctrl-row">
@@ -264,7 +274,13 @@ body.light .profile-events-table .rank-cr { font-weight: 700; color: #1a7f3a; }
           <option value="300">300</option>
           <option value="500">500</option>
         </select>
-        <label class="clock-label"><span data-i18n="clock">Clock</span> <input type="checkbox" id="includeClock"></label>
+        <label class="clock-label" id="clockToggle"><span data-i18n="clock">Clock</span> <input type="checkbox" id="includeClock"></label>
+        <span class="retired-section" id="retiredToggles">
+          <span class="retired-label" data-i18n="removedEvents">Removed events</span>
+          <label class="clock-label" style="margin-left:0"><span data-i18n="feet">333ft</span> <input type="checkbox" id="include333ft"></label>
+          <label class="clock-label" style="margin-left:0"><span data-i18n="magic">Magic</span> <input type="checkbox" id="includeMagic"></label>
+          <label class="clock-label" style="margin-left:0"><span data-i18n="mmagic">MMagic</span> <input type="checkbox" id="includeMMagic"></label>
+        </span>
       </div>
     </div>
   </div>
@@ -277,7 +293,7 @@ body.light .profile-events-table .rank-cr { font-weight: 700; color: #1a7f3a; }
 <script src="1000.js"></script>
 <script src="https://sql.js.org/dist/sql-wasm.js"></script>
 <script>
-let DB_CACHE = 'kinch_db_v2';
+let DB_CACHE = 'kinch_db_v3';
 
 const LANG = {
   en: {
@@ -297,6 +313,11 @@ const LANG = {
     show: "Show",
     clock: "Clock",
     searchPlaceholder: "Search...",
+    search: "Search",
+    removedEvents: "Removed events:",
+    feet: "333ft",
+    magic: "Magic",
+    mmagic: "MMagic",
     world: "World",
     continentAfrica: "Africa",
     continentAsia: "Asia",
@@ -307,12 +328,13 @@ const LANG = {
     all: "All",
     male: "Male",
     female: "Female",
-    allEvents: "All events",
+    allEvents: "All",
     nxn: "NxN",
     bigCubes: "Big cubes",
     bld: "BLD",
     nonBld: "Non-BLD",
-    otherEvents: "Other events",
+    otherEvents: "Other",
+    removed: "Removed",
     after: "After",
     before: "Before",
     day: "☀ Day",
@@ -361,6 +383,8 @@ const LANG = {
     show: "Exibir",
     clock: "Clock",
     searchPlaceholder: "Buscar...",
+    search: "Buscar",
+    removedEvents: "Eventos removidos:",
     world: "Mundo",
     continentAfrica: "África",
     continentAsia: "Ásia",
@@ -371,12 +395,13 @@ const LANG = {
     all: "Todos",
     male: "Masculino",
     female: "Feminino",
-    allEvents: "Todos os eventos",
+    allEvents: "Todos",
     nxn: "NxN",
     bigCubes: "Cubos grandes",
     bld: "BLD",
     nonBld: "Não-BLD",
-    otherEvents: "Outros eventos",
+    otherEvents: "Outros",
+    removed: "Removidos",
     after: "Depois de",
     before: "Antes de",
     day: "☀ Dia",
@@ -425,6 +450,8 @@ const LANG = {
     show: "Mostrar",
     clock: "Clock",
     searchPlaceholder: "Buscar...",
+    search: "Buscar",
+    removedEvents: "Eventos eliminados:",
     world: "Mundo",
     continentAfrica: "África",
     continentAsia: "Asia",
@@ -435,12 +462,13 @@ const LANG = {
     all: "Todos",
     male: "Masculino",
     female: "Femenino",
-    allEvents: "Todos los eventos",
+    allEvents: "Todos",
     nxn: "NxN",
     bigCubes: "Cubos grandes",
     bld: "BLD",
     nonBld: "No-BLD",
-    otherEvents: "Otros eventos",
+    otherEvents: "Otros",
+    removed: "Eliminados",
     after: "Después de",
     before: "Antes de",
     day: "☀ Día",
@@ -489,6 +517,8 @@ const LANG = {
     show: "Anzeigen",
     clock: "Clock",
     searchPlaceholder: "Suchen...",
+    search: "Suchen",
+    removedEvents: "Entfernte Events:",
     world: "Welt",
     continentAfrica: "Afrika",
     continentAsia: "Asien",
@@ -499,12 +529,13 @@ const LANG = {
     all: "Alle",
     male: "Männlich",
     female: "Weiblich",
-    allEvents: "Alle Events",
+    allEvents: "Alle",
     nxn: "NxN",
     bigCubes: "Große Cubes",
     bld: "BLD",
     nonBld: "Nicht-BLD",
-    otherEvents: "Andere Events",
+    otherEvents: "Andere",
+    removed: "Entfernt",
     after: "Nach",
     before: "Vor",
     day: "☀ Tag",
@@ -553,6 +584,8 @@ const LANG = {
     show: "Mostra",
     clock: "Clock",
     searchPlaceholder: "Cerca...",
+    search: "Cerca",
+    removedEvents: "Eventi rimossi:",
     world: "Mondo",
     continentAfrica: "Africa",
     continentAsia: "Asia",
@@ -563,12 +596,13 @@ const LANG = {
     all: "Tutti",
     male: "Maschile",
     female: "Femminile",
-    allEvents: "Tutti gli eventi",
+    allEvents: "Tutti",
     nxn: "NxN",
     bigCubes: "Cubi grandi",
     bld: "BLD",
     nonBld: "Non-BLD",
-    otherEvents: "Altri eventi",
+    otherEvents: "Altri",
+    removed: "Rimossi",
     after: "Dopo",
     before: "Prima",
     day: "☀ Giorno",
@@ -617,6 +651,8 @@ const LANG = {
     show: "Mostra",
     clock: "Clock",
     searchPlaceholder: "Cercar...",
+    search: "Cercar",
+    removedEvents: "Esdeveniments eliminats:",
     world: "Món",
     continentAfrica: "Àfrica",
     continentAsia: "Àsia",
@@ -627,12 +663,13 @@ const LANG = {
     all: "Tots",
     male: "Masculí",
     female: "Femení",
-    allEvents: "Tots els esdeveniments",
+    allEvents: "Tots",
     nxn: "NxN",
     bigCubes: "Cubs grans",
     bld: "BLD",
     nonBld: "No-BLD",
-    otherEvents: "Altres esdeveniments",
+    otherEvents: "Altres",
+    removed: "Eliminats",
     after: "Després de",
     before: "Abans de",
     day: "☀ Dia",
@@ -681,6 +718,8 @@ const LANG = {
     show: "표시",
     clock: "Clock",
     searchPlaceholder: "검색...",
+    search: "검색",
+    removedEvents: "삭제된 종목:",
     world: "전체",
     continentAfrica: "아프리카",
     continentAsia: "아시아",
@@ -697,6 +736,7 @@ const LANG = {
     bld: "BLD",
     nonBld: "비BLD",
     otherEvents: "기타 종목",
+    removed: "삭제됨",
     after: "이후",
     before: "이전",
     day: "☀ 낮",
@@ -745,6 +785,8 @@ const LANG = {
     show: "显示",
     clock: "Clock",
     searchPlaceholder: "搜索...",
+    search: "搜索",
+    removedEvents: "已移除项目:",
     world: "世界",
     continentAfrica: "非洲",
     continentAsia: "亚洲",
@@ -761,6 +803,7 @@ const LANG = {
     bld: "盲拧",
     nonBld: "非盲",
     otherEvents: "其他项目",
+    removed: "已移除",
     after: "之后",
     before: "之前",
     day: "☀ 日间",
@@ -809,6 +852,8 @@ const LANG = {
     show: "Hiển thị",
     clock: "Clock",
     searchPlaceholder: "Tìm kiếm...",
+    search: "Tìm kiếm",
+    removedEvents: "Nội dung đã xóa:",
     world: "Thế giới",
     continentAfrica: "Châu Phi",
     continentAsia: "Châu Á",
@@ -819,12 +864,13 @@ const LANG = {
     all: "Tất cả",
     male: "Nam",
     female: "Nữ",
-    allEvents: "Tất cả nội dung",
+    allEvents: "Tất cả",
     nxn: "NxN",
     bigCubes: "Cube lớn",
     bld: "BLD",
     nonBld: "Không BLD",
-    otherEvents: "Nội dung khác",
+    otherEvents: "Khác",
+    removed: "Đã xóa",
     after: "Sau",
     before: "Trước",
     day: "☀ Ngày",
@@ -1808,17 +1854,20 @@ function setLanguage(lang) {
 
 const EVENT_IDS = ["333","222","444","555","666","777","333bf","333fm","333oh","minx","pyram","skewb","sq1","444bf","555bf","333mbf"];
 const EVENT_IDS_ALL = ["333","222","444","555","666","777","333bf","333fm","333oh","clock","minx","pyram","skewb","sq1","444bf","555bf","333mbf"];
-const EVENT_LABELS = { "333":"333", "222":"222", "444":"444", "555":"555", "666":"666", "777":"777", "333bf":"333BLD", "333fm":"333FM", "333oh":"333OH", "clock":"Clock", "minx":"Mega", "pyram":"Pyra", "skewb":"Skewb", "sq1":"SQ1", "444bf":"444BLD", "555bf":"555BLD", "333mbf":"333MBLD" };
-const AVERAGE_EVENTS = new Set(["333","222","444","555","666","777","333oh","clock","minx","pyram","skewb","sq1"]);
+const RETIRED_EVENT_IDS = ["333ft","magic","mmagic"];
+const EVENT_LABELS = { "333":"333", "222":"222", "444":"444", "555":"555", "666":"666", "777":"777", "333bf":"333BLD", "333fm":"333FM", "333oh":"333OH", "clock":"Clock", "minx":"Mega", "pyram":"Pyra", "skewb":"Skewb", "sq1":"SQ1", "444bf":"444BLD", "555bf":"555BLD", "333mbf":"333MBLD", "333ft":"333ft", "magic":"Magic", "mmagic":"MMagic" };
+const AVERAGE_EVENTS = new Set(["333","222","444","555","666","777","333oh","clock","minx","pyram","skewb","sq1","333ft"]);
 const BETTER_OF_EVENTS = new Set(["333bf","444bf","555bf","333fm"]);
+const SINGLE_ONLY_EVENTS = new Set(["magic","mmagic"]);
 
 const GROUP_EVENTS = {
   "__all__": EVENT_IDS,
   "nxn": ["333","222","444","555","666","777","333oh"],
   "big": ["444","555","666","777"],
   "bld": ["333bf","444bf","555bf","333mbf"],
-  "nonbld": ["333","222","444","555","666","777","333fm","333oh","clock","minx","pyram","skewb","sq1"],
-  "other": ["clock","minx","pyram","skewb","sq1","333fm"],
+  "nonbld": ["333","222","444","555","666","777","333fm","333oh","minx","pyram","skewb","sq1"],
+  "other": ["minx","pyram","skewb","sq1","333fm"],
+  "removed": ["333ft","magic","mmagic"],
 };
 
 function decodeMbfText(wca) {
@@ -1860,6 +1909,9 @@ let pageSize = 100;
 let sortCol = 2;
 let sortDir = -1;
 let includeClock = false;
+let include333ft = false;
+let includeMagic = false;
+let includeMMagic = false;
 let _lastEntries = null;
 let _lastActiveEvents = null;
 let _lastWR = null;
@@ -1875,6 +1927,9 @@ function isDefaultFilters() {
          currentGender === "all" &&
          currentGroup === "__all__" &&
          !includeClock &&
+         !include333ft &&
+         !includeMagic &&
+         !includeMMagic &&
          currentSince === 0 &&
          currentUntil === 9999;
 }
@@ -1933,6 +1988,11 @@ function getTimeString(eid, pbs, wr) {
     return null;
   }
 
+  if (SINGLE_ONLY_EVENTS.has(eid)) {
+    if (pb.s) return { text: formatCenti(pb.s), type: "single" };
+    return null;
+  }
+
   if (AVERAGE_EVENTS.has(eid)) {
     if (pb.a) return { text: formatCenti(pb.a), type: "average" };
     return null;
@@ -1947,6 +2007,7 @@ function getTimeString(eid, pbs, wr) {
 }
 
 function computeKinch(pbs, wr, activeEvents) {
+  if (!activeEvents.length) return { scores: {}, overall: 0 };
   const scores = {};
   let total = 0;
   for (const eid of activeEvents) {
@@ -1960,6 +2021,8 @@ function computeKinch(pbs, wr, activeEvents) {
       }
     } else if (AVERAGE_EVENTS.has(eid)) {
       if (pb.a && wr.average && wr.average[eid]) v = wr.average[eid] / pb.a * 100;
+    } else if (SINGLE_ONLY_EVENTS.has(eid)) {
+      if (pb.s && wr.single && wr.single[eid]) v = wr.single[eid] / pb.s * 100;
     } else {
       let ks = 0, ka = 0;
       if (pb.s && wr.single && wr.single[eid]) ks = wr.single[eid] / pb.s * 100;
@@ -2159,12 +2222,33 @@ function init() {
 
   let searchEl = document.getElementById("search");
   searchEl.oninput = null;
-  searchEl.addEventListener("input", function() { currentPage = 1; renderTable(); });
+  searchEl.addEventListener("keydown", function(e) { if (e.key === "Enter") { currentPage = 1; renderTable(); } });
+
+  let searchBtn = document.getElementById("searchBtn");
+  searchBtn.addEventListener("click", function() { currentPage = 1; renderTable(); });
 
   let clockEl = document.getElementById("includeClock");
   clockEl.onchange = null;
   clockEl.addEventListener("change", function() {
     includeClock = this.checked; currentPage = 1; renderTable();
+  });
+
+  let ftEl = document.getElementById("include333ft");
+  ftEl.onchange = null;
+  ftEl.addEventListener("change", function() {
+    include333ft = this.checked; currentPage = 1; renderTable();
+  });
+
+  let magicEl = document.getElementById("includeMagic");
+  magicEl.onchange = null;
+  magicEl.addEventListener("change", function() {
+    includeMagic = this.checked; currentPage = 1; renderTable();
+  });
+
+  let mmagicEl = document.getElementById("includeMMagic");
+  mmagicEl.onchange = null;
+  mmagicEl.addEventListener("change", function() {
+    includeMMagic = this.checked; currentPage = 1; renderTable();
   });
 
   let genderEl = document.getElementById("genderSelect");
@@ -2173,7 +2257,7 @@ function init() {
 
   let groupEl = document.getElementById("groupSelect");
   groupEl.onchange = null;
-  groupEl.addEventListener("change", function() { currentGroup = this.value; currentPage = 1; renderTable(); });
+  groupEl.addEventListener("change", function() { currentGroup = this.value; currentPage = 1; updateToggleVisibility(); renderTable(); });
 
   let sinceEl = document.getElementById("sinceSelect");
   sinceEl.onchange = null;
@@ -2212,6 +2296,7 @@ function init() {
   }
 
   renderTable();
+  updateToggleVisibility();
 }
 
 function populateCountries(preserveValue) {
@@ -2291,6 +2376,9 @@ function buildKinchExpr(eventId) {
   if (AVERAGE_EVENTS.has(eventId)) {
     return "CASE WHEN es.best_average > 0 AND COALESCE(r.record_average, rw.record_average) > 0 THEN MIN(100.0, COALESCE(r.record_average, rw.record_average) * 100.0 / es.best_average) ELSE 0 END";
   }
+  if (SINGLE_ONLY_EVENTS.has(eventId)) {
+    return "CASE WHEN es.best_single > 0 AND COALESCE(r.record_single, rw.record_single) > 0 THEN MIN(100.0, COALESCE(r.record_single, rw.record_single) * 100.0 / es.best_single) ELSE 0 END";
+  }
   return "MIN(100.0, MAX(" +
     "CASE WHEN es.best_single > 0 AND COALESCE(r.record_single, rw.record_single) > 0 THEN COALESCE(r.record_single, rw.record_single) * 100.0 / es.best_single ELSE 0 END," +
     "CASE WHEN es.best_average > 0 AND COALESCE(r.record_average, rw.record_average) > 0 THEN COALESCE(r.record_average, rw.record_average) * 100.0 / es.best_average ELSE 0 END))";
@@ -2303,6 +2391,7 @@ function canUsePrecomputed() {
   if (currentSince > 0 || currentUntil < 9999) return false;
   if (document.getElementById("search").value.trim()) return false;
   if (sortCol !== 0 && sortCol !== 2 && sortCol !== 3) return false;
+  if (include333ft || includeMagic || includeMMagic) return false;
   return true;
 }
 
@@ -2345,6 +2434,7 @@ function getEntries() {
     }
   }
 
+  _precomputedTotal = 0;
   let activeEvents = getActiveEvents();
   let scope = getRecordScope();
   let gender = currentGender;
@@ -2425,9 +2515,25 @@ function loadPbsForEntries(entries, activeEvents, wr) {
   }
 }
 
+function isToggleableGroup() {
+  return currentGroup === "__all__" || currentGroup === "other" || currentGroup === "removed";
+}
+
+function updateToggleVisibility() {
+  let visClock = (currentGroup === "__all__" || currentGroup === "other" || currentGroup === "removed") ? "" : "none";
+  let visRetired = (currentGroup === "__all__" || currentGroup === "other") ? "" : "none";
+  document.getElementById("clockToggle").style.display = visClock;
+  document.getElementById("retiredToggles").style.display = visRetired;
+}
+
 function getActiveEvents() {
   let events = GROUP_EVENTS[currentGroup] || EVENT_IDS;
-  if (includeClock && !events.includes("clock")) return events.concat(["clock"]);
+  if (isToggleableGroup()) {
+    if (includeClock && !events.includes("clock")) events = events.concat(["clock"]);
+    if (include333ft && !events.includes("333ft")) events = events.concat(["333ft"]);
+    if (includeMagic && !events.includes("magic")) events = events.concat(["magic"]);
+    if (includeMMagic && !events.includes("mmagic")) events = events.concat(["mmagic"]);
+  }
   return events;
 }
 
@@ -2870,6 +2976,33 @@ function renderProfile(person) {
   }
 
   html += `</tbody></table></div></div>`;
+
+  const retiredOrder = ["333ft","magic","mmagic"];
+  let hasRetired = retiredOrder.some(function(eid) { return person.pbs && person.pbs[eid]; });
+  if (hasRetired) {
+    html += `<div class="profile-section">`;
+    html += `<div class="profile-section-title">${t("removed")}</div>`;
+    html += `<div class="table-wrap" style="margin-top:4px">`;
+    html += `<table class="profile-events-table"><thead><tr>`;
+    html += `<th>${t("profileEvent")}</th>`;
+    html += `<th class="comp-col">${t("profileCompetition")}</th>`;
+    html += `<th>${t("profileNR")}</th>`;
+    html += `<th>${t("profileCR")}</th>`;
+    html += `<th>${t("profileWR")}</th>`;
+    html += `<th>${t("profileSingle")}</th>`;
+    html += `<th>${t("profileAverage")}</th>`;
+    html += `<th>${t("profileWR")}</th>`;
+    html += `<th>${t("profileCR")}</th>`;
+    html += `<th>${t("profileNR")}</th>`;
+    html += `<th class="comp-col">${t("profileCompetition")}</th>`;
+    html += `</tr></thead><tbody>`;
+    for (const eid of retiredOrder) {
+      const pb = person.pbs && person.pbs[eid];
+      if (!pb) continue;
+      html += renderEventRow(pb, eid, compNames);
+    }
+    html += `</tbody></table></div></div>`;
+  }
   document.getElementById("profileView").innerHTML = html;
 }
 

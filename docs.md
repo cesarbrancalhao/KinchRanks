@@ -82,14 +82,19 @@ CREATE TABLE precomputed_totals (
 ### Event classification
 
 | Category | Events | Kinch derivation |
-|---|---|---|
-| `AVERAGE_EVENTS` | 333, 222, 444, 555, 666, 777, 333oh, clock, minx, pyram, skewb, sq1 | `WR_avg / PB_avg × 100` |
+|---|---|---|---|
+| `AVERAGE_EVENTS` | 333, 222, 444, 555, 666, 777, 333oh, clock, 333ft, minx, pyram, skewb, sq1 | `WR_avg / PB_avg × 100` |
 | `BETTER_OF_EVENTS` | 333bf, 444bf, 555bf, 333fm | `max(score_single, score_average)` |
+| `SINGLE_ONLY_EVENTS` | magic, mmagic | `WR_single / PB_single × 100` (no average format) |
 | `MBF_EVENT` | 333mbf | `mbf_raw / WR_mbf × 100` |
+
+### Retired events
+
+Three retired WCA events are parsed and stored in the DB but excluded from default views: **333ft** (3x3 with Feet), **magic** (Magic), and **mmagic** (Master Magic). Each has its own toggle checkbox in the UI (default off), working like the Clock toggle. When any retired event is toggled on, the precomputed path is skipped and on-the-fly SQL is used. Retired events are not precomputed.
 
 ### Precomputed rankings
 
-The `precomputed` table stores the top 500 entries for 36 combinations (3 genders × 6 event groups × 2 clock toggle). Excludes country/continent/debut filters. The `precomputed_totals` table stores the actual entry count per combination, enabling instant total display in pagination without a COUNT query.
+The `precomputed` table stores the top 500 entries for 42 combinations (3 genders × 7 event groups × 2 clock toggle). Excludes country/continent/debut filters. The "removed" group is not precomputed — it always uses the on-the-fly kinch SQL query. The `precomputed_totals` table stores the actual entry count per combination, enabling instant total display in pagination without a COUNT query.
 
 When the user's filters match a precomputed combination and the requested page falls within the stored range (ranks 1–500), the table renders instantly. Pages beyond 500 fall through to the on-the-fly kinch SQL query.
 
@@ -130,15 +135,16 @@ On page load:
 | `queryAll(sql, params)` | Execute SQL via sql.js prepared statement, return array of row objects. |
 | `loadDb()` | Fetch sql.js WASM + `data.db.gz`, decompress, init DB, cache in IndexedDB. |
 | `onDbLoaded()` | Hide loading overlay, enable disabled filters, call `init()`. |
-| `canUsePrecomputed()` | Returns true when filters match a precomputed combination (no country/continent/debut/search, default sort). |
+| `canUsePrecomputed()` | Returns true when filters match a precomputed combination (no country/continent/debut/search/retired-events, default sort). |
 | `getPrecomputedEntries()` | Query `precomputed` table for instant ranked entries. |
 | `getPrecomputedTotal()` | O(1) total count from `precomputed_totals`. |
 | `getEntries()` | Main entry point: tries precomputed first, falls back to complex kinch SQL for country/continent/debut/search or pages beyond 500. |
-| `buildKinchExpr(eventId)` | Builds a per-event SQL kinch expression (MBF, average, or better-of). |
+| `buildKinchExpr(eventId)` | Builds a per-event SQL kinch expression (MBF, average, better-of, or single-only). |
+| `getActiveEvents()` | Returns event list based on selected group + toggled events (clock, retired). Toggles only apply for All/Other/Removed groups. |
+| `updateToggleVisibility()` | Shows/hides the Clock toggle and retired-events section based on the selected event group. |
 | `loadPbsForEntries(entries, activeEvents)` | Batched query loading raw PBs only for visible page entries. |
 | `ensurePersonInLookup(wcaId)` | Lazy-load a person's full data from DB for profile view. |
 | `getWR()` | Query records table for scope/gender baseline; fall back to `KINCH_QUICK.wr` in quick mode. |
-| `getActiveEvents()` | Returns event list based on selected group + clock toggle. |
 | `renderTable()` | Renders HTML table. Quick mode uses `KINCH_QUICK`; otherwise pbs+events loaded only for current page. |
 | `showProfile()` / `hideProfile()` | Toggle between rankings table and single-person profile view. Uses DB for all data. |
 
@@ -149,3 +155,11 @@ Sorting is pushed entirely to SQL. Clicking the overall, name, or any event colu
 ### Pagination
 
 Entry count comes from `entries.length` (complex SQL or precomputed). When precomputed path is used, the real total from `precomputed_totals` is shown. Pages beyond the precomputed range (500) automatically fall through to the complex SQL.
+
+### Search
+
+Name search triggers only on Enter key or clicking the adjacent Search button — not on every keystroke — to avoid heavy SQL queries while typing.
+
+### Profile view
+
+Clicking a person's name loads their full event-by-event results. Active events are shown in the "Results" table; retired events (333ft, magic, mmagic) appear in a separate "Removed" table below it, only if the person has any.

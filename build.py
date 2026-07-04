@@ -35,8 +35,12 @@ KINCH_EVENTS = [
 ]
 KINCH_EVENTS_ALL = KINCH_EVENTS + ["clock"]
 
-AVERAGE_EVENTS = {"333", "222", "444", "555", "666", "777", "333oh", "clock", "minx", "pyram", "skewb", "sq1"}
+RETIRED_EVENTS = ["333ft", "magic", "mmagic"]
+ALL_DB_EVENTS = KINCH_EVENTS_ALL + RETIRED_EVENTS
+
+AVERAGE_EVENTS = {"333", "222", "444", "555", "666", "777", "333oh", "clock", "minx", "pyram", "skewb", "sq1", "333ft"}
 BETTER_OF_EVENTS = {"333bf", "444bf", "555bf", "333fm"}
+SINGLE_ONLY_EVENTS = {"magic", "mmagic"}
 MBF_EVENT = "333mbf"
 
 MIN_EVENTS = 1
@@ -52,7 +56,8 @@ CONTINENT_NAMES = {
     "_Oceania": "Oceania",
 }
 
-assert set(KINCH_EVENTS) == (AVERAGE_EVENTS | BETTER_OF_EVENTS | {MBF_EVENT}) - {"clock"}
+assert set(KINCH_EVENTS) == (AVERAGE_EVENTS | BETTER_OF_EVENTS | {MBF_EVENT}) - {"clock", "333ft"}
+assert set(ALL_DB_EVENTS) == (AVERAGE_EVENTS | BETTER_OF_EVENTS | SINGLE_ONLY_EVENTS | {MBF_EVENT})
 
 
 def decode_mbf(wca_value):
@@ -272,7 +277,7 @@ def _write_sqlite(persons, wr, cwr, conwr, by_country, result, country_continent
             pbs_full = entry.get("pbs", {})
             pbs_ext = entry.get("_pbs_ext", {})
 
-            for eid in KINCH_EVENTS_ALL:
+            for eid in ALL_DB_EVENTS:
                 pb = pbs_full.get(eid, {})
                 ext = pbs_ext.get(eid, {})
                 if not pb:
@@ -308,7 +313,7 @@ def _write_sqlite(persons, wr, cwr, conwr, by_country, result, country_continent
     wr_rows = []
     for gk in ("all", "m", "f"):
         w = wr.get(gk, {})
-        for eid in KINCH_EVENTS_ALL:
+        for eid in ALL_DB_EVENTS:
             rs = w["single"].get(eid) if "single" in w else None
             ra = w["average"].get(eid) if "average" in w else None
             mbf = w.get("mbf_score") if eid == MBF_EVENT else None
@@ -317,7 +322,7 @@ def _write_sqlite(persons, wr, cwr, conwr, by_country, result, country_continent
         cw = cwr.get(cid, {})
         for gk in ("all", "m", "f"):
             w = cw.get(gk, {})
-            for eid in KINCH_EVENTS_ALL:
+            for eid in ALL_DB_EVENTS:
                 rs = w["single"].get(eid) if "single" in w else None
                 ra = w["average"].get(eid) if "average" in w else None
                 mbf = w.get("mbf_score") if eid == MBF_EVENT else None
@@ -328,7 +333,7 @@ def _write_sqlite(persons, wr, cwr, conwr, by_country, result, country_continent
             cw = conwr[confid]
             for gk in ("all", "m", "f"):
                 w = cw.get(gk, {})
-                for eid in KINCH_EVENTS_ALL:
+                for eid in ALL_DB_EVENTS:
                     rs = w["single"].get(eid) if "single" in w else None
                     ra = w["average"].get(eid) if "average" in w else None
                     mbf = w.get("mbf_score") if eid == MBF_EVENT else None
@@ -380,8 +385,8 @@ def _write_sqlite(persons, wr, cwr, conwr, by_country, result, country_continent
         "nxn": ["333","222","444","555","666","777","333oh"],
         "big": ["444","555","666","777"],
         "bld": ["333bf","444bf","555bf","333mbf"],
-        "nonbld": ["333","222","444","555","666","777","333fm","333oh","clock","minx","pyram","skewb","sq1"],
-        "other": ["clock","minx","pyram","skewb","sq1","333fm"],
+        "nonbld": ["333","222","444","555","666","777","333fm","333oh","minx","pyram","skewb","sq1"],
+        "other": ["minx","pyram","skewb","sq1","333fm"],
     }
 
     event_kinch = {}
@@ -392,7 +397,7 @@ def _write_sqlite(persons, wr, cwr, conwr, by_country, result, country_continent
                 continue
             pbs = entry.get("pbs", {})
             scores = {}
-            for eid in KINCH_EVENTS_ALL:
+            for eid in ALL_DB_EVENTS:
                 pb = pbs.get(eid, {})
                 s = 0.0
                 if eid == MBF_EVENT:
@@ -418,6 +423,11 @@ def _write_sqlite(persons, wr, cwr, conwr, by_country, result, country_continent
                     if av is not None and av > 0 and wva and wva > 0:
                         ka = wva / av * 100
                     s = round(min(max(ks, ka), 100.0), 2)
+                elif eid in SINGLE_ONLY_EVENTS:
+                    sv = pb.get("s")
+                    wvs = wr["all"]["single"].get(eid)
+                    if sv is not None and sv > 0 and wvs and wvs > 0:
+                        s = round(min(wvs / sv * 100, 100.0), 2)
                 scores[eid] = s
             event_kinch[wca_id] = scores
 
@@ -541,7 +551,7 @@ def main():
                     except (IndexError, TypeError):
                         continue
 
-                    if event_id not in KINCH_EVENTS_ALL:
+                    if event_id not in ALL_DB_EVENTS:
                         continue
                     if not person_id:
                         continue
@@ -642,7 +652,7 @@ def main():
 
     print("Computing event ranks (NR/CR/WR)...", flush=True)
 
-    for eid in KINCH_EVENTS_ALL:
+    for eid in ALL_DB_EVENTS:
         s_world = []
         a_world = []
         s_by_country = defaultdict(list)
@@ -729,7 +739,7 @@ def main():
         gender = person["gender"]
 
         scores = {}
-        for event_id in KINCH_EVENTS_ALL:
+        for event_id in ALL_DB_EVENTS:
             vals = events.get(event_id, {})
             kinch = 0.0
 
@@ -756,6 +766,11 @@ def main():
                 if a_val is not None and a_val > 0 and wr_a and wr_a > 0:
                     k_avg = wr_a / a_val * 100
                 kinch = max(k_single, k_avg)
+            elif event_id in SINGLE_ONLY_EVENTS:
+                s = vals.get("single")
+                wr_s = cw["single"].get(event_id)
+                if s is not None and s > 0 and wr_s and wr_s > 0:
+                    kinch = wr_s / s * 100
 
             kinch = min(kinch, 100.0)
             scores[event_id] = round(kinch, 2)
@@ -767,7 +782,7 @@ def main():
 
         entry_pbs = {}
         entry_pbs_ext = {}
-        for event_id in KINCH_EVENTS_ALL:
+        for event_id in ALL_DB_EVENTS:
             vals = events.get(event_id, {})
             if not vals:
                 continue
@@ -829,7 +844,7 @@ def main():
             if i < TOP_OVERALL and e["_n_events"] >= MIN_EVENTS:
                 selected.add(i)
 
-        for event_id in KINCH_EVENTS_ALL:
+        for event_id in ALL_DB_EVENTS:
             indexed = list(enumerate(entries))
             indexed.sort(key=lambda x: x[1]["_scores"].get(event_id, 0.0), reverse=True)
             for i, _ in indexed[:TOP_PER_EVENT]:
@@ -883,8 +898,8 @@ def main():
 
     def _filter_wr(w):
         return {
-            "single": {k: v for k, v in w["single"].items() if k in KINCH_EVENTS_ALL},
-            "average": {k: v for k, v in w["average"].items() if k in KINCH_EVENTS_ALL},
+            "single": {k: v for k, v in w["single"].items() if k in ALL_DB_EVENTS},
+            "average": {k: v for k, v in w["average"].items() if k in ALL_DB_EVENTS},
             "mbf_score": w["mbf_score"],
         }
 
