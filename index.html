@@ -1912,27 +1912,9 @@ let includeClock = false;
 let include333ft = false;
 let includeMagic = false;
 let includeMMagic = false;
-let _lastEntries = null;
-let _lastActiveEvents = null;
-let _lastWR = null;
-let _nextPageHTML = null;
-let _preRenderedPage = 0;
 let _pendingFullRefresh = false;
 let _currentProfileId = null;
 let _precomputedTotal = 0;
-
-function isDefaultFilters() {
-  return (currentCountry === null || currentCountry === "__world__") &&
-         currentContinent === "__world__" &&
-         currentGender === "all" &&
-         currentGroup === "__all__" &&
-         !includeClock &&
-         !include333ft &&
-         !includeMagic &&
-         !includeMMagic &&
-         currentSince === 0 &&
-         currentUntil === 9999;
-}
 
 function decodeMbf(wca) {
   if (wca <= 0) return null;
@@ -2344,19 +2326,7 @@ function populateCountries(preserveValue) {
 function populateSince() {
   let selAfter = document.getElementById("sinceSelect");
   let selUntil = document.getElementById("untilSelect");
-  let years;
-  if (dbLoaded) {
-    years = queryDebutYears();
-  } else {
-    years = [];
-    for (let c in allData.countries) {
-      for (let i = 0; i < allData.countries[c].entries.length; i++) {
-        let y = parseInt((allData.countries[c].entries[i].id || "").substring(0, 4));
-        if (!isNaN(y) && y >= 2000) years.push(y);
-      }
-    }
-    years = [...new Set(years)].sort();
-  }
+  let years = queryDebutYears();
   for (let i = 0; i < years.length; i++) {
     selAfter.add(new Option(years[i], years[i]));
     selUntil.add(new Option(years[i], years[i]));
@@ -2516,12 +2486,12 @@ function loadPbsForEntries(entries, activeEvents, wr) {
 }
 
 function isToggleableGroup() {
-  return currentGroup === "__all__" || currentGroup === "other" || currentGroup === "removed";
+  return currentGroup === "__all__" || currentGroup === "other" || currentGroup === "removed" || currentGroup === "nonbld";
 }
 
 function updateToggleVisibility() {
-  let visClock = (currentGroup === "__all__" || currentGroup === "other" || currentGroup === "removed") ? "" : "none";
-  let visRetired = (currentGroup === "__all__" || currentGroup === "other") ? "" : "none";
+  let visClock = (currentGroup === "__all__" || currentGroup === "other" || currentGroup === "removed" || currentGroup === "nonbld") ? "" : "none";
+  let visRetired = (currentGroup === "__all__" || currentGroup === "other" || currentGroup === "nonbld") ? "" : "none";
   document.getElementById("clockToggle").style.display = visClock;
   document.getElementById("retiredToggles").style.display = visRetired;
 }
@@ -2668,120 +2638,6 @@ function renderTable() {
     });
   });
 
-  _lastEntries = null;
-}
-
-function renderPage() {
-  let entries = _lastEntries;
-  let activeEvents = _lastActiveEvents;
-  let wr = _lastWR;
-  let totalEntries = entries.length;
-  let totalPages = Math.max(1, Math.ceil(totalEntries / pageSize));
-  if (currentPage > totalPages) currentPage = totalPages;
-  let start = (currentPage - 1) * pageSize;
-  let pageEntries = entries.slice(start, start + pageSize).map(function(e, i) { return { ...e, rank: start + i + 1 }; });
-
-  let wrap = document.getElementById("tableWrap");
-  let tbody = wrap.querySelector("tbody");
-  if (!tbody) return renderTable();
-
-  let html = "";
-  if (currentPage === _preRenderedPage && _nextPageHTML) {
-    html = _nextPageHTML;
-    _nextPageHTML = null;
-    _preRenderedPage = 0;
-  } else {
-    pageEntries.forEach(function(e) {
-      html += "<tr>";
-      html += "<td>" + e.rank + "</td>";
-      let flag = currentCountry === "__world__" ? " <span style=\"color:#8b949e;font-size:11px\">" + esc(e.country) + "</span>" : "";
-      html += "<td><a href=\"javascript:void(0)\" class=\"person-link\" data-wca-id=\"" + esc(e.id) + "\" onclick=\"showProfile('" + esc(e.id) + "');return false\">" + esc(e.name) + "</a>" + flag + "</td>";
-      html += "<td>" + e.overall.toFixed(2) + "</td>";
-      let evtCount = activeEvents.filter(function(eid) { return e.events[eid] > 0; }).length;
-      html += "<td>" + evtCount + "</td>";
-      activeEvents.forEach(function(eid) {
-        let v = e.events[eid] || 0;
-        if (v > 0) {
-          let cls = (v >= 100 ? "score-100" : v >= 90 ? "score-90" : "") + " score-cell";
-          let info = getTimeString(eid, e.pbs, wr);
-          html += "<td class=\"" + cls + "\" data-time=\"" + esc(info ? info.text : "") + "\" data-type=\"" + (info ? info.type : "") + "\">" + v.toFixed(2) + "</td>";
-        } else {
-          html += "<td>-</td>";
-        }
-      });
-      html += "</tr>";
-    });
-  }
-  tbody.innerHTML = html;
-
-  let pagDiv = document.getElementById("pagination");
-  let pagHtml = "<span class=\"info\">" + totalEntries + " " + t("total") + "</span>";
-  pagHtml += "<button " + (currentPage === 1 ? "disabled" : "") + " data-page=\"1\">" + t("first") + "</button>";
-  pagHtml += "<button " + (currentPage === 1 ? "disabled" : "") + " data-page=\"" + (currentPage - 1) + "\">" + t("prev") + "</button>";
-  let startPg = Math.max(1, currentPage - 3);
-  let endPg = Math.min(totalPages, currentPage + 3);
-  for (let p = startPg; p <= endPg; p++) {
-    pagHtml += "<button class=\"" + (p === currentPage ? "active" : "") + "\" data-page=\"" + p + "\">" + p + "</button>";
-  }
-  pagHtml += "<button " + (currentPage === totalPages ? "disabled" : "") + " data-page=\"" + (currentPage + 1) + "\">" + t("next") + "</button>";
-  pagHtml += "<button " + (currentPage === totalPages ? "disabled" : "") + " data-page=\"" + totalPages + "\">" + t("last") + "</button>";
-  pagDiv.innerHTML = pagHtml;
-  pagDiv.style.display = "flex";
-
-  pagDiv.querySelectorAll("button[data-page]").forEach(function(btn) {
-    btn.addEventListener("click", function() {
-      currentPage = parseInt(btn.dataset.page);
-      renderPage();
-    });
-  });
-
-  wrap.querySelectorAll("td.score-cell").forEach(function(td) {
-    td.addEventListener("click", function() {
-      let colIdx = td.cellIndex;
-      let allCells = wrap.querySelectorAll("tr td:nth-child(" + (colIdx + 1) + ").score-cell");
-      let showing = td.classList.contains("showing-time");
-      allCells.forEach(function(cell) {
-        if (showing) {
-          cell.textContent = cell.dataset.score;
-          cell.classList.remove("showing-time", "single", "average");
-        } else if (cell.dataset.time) {
-          cell.dataset.score = cell.textContent;
-          cell.textContent = cell.dataset.time;
-          cell.classList.add("showing-time", cell.dataset.type);
-        }
-      });
-    });
-  });
-
-  if (currentPage < totalPages) {
-    let _n = currentPage + 1;
-    let _ns = (_n - 1) * pageSize;
-    let _ne = entries.slice(_ns, _ns + pageSize);
-    setTimeout(function() {
-      _nextPageHTML = "";
-      _ne.forEach(function(e, idx) {
-        let rank = _ns + idx + 1;
-        _nextPageHTML += "<tr><td>" + rank + "</td>";
-        let flag2 = currentCountry === "__world__" ? " <span style=\"color:#8b949e;font-size:11px\">" + esc(e.country) + "</span>" : "";
-        _nextPageHTML += "<td><a href=\"javascript:void(0)\" class=\"person-link\" data-wca-id=\"" + esc(e.id) + "\" onclick=\"showProfile('" + esc(e.id) + "');return false\">" + esc(e.name) + "</a>" + flag2 + "</td>";
-        _nextPageHTML += "<td>" + e.overall.toFixed(2) + "</td>";
-        let ec = activeEvents.filter(function(eid) { return e.events[eid] > 0; }).length;
-        _nextPageHTML += "<td>" + ec + "</td>";
-        activeEvents.forEach(function(eid) {
-          let v2 = e.events[eid] || 0;
-          if (v2 > 0) {
-            let cls2 = (v2 >= 100 ? "score-100" : v2 >= 90 ? "score-90" : "") + " score-cell";
-            let info2 = getTimeString(eid, e.pbs, wr);
-            _nextPageHTML += "<td class=\"" + cls2 + "\" data-time=\"" + esc(info2 ? info2.text : "") + "\" data-type=\"" + (info2 ? info2.type : "") + "\">" + v2.toFixed(2) + "</td>";
-          } else {
-            _nextPageHTML += "<td>-</td>";
-          }
-        });
-        _nextPageHTML += "</tr>";
-      });
-      _preRenderedPage = _n;
-    }, 0);
-  }
 }
 
 function ensurePersonInLookup(wcaId) {
