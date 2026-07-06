@@ -511,23 +511,23 @@ def main():
 
                 if in_table == "competitions":
                     row = parse_sql_row(line)
-                    if row is None or len(row) < 49:
+                    if row is None or len(row) < 2:
                         continue
                     cid = row[0]
-                    cname = row[48]
+                    cname = row[1]
                     if cid and cname:
                         comp_names[cid] = cname
 
                 elif in_table == "persons":
                     row = parse_sql_row(line)
-                    if row is None or len(row) < 9:
+                    if row is None or len(row) < 5:
                         continue
-                    sub_id = row[7]
-                    wca_id = row[8]
+                    sub_id = row[1]
+                    wca_id = row[0]
                     if sub_id == 1 and wca_id:
                         persons[wca_id] = {
-                            "name": row[6] or "",
-                            "country_id": row[2] or "",
+                            "name": row[2] or "",
+                            "country_id": row[3] or "",
                             "gender": row[4] or "",
                         }
                 elif in_table == "countries":
@@ -535,19 +535,19 @@ def main():
                     if row is None or len(row) < 2:
                         continue
                     c_name = row[0]
-                    cont_id = row[1]
+                    cont_id = row[2]
                     if c_name and cont_id:
                         country_continent[c_name] = cont_id
                 elif in_table == "results":
                     row = parse_sql_row(line)
-                    if row is None or len(row) < 8:
+                    if row is None or len(row) < 9:
                         continue
                     try:
-                        competition_id = row[3]
-                        event_id = row[5]
-                        person_id = row[7]
-                        average = row[1]
-                        best = row[2]
+                        competition_id = row[1]
+                        event_id = row[2]
+                        person_id = row[8]
+                        average = row[6]
+                        best = row[5]
                     except (IndexError, TypeError):
                         continue
 
