@@ -14,6 +14,7 @@ Interactive [Kinch rank](https://www.speedsolving.com/wiki/index.php/KinchRanks)
 - **Retired events** — toggle 333ft, Magic, Master Magic on/off like Clock; scores computed against their respective WRs
 - **Search & sort** — search by name (Enter key or button click, pushed to SQL), sort by any column (via SQL ORDER BY)
 - **Profile view** — click any name for detailed event-by-event results with NR/CR/WR ranks, plus a separate table for retired events
+- **Statistics view** — a separate page with all-time leaderboards: most podiums, most world records currently held, most world records ever held, most solves, most competitions attended, busiest year, longest active career, and most competitions per country
 - **Dark/light mode** — night theme (default) and WCA-inspired day theme
 - **9 languages** — English, Portuguese, Spanish, German, Italian, Catalan, Korean, Chinese, Vietnamese
 
@@ -26,6 +27,8 @@ The data pipeline (`build.py`) streams the [WCA developer database dump](https:/
 
 The frontend (`index.html`) renders the table immediately from `1000.js` while `data.db.gz` loads asynchronously. On subsequent visits the decompressed DB is served from IndexedDB. Kinch scores are computed on the fly in SQL — no stored columns. Clock and retired events (333ft, Magic, Master Magic) can be toggled on/off; their checkboxes are only shown for All, Other, and Removed event groups.
 
+The Statistics view is powered by a separate script (`calc/other_stats.py`) that streams the same WCA SQL dump and outputs `otherstatistics.js` (`var STATS_DATA = {...}`), loaded synchronously by the frontend. It aggregates all-time leaderboards (podiums, world records held/ever, solves, competitions, busiest year, longest career, per-country competitions) independently of the main Kinch pipeline.
+
 All sorting (including per-event columns), pagination, and search are pushed to SQL. PBs and per-event scores are loaded only for the visible page entries (not all 71k), keeping RAM usage minimal.
 
 No server, no API calls, fully static. Deploys to GitHub Pages.
@@ -37,3 +40,5 @@ No server, no API calls, fully static. Deploys to GitHub Pages.
 3. Run `python3 build.py`
 
 This outputs `data.db`, `data.db.gz`, and `1000.js`.
+
+To regenerate the Statistics view data, run `python3 calc/other_stats.py` (set `SQL_PATH` inside the script to your dump). This outputs `otherstatistics.js`.
