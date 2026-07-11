@@ -6,3 +6,5 @@ __pycache__/
 .vscode/
 .idea/
 data.db
+calc/
+WCA_export.sql

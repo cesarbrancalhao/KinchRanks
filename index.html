@@ -190,12 +190,38 @@ body.light .profile-events-table .rank-wr { font-weight: 700; color: #d32f2f; }
 body.light .profile-events-table .rank-nr { font-weight: 700; color: #0055A4; }
 .profile-events-table .rank-cr { font-weight: 700; color: #7ee787; }
 body.light .profile-events-table .rank-cr { font-weight: 700; color: #1a7f3a; }
+
+.stats-section { margin-bottom: 24px; }
+.stats-section h3 { font-size: 15px; color: #f0f6fc; margin-bottom: 8px; font-weight: 600; text-align: center; }
+body.light .stats-section h3 { color: #111; }
+.stats-select { padding: 4px 8px; border: 1px solid #30363d; border-radius: 4px; background: #0d1117; color: #c9d1d9; font-size: 12px; margin-left: 8px; }
+body.light .stats-select { background: #fff; border-color: #ccc; color: #222; }
+.stats-table { width: 100%; max-width: 700px; margin: 0 auto; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+.stats-table, .stats-table th, .stats-table td { position: static; }
+.stats-table th { padding: 6px 10px; text-align: left; font-weight: 600; background: #21262d; color: #8b949e; border-bottom: 1px solid #30363d; }
+.stats-table td { padding: 6px 10px; color: #c9d1d9; border-bottom: 1px solid #21262d; }
+.stats-table tbody tr:nth-child(even) td { background: #161b22; }
+.stats-table tbody tr:hover td { background: #1c2533; }
+.stats-table td:first-child { color: #58a6ff; font-weight: 600; text-align: right; }
+.stats-table td:nth-child(2) { font-family: "SF Mono", "Fira Code", monospace; color: #58a6ff; font-weight: 600; }
+.stats-table td:nth-child(4), .stats-table td:nth-child(5) { font-weight: 700; color: #f0883e; }
+body.light .stats-table th { background: #0055A4; color: #fff; border-bottom-color: #004494; }
+body.light .stats-table td { color: #222; }
+body.light .stats-table tbody tr:nth-child(even) td { background: #f5f5f5; }
+body.light .stats-table tbody tr:hover td { background: #e8f0ff; }
+body.light .stats-table td:first-child { color: #222; }
+body.light .stats-table td:nth-child(2) { color: #222; }
+body.light .stats-table td:nth-child(4), body.light .stats-table td:nth-child(5) { color: #f4771d; }
+.stats-back { margin-bottom: 16px; }
+.stats-two-col { display: flex; gap: 32px; flex-wrap: wrap; }
+.stats-col { flex: 1; min-width: 340px; }
 </style>
 </head>
 <body>
 <div class="container">
   <h1><a href="https://github.com/cesarbrancalhao" target="_blank" style="color:inherit;">MCBF</a> <span data-i18n="title">Kinch Ranks</span></h1>
   <div style="position:absolute;top:24px;right:24px;display:flex;gap:8px;align-items:center">
+    <button id="statsBtn" class="theme-toggle" onclick="showStats()">Statistics</button>
     <select id="langSelect" onchange="setLanguage(this.value)">
       <option value="en">English</option>
       <option value="pt">Português</option>
@@ -288,9 +314,11 @@ body.light .profile-events-table .rank-cr { font-weight: 700; color: #1a7f3a; }
   <div class="table-wrap" id="tableWrap" style="display:none"></div>
   <div id="pagination" class="pagination" style="display:none"></div>
   <div id="profileView" style="display:none"></div>
+  <div id="statsView" style="display:none"></div>
 </div>
 
 <script src="1000.js"></script>
+<script src="otherstatistics.js"></script>
 <script src="https://sql.js.org/dist/sql-wasm.js"></script>
 <script>
 let DB_CACHE = 'kinch_db_v3';
@@ -2701,6 +2729,93 @@ function hideProfile() {
     _pendingFullRefresh = false;
     init();
   }
+}
+
+function showStats() {
+  document.getElementById("controls").style.display = "none";
+  document.getElementById("status").style.display = "none";
+  document.getElementById("tableWrap").style.display = "none";
+  document.getElementById("pagination").style.display = "none";
+  document.getElementById("subtitle").style.display = "none";
+  document.getElementById("legendKinch").style.display = "none";
+  document.getElementById("legendColors").style.display = "none";
+  document.getElementById("profileView").style.display = "none";
+
+  renderStats();
+  document.getElementById("statsView").style.display = "block";
+  window.scrollTo(0, 0);
+}
+
+function hideStats() {
+  document.getElementById("statsView").style.display = "none";
+  document.getElementById("controls").style.display = "flex";
+  document.getElementById("tableWrap").style.display = "block";
+  document.getElementById("pagination").style.display = "flex";
+  document.getElementById("subtitle").style.display = "";
+  document.getElementById("legendKinch").style.display = "";
+  document.getElementById("legendColors").style.display = "";
+}
+
+function renderStats() {
+  let html = `<div class="profile-header">`;
+  html += `<button class="profile-back" onclick="hideStats()">← Back to rankings</button>`;
+  html += `<span class="profile-name">Other Statistics</span>`;
+  html += `</div>`;
+
+  const sd = window.STATS_DATA || STATS_DATA;
+  if (!sd) {
+    html += '<div class="status">No statistics data loaded. Make sure otherstatistics.js is built.</div>';
+    document.getElementById("statsView").innerHTML = html;
+    return;
+  }
+
+  html += `<p class="subtitle" style="text-align:center">Generated: ${sd.generated_at}</p>`;
+
+  html += statTable("Most Podiums", sd.podiums, "Podiums");
+  html += statTable("Most World Records Held", sd.world_records, "WRs");
+  html += statTable("Most World Records Ever", sd.world_records_ever, "WRs");
+  html += statTable("Most Solves Ever", sd.most_solves, "Solves");
+  html += statTable("Most Competitions Attended", sd.most_comps, "Comps");
+
+  html += statTable("Busiest Year", sd.busiest_year, "Comps", true);
+  html += statTable("Longest Active Career", sd.longest_career, "Span", true);
+
+  const countries = Object.keys(sd.comps_by_country).sort();
+  html += `<div class="stats-section"><h3>Most Competitions Attended per Country <select class="stats-select" id="countryStatSelect" onchange="updateCountryStat()">`;
+  countries.forEach(function(c) {
+    html += `<option value="${esc(c)}">${esc(c)} (${sd.comps_by_country[c].length})</option>`;
+  });
+  html += `</select></h3>`;
+  html += `<div id="countryStatTable"></div></div>`;
+
+  document.getElementById("statsView").innerHTML = html;
+  updateCountryStat();
+}
+
+function statTable(title, data, valLabel, showDetail) {
+  let h = `<div class="stats-section"><h3>${title}</h3>`;
+  h += `<table class="stats-table"><thead><tr><th>#</th><th>WCA ID</th><th>Name</th><th>Country</th><th>${valLabel}</th></tr></thead><tbody>`;
+  data.forEach(function(p) {
+    let v = p.value;
+    if (showDetail && p.detail) v = `${p.value} (${p.detail})`;
+    h += `<tr><td>${p.rank}</td><td>${esc(p.wca_id)}</td><td>${esc(p.name)}</td><td>${esc(p.country)}</td><td>${v}</td></tr>`;
+  });
+  h += `</tbody></table></div>`;
+  return h;
+}
+
+function updateCountryStat() {
+  const sel = document.getElementById("countryStatSelect");
+  if (!sel) return;
+  const c = sel.value;
+  const sd = window.STATS_DATA || STATS_DATA;
+  const data = sd.comps_by_country[c] || [];
+  let h = `<table class="stats-table"><thead><tr><th>#</th><th>WCA ID</th><th>Name</th><th>Comps</th></tr></thead><tbody>`;
+  data.forEach(function(p) {
+    h += `<tr><td>${p.rank}</td><td>${esc(p.wca_id)}</td><td>${esc(p.name)}</td><td>${p.value}</td></tr>`;
+  });
+  h += `</tbody></table>`;
+  document.getElementById("countryStatTable").innerHTML = h;
 }
 
 function renderProfile(person) {
