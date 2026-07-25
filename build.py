@@ -47,6 +47,8 @@ MIN_EVENTS = 1
 TOP_OVERALL = 1000
 TOP_PER_EVENT = 200
 
+FORCE_INCLUDE_IDS = {"2015FILH02"}
+
 CONTINENT_NAMES = {
     "_Africa": "Africa",
     "_Asia": "Asia",
@@ -850,6 +852,10 @@ def main():
             for i, _ in indexed[:TOP_PER_EVENT]:
                 if entries[i]["_scores"].get(event_id, 0.0) > 0:
                     selected.add(i)
+
+        for i, e in enumerate(entries):
+            if e["id"] in FORCE_INCLUDE_IDS:
+                selected.add(i)
 
         top_entries = [entries[i] for i in sorted(selected)]
         top_entries.sort(key=lambda x: x["overall"], reverse=True)
