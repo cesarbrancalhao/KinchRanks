@@ -137,7 +137,7 @@ td:first-child { color: var(--blue); font-weight: 600; }
 td:nth-child(2) { font-weight: 500; text-align: left; }
 .person-link { color: inherit; text-decoration: none; }
 .person-link:hover { text-decoration: underline; color: var(--blue); }
-td:nth-child(3) { font-weight: 700; color: var(--orange); }
+.main-table td:nth-child(3) { font-weight: 700; color: var(--orange); }
 .score-100 { color: var(--gold); font-weight: 700; }
 .score-90 { font-weight: 700; }
 .score-cell { cursor: pointer; }
@@ -178,7 +178,7 @@ td:nth-child(3) { font-weight: 700; color: var(--orange); }
 .profile-info-table thead th:first-child { border-top-left-radius: 12px; }
 .profile-info-table thead th:last-child { border-top-right-radius: 12px; }
 .profile-info-table td { padding: 8px 14px; text-align: left; color: var(--text-2); font-weight: 400; background: none; }
-.profile-info-table th:first-child, .profile-info-table td:first-child { position: static; }
+.profile-info-table th:first-child, .profile-info-table td:first-child { position: static; width: auto; min-width: auto; }
 .profile-info-table tbody tr { background: none; }
 .profile-info-table tbody tr:nth-child(even) { background: none; }
 .profile-info-table tbody tr:hover { background: none; }
@@ -190,10 +190,10 @@ td:nth-child(3) { font-weight: 700; color: var(--orange); }
 .profile-events-table thead th:hover { color: inherit; }
 .profile-events-table thead th:first-child, .profile-events-table thead th:nth-child(2) { position: static; z-index: auto; }
 .profile-events-table th, .profile-events-table td { text-align: right; }
-.profile-events-table th:first-child, .profile-events-table td:first-child { text-align: left; position: static; }
+.profile-events-table th:first-child, .profile-events-table td:first-child { text-align: left; position: static; width: auto; min-width: auto; }
 .profile-events-table td:first-child { background: inherit; }
 .profile-events-table td:first-child { color: inherit; }
-.profile-events-table th:nth-child(2), .profile-events-table td:nth-child(2) { text-align: left; position: static; }
+.profile-events-table th:nth-child(2), .profile-events-table td:nth-child(2) { text-align: left; position: static; box-shadow: none; font-weight: inherit; }
 .profile-events-table td:first-child { font-weight: 600; }
 .profile-events-table .comp-col { text-align: left; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
 .profile-events-table .rank-col { color: var(--dim); }
@@ -223,8 +223,8 @@ td:nth-child(3) { font-weight: 700; color: var(--orange); }
 .stats-table tbody tr:last-child td:last-child { border-bottom-right-radius: 12px; }
 .stats-table tbody tr:nth-child(even) td { background: var(--card-2); }
 .stats-table tbody tr:hover td { background: var(--row-hover); }
-.stats-table td:first-child { color: var(--blue); font-weight: 600; text-align: right; }
-.stats-table td:nth-child(2) { font-family: "SF Mono", "Fira Code", monospace; color: var(--blue); font-weight: 600; }
+.stats-table td:first-child { color: var(--blue); font-weight: 600; text-align: right; width: auto; min-width: auto; }
+.stats-table td:nth-child(2) { font-family: "SF Mono", "Fira Code", monospace; color: var(--blue); font-weight: 600; box-shadow: none; }
 .stats-table td:nth-child(4), .stats-table td:nth-child(5) { font-weight: 700; color: var(--orange); }
 .stats-back { margin-bottom: 16px; }
 .stats-two-col { display: flex; gap: 32px; flex-wrap: wrap; }
@@ -2618,7 +2618,7 @@ function renderTable() {
   let activeEvents = getActiveEvents();
   let wr = getWR();
 
-  let html = "<table><thead><tr>";
+  let html = "<table class=\"main-table\"><thead><tr>";
   html += '<th data-col="0">' + t("colRank") + '</th>';
   html += '<th data-col="1">' + t("colPerson") + '</th>';
   html += '<th data-col="2">' + t("colOverall") + '</th>';
