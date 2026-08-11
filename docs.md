@@ -125,7 +125,7 @@ Uses a hand-rolled `parse_values_line()` to split `INSERT INTO ... VALUES` rows 
 
 ### Output
 
-Writes `otherstatistics.js` (`var STATS_DATA = {...};`) consumed synchronously by the frontend. `SQL_PATH` and `OUTPUT_PATH` are hardcoded constants at the top of the script.
+Writes `otherstatistics.js` (`var STATS_DATA = {...};`) consumed synchronously by the Statistics page (`Statistics/index.html`). `SQL_PATH` and `OUTPUT_PATH` are hardcoded constants at the top of the script.
 
 ---
 
@@ -133,8 +133,8 @@ Writes `otherstatistics.js` (`var STATS_DATA = {...};`) consumed synchronously b
 
 ### Loading strategy
 
-1. `1000.js` loads synchronously — sets `window.KINCH_QUICK` with top 1000 pre-computed entries. ~200 KB, loads instantly. `otherstatistics.js` also loads synchronously — sets `window.STATS_DATA` for the Statistics view.
-2. sql.js WASM + `data.db.gz` load asynchronously. The DB is decompressed in-browser via `DecompressionStream`, then cached in IndexedDB for subsequent visits. A loading overlay with spinner covers the controls area until ready.
+1. `1000.js` loads synchronously — sets `window.KINCH_QUICK` with top 1000 pre-computed entries. ~200 KB, loads instantly. (`otherstatistics.js` is loaded by the separate Statistics page instead — see below. The Rankings page also uses the same sql.js DB but does not load `1000.js`.)
+2. sql.js WASM + `data.db.gz` load asynchronously. The DB is decompressed in-browser via `DecompressionStream`, then cached in IndexedDB for subsequent visits. A loading overlay with spinner covers the controls area until ready. The same IndexedDB cache key (`kinch_db_v3`) is shared with the Rankings page, so the DB is only downloaded once.
 
 On page load:
 - **Quick mode**: renders top 1000 from `KINCH_QUICK`. Controls covered by loading overlay. Gender, event group, search, page size, and clock are fully functional. Country/continent/debut-year dropdowns are disabled until DB loads.
@@ -193,16 +193,35 @@ Name search triggers only on Enter key or clicking the adjacent Search button �
 
 Clicking a person's name loads their full event-by-event results. Active events are shown in the "Results" table; retired events (333ft, magic, mmagic) appear in a separate "Removed" table below it, only if the person has any.
 
-### Statistics view
+### Statistics page
 
-A "Statistics" button in the top bar opens a separate all-time leaderboards page (`#statsView`), backed by `STATS_DATA` from `otherstatistics.js` (loaded synchronously alongside `1000.js`). It requires no database — everything is precomputed by `calc/other_stats.py`.
+A "Statistics" button in the top bar navigates to a separate all-time leaderboards page at `Statistics/index.html` (served as `/Statistics/` on GitHub Pages), backed by `STATS_DATA` from `../otherstatistics.js`. It is a fully standalone page (own theme toggle, sharing the same `localStorage` theme key) and requires no database — everything is precomputed by `calc/other_stats.py`.
 
 | Function | Description |
 |---|---|
-| `showStats()` | Hides the rankings UI (controls, table, pagination, legends, profile) and renders the stats page. |
-| `hideStats()` | Restores the rankings view. |
 | `renderStats()` | Builds all leaderboard tables from `STATS_DATA` plus the per-country dropdown. |
 | `statTable(title, data, valLabel, showDetail)` | Renders a single ranked leaderboard table; `showDetail` appends `p.detail` to the value (used for busiest year / longest career). |
 | `updateCountryStat()` | Re-renders the "Most Competitions per Country" table when the country dropdown changes. |
 
 Leaderboards shown: Most Podiums, Most World Records Held, Most World Records Ever, Most Solves Ever, Most Competitions Attended, Busiest Year, Longest Active Career, and Most Competitions Attended per Country.
+
+### Rankings page
+
+A **Rankings** button navigates to a separate event rankings page at `Rankings/index.html` (served as `/Rankings/` on GitHub Pages). It queries the same sql.js SQLite database and shows WCA-style per-event rankings for all 20 events (including retired: 333ft, Magic, Master Magic).
+
+Navigation between events uses [Cubing Icons](https://icons.cubing.net/) (`cubing-icon event-333` etc.) in a horizontal icon bar. The active event is highlighted; clicking an icon switches to that event's ranking.
+
+**Filters** are the same as the main Kinch page but without the Events group selector:
+- Region/Country (continent dropdown narrows country choices; specific country filters the table)
+- Gender (All / Male / Female)
+- Name search
+- Debut year range (After / Before)
+- Show: 20 (default), 50, or 100 entries per page
+
+**Query**: per-event rankings use `RANK() OVER (ORDER BY ...)` in SQLite, sorting by the relevant result field:
+- Average events (333, 222, 444, 555, 666, 777, 333oh, clock, minx, pyram, skewb, sq1, 333ft) — `best_average ASC`
+- Single events (333bf, 444bf, 555bf, 333fm, 333mbf, magic, mmagic) — `best_single ASC`
+
+All WCA result values are encoded so that ascending order is the correct ranking order (including 333mbf, whose integer encoding places better results first).
+
+**Table**: mirrors the main page's profile view — rank, WCA ID, name, country, then single side (competition, NR, CR, WR, single) and average side (average, WR, CR, NR, competition). Rank cells use the same bold/coloring logic as the profile (`rank-wr` gold / `rank-cr` green / `rank-nr` blue, bold ≤ 20, bright ≤ 10); result cells are gold/green/blue when the result is a WR/CR/NR. Competition names are resolved from the `competitions` table for the visible page only. Results are formatted per event type: centiseconds via `formatCenti`, WCA multi-blind decoding via `decodeMbfText`, and FMC as integer moves value. Pagination uses the `RANK()` value directly for correct rank numbers across pages.

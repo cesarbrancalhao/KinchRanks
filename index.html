@@ -92,10 +92,10 @@ h1 a { text-decoration: none; }
 
 .controls { display: flex; flex-direction: column; gap: 4px; margin: 18px 0 16px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 10px; box-shadow: var(--shadow); }
 .ctrl-row { display: flex; gap: 12px; }
-.ctrl-cell { flex: 1; display: flex; align-items: center; gap: 8px; padding: 6px 10px; min-width: 0; border-radius: 9px; }
+.ctrl-cell { flex: 1; display: flex; align-items: center; gap: 8px; padding: 6px 10px; min-width: 0; border-radius: 9px; flex-wrap: wrap; }
 .cg-label { font-size: 10.5px; font-weight: 700; letter-spacing: .07em; color: var(--faint); text-transform: uppercase; white-space: nowrap; min-width: 44px; }
 .controls select, .controls input[type="text"] { padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; background-color: var(--bg); color: var(--text-2); font-size: 13px; font-family: inherit; outline: none; transition: border-color .15s, box-shadow .15s; }
-.controls select { appearance: none; -webkit-appearance: none; padding-right: 28px; background-image: var(--chevron); background-repeat: no-repeat; background-position: right 10px center; cursor: pointer; }
+.controls select { appearance: none; -webkit-appearance: none; padding-right: 28px; background-image: var(--chevron); background-repeat: no-repeat; background-position: right 10px center; cursor: pointer; max-width: 100%; }
 .controls select:hover:not(:disabled) { border-color: var(--dim); }
 .controls select:disabled { opacity: 0.45; cursor: not-allowed; }
 .controls select:focus, .controls input[type="text"]:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--focus); }
@@ -158,11 +158,11 @@ td:nth-child(2) { font-weight: 500; text-align: left; }
 .pagination button:disabled { opacity: 0.35; cursor: default; }
 .pagination .info { font-size: 13px; color: var(--dim); margin: 0 10px; }
 
-.theme-toggle, #langSelect { padding: 7px 14px; border: 1px solid var(--border); border-radius: 9px; background: var(--card); color: var(--text-2); font-size: 13px; font-family: inherit; cursor: pointer; transition: border-color .15s, color .15s, transform .1s; }
+.theme-toggle, #langSelect { padding: 7px 14px; border: 1px solid var(--border); border-radius: 9px; background: var(--card); color: var(--text-2); font-size: 13px; font-family: inherit; cursor: pointer; transition: border-color .15s, color .15s, transform .1s; text-decoration: none; }
 .theme-toggle:hover, #langSelect:hover { border-color: var(--blue); color: var(--text); }
 .theme-toggle:active { transform: translateY(1px); }
-#statsBtn { background: var(--btn-grad); border-color: transparent; color: #fff; font-weight: 600; box-shadow: 0 4px 14px rgba(31,111,235,.30); }
-#statsBtn:hover { background: var(--btn-grad-hover); border-color: transparent; color: #fff; }
+.nav-btn { background: var(--btn-grad); border-color: transparent; color: #fff; font-weight: 600; box-shadow: 0 4px 14px rgba(31,111,235,.30); }
+.nav-btn:hover { background: var(--btn-grad-hover); border-color: transparent; color: #fff; }
 #langSelect { appearance: none; -webkit-appearance: none; padding-right: 28px; background-image: var(--chevron); background-repeat: no-repeat; background-position: right 10px center; }
 
 .profile-header { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 8px 0 20px; position: relative; }
@@ -209,27 +209,6 @@ td:nth-child(2) { font-weight: 500; text-align: left; }
 .profile-events-table .rank-nr { font-weight: 700; color: var(--blue); }
 .profile-events-table .rank-cr { font-weight: 700; color: var(--green); }
 
-.stats-section { margin-bottom: 28px; }
-.stats-section h3 { font-size: 15px; color: var(--text); margin-bottom: 10px; font-weight: 700; letter-spacing: -0.01em; text-align: center; }
-.stats-select { padding: 5px 26px 5px 10px; border: 1px solid var(--border); border-radius: 7px; background-color: var(--bg); color: var(--text-2); font-size: 12px; font-family: inherit; margin-left: 8px; appearance: none; -webkit-appearance: none; background-image: var(--chevron); background-repeat: no-repeat; background-position: right 8px center; cursor: pointer; }
-.stats-table { width: 100%; max-width: 720px; margin: 0 auto; border-collapse: separate; border-spacing: 0; font-size: 13px; white-space: nowrap; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
-.stats-table, .stats-table th, .stats-table td { position: static; }
-.stats-table th { padding: 8px 12px; text-align: left; font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; background: var(--thead-bg); color: var(--thead-text); border-bottom: 1px solid var(--border); }
-.stats-table thead th:first-child { border-top-left-radius: 12px; }
-.stats-table thead th:last-child { border-top-right-radius: 12px; }
-.stats-table td { padding: 8px 12px; color: var(--text-2); border-bottom: 1px solid var(--border-soft); }
-.stats-table tbody tr:last-child td { border-bottom: none; }
-.stats-table tbody tr:last-child td:first-child { border-bottom-left-radius: 12px; }
-.stats-table tbody tr:last-child td:last-child { border-bottom-right-radius: 12px; }
-.stats-table tbody tr:nth-child(even) td { background: var(--card-2); }
-.stats-table tbody tr:hover td { background: var(--row-hover); }
-.stats-table td:first-child { color: var(--blue); font-weight: 600; text-align: right; width: auto; min-width: auto; }
-.stats-table td:nth-child(2) { font-family: "SF Mono", "Fira Code", monospace; color: var(--blue); font-weight: 600; box-shadow: none; }
-.stats-table td:nth-child(4), .stats-table td:nth-child(5) { font-weight: 700; color: var(--orange); }
-.stats-back { margin-bottom: 16px; }
-.stats-two-col { display: flex; gap: 32px; flex-wrap: wrap; }
-.stats-col { flex: 1; min-width: 340px; }
-
 @media (max-width: 860px) {
   .app-header { flex-direction: column; align-items: flex-start; }
   .ctrl-row { flex-direction: column; gap: 2px; }
@@ -237,6 +216,16 @@ td:nth-child(2) { font-weight: 500; text-align: left; }
   .retired-section { margin-left: 4px; flex-wrap: wrap; }
   .profile-header { flex-direction: column; }
   .profile-back { position: static; }
+}
+
+@media (max-width: 600px) {
+  .container { padding: 16px 10px 32px; }
+  h1 { font-size: 18px; }
+  .brand-logo { width: 34px; height: 34px; }
+  .controls { padding: 6px; }
+  th, td { padding: 7px 9px; }
+  th:first-child, td:first-child { width: 40px; min-width: 40px; padding: 7px 6px; }
+  th:nth-child(2), td:nth-child(2) { left: 40px; }
 }
 </style>
 </head>
@@ -251,7 +240,8 @@ td:nth-child(2) { font-weight: 500; text-align: left; }
       </div>
     </div>
     <div class="header-actions">
-      <button id="statsBtn" class="theme-toggle" onclick="showStats()">Statistics</button>
+      <a class="theme-toggle nav-btn" href="Statistics/">Statistics</a>
+      <a class="theme-toggle nav-btn" href="Rankings/">Rankings</a>
       <select id="langSelect" onchange="setLanguage(this.value)">
         <option value="en">English</option>
         <option value="pt">Português</option>
@@ -344,11 +334,9 @@ td:nth-child(2) { font-weight: 500; text-align: left; }
   <div class="table-wrap" id="tableWrap" style="display:none"></div>
   <div id="pagination" class="pagination" style="display:none"></div>
   <div id="profileView" style="display:none"></div>
-  <div id="statsView" style="display:none"></div>
 </div>
 
 <script src="1000.js"></script>
-<script src="otherstatistics.js"></script>
 <script src="https://sql.js.org/dist/sql-wasm.js"></script>
 <script>
 let DB_CACHE = 'kinch_db_v3';
@@ -2759,93 +2747,6 @@ function hideProfile() {
     _pendingFullRefresh = false;
     init();
   }
-}
-
-function showStats() {
-  document.getElementById("controls").style.display = "none";
-  document.getElementById("status").style.display = "none";
-  document.getElementById("tableWrap").style.display = "none";
-  document.getElementById("pagination").style.display = "none";
-  document.getElementById("subtitle").style.display = "none";
-  document.getElementById("legendKinch").style.display = "none";
-  document.getElementById("legendColors").style.display = "none";
-  document.getElementById("profileView").style.display = "none";
-
-  renderStats();
-  document.getElementById("statsView").style.display = "block";
-  window.scrollTo(0, 0);
-}
-
-function hideStats() {
-  document.getElementById("statsView").style.display = "none";
-  document.getElementById("controls").style.display = "flex";
-  document.getElementById("tableWrap").style.display = "block";
-  document.getElementById("pagination").style.display = "flex";
-  document.getElementById("subtitle").style.display = "";
-  document.getElementById("legendKinch").style.display = "";
-  document.getElementById("legendColors").style.display = "";
-}
-
-function renderStats() {
-  let html = `<div class="profile-header">`;
-  html += `<button class="profile-back" onclick="hideStats()">← Back to rankings</button>`;
-  html += `<span class="profile-name">Other Statistics</span>`;
-  html += `</div>`;
-
-  const sd = window.STATS_DATA || STATS_DATA;
-  if (!sd) {
-    html += '<div class="status">No statistics data loaded. Make sure otherstatistics.js is built.</div>';
-    document.getElementById("statsView").innerHTML = html;
-    return;
-  }
-
-  html += `<p class="subtitle" style="text-align:center">Generated: ${sd.generated_at}</p>`;
-
-  html += statTable("Most Podiums", sd.podiums, "Podiums");
-  html += statTable("Most World Records Held", sd.world_records, "WRs");
-  html += statTable("Most World Records Ever", sd.world_records_ever, "WRs");
-  html += statTable("Most Solves Ever", sd.most_solves, "Solves");
-  html += statTable("Most Competitions Attended", sd.most_comps, "Comps");
-
-  html += statTable("Busiest Year", sd.busiest_year, "Comps", true);
-  html += statTable("Longest Active Career", sd.longest_career, "Span", true);
-
-  const countries = Object.keys(sd.comps_by_country).sort();
-  html += `<div class="stats-section"><h3>Most Competitions Attended per Country <select class="stats-select" id="countryStatSelect" onchange="updateCountryStat()">`;
-  countries.forEach(function(c) {
-    html += `<option value="${esc(c)}">${esc(c)} (${sd.comps_by_country[c].length})</option>`;
-  });
-  html += `</select></h3>`;
-  html += `<div id="countryStatTable"></div></div>`;
-
-  document.getElementById("statsView").innerHTML = html;
-  updateCountryStat();
-}
-
-function statTable(title, data, valLabel, showDetail) {
-  let h = `<div class="stats-section"><h3>${title}</h3>`;
-  h += `<table class="stats-table"><thead><tr><th>#</th><th>WCA ID</th><th>Name</th><th>Country</th><th>${valLabel}</th></tr></thead><tbody>`;
-  data.forEach(function(p) {
-    let v = p.value;
-    if (showDetail && p.detail) v = `${p.value} (${p.detail})`;
-    h += `<tr><td>${p.rank}</td><td>${esc(p.wca_id)}</td><td>${esc(p.name)}</td><td>${esc(p.country)}</td><td>${v}</td></tr>`;
-  });
-  h += `</tbody></table></div>`;
-  return h;
-}
-
-function updateCountryStat() {
-  const sel = document.getElementById("countryStatSelect");
-  if (!sel) return;
-  const c = sel.value;
-  const sd = window.STATS_DATA || STATS_DATA;
-  const data = sd.comps_by_country[c] || [];
-  let h = `<table class="stats-table"><thead><tr><th>#</th><th>WCA ID</th><th>Name</th><th>Comps</th></tr></thead><tbody>`;
-  data.forEach(function(p) {
-    h += `<tr><td>${p.rank}</td><td>${esc(p.wca_id)}</td><td>${esc(p.name)}</td><td>${p.value}</td></tr>`;
-  });
-  h += `</tbody></table>`;
-  document.getElementById("countryStatTable").innerHTML = h;
 }
 
 function renderProfile(person) {

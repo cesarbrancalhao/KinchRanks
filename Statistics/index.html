@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="../favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Kinch Ranks — Statistics</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  --bg: #0a0d14;
+  --card: #10141d;
+  --card-2: #161b26;
+  --thead-bg: #171c28;
+  --thead-text: #8b949e;
+  --border: #242b3a;
+  --border-soft: #1b2230;
+  --text: #e6eaf2;
+  --text-2: #c9d1d9;
+  --dim: #8b949e;
+  --faint: #6e7681;
+  --blue: #58a6ff;
+  --orange: #ffa657;
+  --row-hover: #1a2233;
+  --btn-grad: linear-gradient(135deg, #1f6feb, #388bfd);
+  --btn-grad-hover: linear-gradient(135deg, #2a7bff, #4c9aff);
+  --shadow: 0 10px 30px rgba(0,0,0,.35);
+  --chevron: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3e%3cpath d='M1 1l4 4 4-4' fill='none' stroke='%238b949e' stroke-width='1.5' stroke-linecap='round'/%3e%3c/svg%3e");
+  margin: 0; padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(1100px 480px at 15% -8%, rgba(88,166,255,.10), transparent 60%),
+    radial-gradient(900px 420px at 88% -12%, rgba(255,166,87,.07), transparent 60%);
+  background-attachment: fixed;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .25s, color .25s;
+}
+
+body.light {
+  --bg: #eef1f6;
+  --card: #ffffff;
+  --card-2: #f3f6fb;
+  --thead-bg: #0055A4;
+  --thead-text: #ffffff;
+  --border: #dde3ec;
+  --border-soft: #e6ebf2;
+  --text: #1a2233;
+  --text-2: #2a3242;
+  --dim: #5a6472;
+  --faint: #8a94a6;
+  --blue: #0055A4;
+  --orange: #f4771d;
+  --row-hover: #e8f0ff;
+  --btn-grad: linear-gradient(135deg, #0055A4, #1a6fc4);
+  --btn-grad-hover: linear-gradient(135deg, #004494, #0055A4);
+  --shadow: 0 10px 28px rgba(20,40,80,.10);
+  --chevron: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3e%3cpath d='M1 1l4 4 4-4' fill='none' stroke='%235a6472' stroke-width='1.5' stroke-linecap='round'/%3e%3c/svg%3e");
+  background-image:
+    radial-gradient(1100px 480px at 15% -8%, rgba(0,85,164,.06), transparent 60%),
+    radial-gradient(900px 420px at 88% -12%, rgba(244,119,29,.05), transparent 60%);
+}
+
+.container { max-width: 900px; margin: 0 auto; padding: 28px 24px 48px; }
+
+.app-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+.brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.brand-logo { width: 42px; height: 42px; border-radius: 10px; background: #fff; padding: 3px; box-shadow: var(--shadow); }
+h1 { font-size: 22px; margin: 0; font-weight: 800; letter-spacing: -0.02em; }
+h1 a { text-decoration: none; color: inherit; }
+.grad { background: linear-gradient(90deg, var(--blue), var(--orange)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+.subtitle { font-size: 13px; color: var(--dim); margin: 2px 0 0; }
+.header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.theme-toggle { padding: 7px 14px; border: 1px solid var(--border); border-radius: 9px; background: var(--card); color: var(--text-2); font-size: 13px; font-family: inherit; cursor: pointer; text-decoration: none; transition: border-color .15s, color .15s, transform .1s; }
+.theme-toggle:hover { border-color: var(--blue); color: var(--text); }
+.theme-toggle:active { transform: translateY(1px); }
+.nav-btn { background: var(--btn-grad); border-color: transparent; color: #fff; font-weight: 600; box-shadow: 0 4px 14px rgba(31,111,235,.30); }
+.nav-btn:hover { background: var(--btn-grad-hover); border-color: transparent; color: #fff; }
+
+.status { font-size: 14px; color: var(--dim); padding: 48px 0; text-align: center; }
+
+.stats-section { margin-bottom: 28px; overflow-x: auto; }
+.stats-section h3 { font-size: 15px; color: var(--text); margin-bottom: 10px; font-weight: 700; letter-spacing: -0.01em; text-align: center; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px; }
+.stats-select { padding: 5px 26px 5px 10px; border: 1px solid var(--border); border-radius: 7px; background-color: var(--bg); color: var(--text-2); font-size: 12px; font-family: inherit; margin-left: 8px; appearance: none; -webkit-appearance: none; background-image: var(--chevron); background-repeat: no-repeat; background-position: right 8px center; cursor: pointer; max-width: 100%; }
+.stats-table { width: 100%; max-width: 720px; margin: 0 auto; border-collapse: separate; border-spacing: 0; font-size: 13px; white-space: nowrap; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
+.stats-table th { padding: 8px 12px; text-align: left; font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; background: var(--thead-bg); color: var(--thead-text); border-bottom: 1px solid var(--border); }
+.stats-table thead th:first-child { border-top-left-radius: 12px; }
+.stats-table thead th:last-child { border-top-right-radius: 12px; }
+.stats-table td { padding: 8px 12px; color: var(--text-2); border-bottom: 1px solid var(--border-soft); }
+.stats-table tbody tr:last-child td { border-bottom: none; }
+.stats-table tbody tr:last-child td:first-child { border-bottom-left-radius: 12px; }
+.stats-table tbody tr:last-child td:last-child { border-bottom-right-radius: 12px; }
+.stats-table tbody tr:nth-child(even) td { background: var(--card-2); }
+.stats-table tbody tr:hover td { background: var(--row-hover); }
+.stats-table td:first-child { color: var(--blue); font-weight: 600; text-align: right; }
+.stats-table td:nth-child(2) { font-family: "SF Mono", "Fira Code", monospace; color: var(--blue); font-weight: 600; }
+.stats-table td:nth-child(4), .stats-table td:nth-child(5) { font-weight: 700; color: var(--orange); }
+
+@media (max-width: 860px) {
+  .app-header { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 600px) {
+  .container { padding: 16px 10px 32px; }
+  h1 { font-size: 18px; }
+  .brand-logo { width: 34px; height: 34px; }
+  .stats-table th, .stats-table td { padding: 7px 9px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="app-header">
+    <div class="brand">
+      <img src="../favicon.png" alt="" class="brand-logo">
+      <div>
+        <h1><a href="../">MCBF</a> <span class="grad">Kinch Ranks</span></h1>
+        <p class="subtitle">Other Statistics</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a class="theme-toggle nav-btn" href="../">← Kinch</a>
+      <a class="theme-toggle nav-btn" href="../Rankings/">Rankings</a>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ Day</button>
+    </div>
+  </header>
+
+  <div id="statsView"></div>
+</div>
+
+<script src="../otherstatistics.js"></script>
+<script>
+function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function toggleTheme() {
+  document.body.classList.toggle("light");
+  let btn = document.getElementById("themeToggle");
+  if (document.body.classList.contains("light")) {
+    btn.textContent = "🌙 Night";
+    localStorage.setItem("theme", "light");
+  } else {
+    btn.textContent = "☀ Day";
+    localStorage.setItem("theme", "dark");
+  }
+}
+
+(function() {
+  if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light");
+    document.getElementById("themeToggle").textContent = "🌙 Night";
+  }
+})();
+
+function statTable(title, data, valLabel, showDetail) {
+  let h = `<div class="stats-section"><h3>${title}</h3>`;
+  h += `<table class="stats-table"><thead><tr><th>#</th><th>WCA ID</th><th>Name</th><th>Country</th><th>${valLabel}</th></tr></thead><tbody>`;
+  data.forEach(function(p) {
+    let v = p.value;
+    if (showDetail && p.detail) v = `${p.value} (${p.detail})`;
+    h += `<tr><td>${p.rank}</td><td>${esc(p.wca_id)}</td><td>${esc(p.name)}</td><td>${esc(p.country)}</td><td>${v}</td></tr>`;
+  });
+  h += `</tbody></table></div>`;
+  return h;
+}
+
+function updateCountryStat() {
+  const sel = document.getElementById("countryStatSelect");
+  if (!sel) return;
+  const c = sel.value;
+  const data = STATS_DATA.comps_by_country[c] || [];
+  let h = `<table class="stats-table"><thead><tr><th>#</th><th>WCA ID</th><th>Name</th><th>Comps</th></tr></thead><tbody>`;
+  data.forEach(function(p) {
+    h += `<tr><td>${p.rank}</td><td>${esc(p.wca_id)}</td><td>${esc(p.name)}</td><td>${p.value}</td></tr>`;
+  });
+  h += `</tbody></table>`;
+  document.getElementById("countryStatTable").innerHTML = h;
+}
+
+function renderStats() {
+  let html = "";
+
+  if (typeof STATS_DATA === "undefined" || !STATS_DATA) {
+    html = '<div class="status">No statistics data loaded. Make sure otherstatistics.js is built.</div>';
+    document.getElementById("statsView").innerHTML = html;
+    return;
+  }
+  const sd = STATS_DATA;
+
+  html += `<p class="subtitle" style="text-align:center">Generated: ${esc(sd.generated_at)}</p>`;
+
+  html += statTable("Most Podiums", sd.podiums, "Podiums");
+  html += statTable("Most World Records Held", sd.world_records, "WRs");
+  html += statTable("Most World Records Ever", sd.world_records_ever, "WRs");
+  html += statTable("Most Solves Ever", sd.most_solves, "Solves");
+  html += statTable("Most Competitions Attended", sd.most_comps, "Comps");
+
+  html += statTable("Busiest Year", sd.busiest_year, "Comps", true);
+  html += statTable("Longest Active Career", sd.longest_career, "Span", true);
+
+  const countries = Object.keys(sd.comps_by_country).sort();
+  html += `<div class="stats-section"><h3>Most Competitions Attended per Country <select class="stats-select" id="countryStatSelect" onchange="updateCountryStat()">`;
+  countries.forEach(function(c) {
+    html += `<option value="${esc(c)}">${esc(c)} (${sd.comps_by_country[c].length})</option>`;
+  });
+  html += `</select></h3>`;
+  html += `<div id="countryStatTable"></div></div>`;
+
+  document.getElementById("statsView").innerHTML = html;
+  updateCountryStat();
+}
+
+renderStats();
+</script>
+</body>
+</html>

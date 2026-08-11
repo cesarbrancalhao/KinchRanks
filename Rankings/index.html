@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="../favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.cubing.net/v0/css/@cubing/icons/css">
+<title>Kinch Ranks — Rankings</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  --bg: #0a0d14;
+  --card: #10141d;
+  --card-2: #161b26;
+  --thead-bg: #171c28;
+  --thead-text: #8b949e;
+  --border: #242b3a;
+  --border-soft: #1b2230;
+  --text: #e6eaf2;
+  --text-2: #c9d1d9;
+  --dim: #8b949e;
+  --faint: #6e7681;
+  --blue: #58a6ff;
+  --orange: #ffa657;
+  --gold: #f0c040;
+  --green: #7ee787;
+  --row-hover: #1a2233;
+  --focus: rgba(88,166,255,.22);
+  --btn-grad: linear-gradient(135deg, #1f6feb, #388bfd);
+  --btn-grad-hover: linear-gradient(135deg, #2a7bff, #4c9aff);
+  --shadow: 0 10px 30px rgba(0,0,0,.35);
+  --chevron: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3e%3cpath d='M1 1l4 4 4-4' fill='none' stroke='%238b949e' stroke-width='1.5' stroke-linecap='round'/%3e%3c/svg%3e");
+  margin: 0; padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(1100px 480px at 15% -8%, rgba(88,166,255,.10), transparent 60%),
+    radial-gradient(900px 420px at 88% -12%, rgba(255,166,87,.07), transparent 60%);
+  background-attachment: fixed;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .25s, color .25s;
+}
+
+body.light {
+  --bg: #eef1f6;
+  --card: #ffffff;
+  --card-2: #f3f6fb;
+  --thead-bg: #0055A4;
+  --thead-text: #ffffff;
+  --border: #dde3ec;
+  --border-soft: #e6ebf2;
+  --text: #1a2233;
+  --text-2: #2a3242;
+  --dim: #5a6472;
+  --faint: #8a94a6;
+  --blue: #0055A4;
+  --orange: #f4771d;
+  --gold: #d32f2f;
+  --green: #1a7f3a;
+  --row-hover: #e8f0ff;
+  --focus: rgba(0,85,164,.16);
+  --btn-grad: linear-gradient(135deg, #0055A4, #1a6fc4);
+  --btn-grad-hover: linear-gradient(135deg, #004494, #0055A4);
+  --shadow: 0 10px 28px rgba(20,40,80,.10);
+  --chevron: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3e%3cpath d='M1 1l4 4 4-4' fill='none' stroke='%235a6472' stroke-width='1.5' stroke-linecap='round'/%3e%3c/svg%3e");
+  background-image:
+    radial-gradient(1100px 480px at 15% -8%, rgba(0,85,164,.06), transparent 60%),
+    radial-gradient(900px 420px at 88% -12%, rgba(244,119,29,.05), transparent 60%);
+}
+
+.container { max-width: 1520px; margin: 0 auto; padding: 28px 24px 48px; }
+
+.app-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+.brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.brand-logo { width: 42px; height: 42px; border-radius: 10px; background: #fff; padding: 3px; box-shadow: var(--shadow); }
+h1 { font-size: 22px; margin: 0; font-weight: 800; letter-spacing: -0.02em; }
+h1 a { text-decoration: none; color: inherit; }
+.grad { background: linear-gradient(90deg, var(--blue), var(--orange)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+.subtitle { font-size: 13px; color: var(--dim); margin: 2px 0 0; }
+.header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.theme-toggle { padding: 7px 14px; border: 1px solid var(--border); border-radius: 9px; background: var(--card); color: var(--text-2); font-size: 13px; font-family: inherit; cursor: pointer; text-decoration: none; transition: border-color .15s, color .15s, transform .1s; }
+.theme-toggle:hover { border-color: var(--blue); color: var(--text); }
+.theme-toggle:active { transform: translateY(1px); }
+.nav-btn { background: var(--btn-grad); border-color: transparent; color: #fff; font-weight: 600; box-shadow: 0 4px 14px rgba(31,111,235,.30); }
+.nav-btn:hover { background: var(--btn-grad-hover); border-color: transparent; color: #fff; }
+
+.controls { display: flex; flex-direction: column; gap: 4px; margin: 18px 0 6px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; box-shadow: var(--shadow); }
+.ctrl-row { display: flex; gap: 12px; }
+.ctrl-cell { flex: 1; display: flex; align-items: center; gap: 8px; padding: 6px 10px; min-width: 0; border-radius: 9px; flex-wrap: wrap; }
+.cg-label { font-size: 10.5px; font-weight: 700; letter-spacing: .07em; color: var(--faint); text-transform: uppercase; white-space: nowrap; min-width: 44px; }
+.controls select, .controls input[type="text"] { padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; background-color: var(--bg); color: var(--text-2); font-size: 13px; font-family: inherit; outline: none; transition: border-color .15s, box-shadow .15s; }
+.controls select { appearance: none; -webkit-appearance: none; padding-right: 28px; background-image: var(--chevron); background-repeat: no-repeat; background-position: right 10px center; cursor: pointer; max-width: 100%; }
+.controls select:hover:not(:disabled) { border-color: var(--dim); }
+.controls select:disabled { opacity: 0.45; cursor: not-allowed; }
+.controls select:focus, .controls input[type="text"]:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--focus); }
+.controls input[type="text"] { flex: 1; width: auto; min-width: 120px; }
+.search-btn { padding: 7px 16px; border: none; border-radius: 8px; background: var(--btn-grad); color: #fff; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; white-space: nowrap; transition: background .15s, transform .1s; }
+.search-btn:hover { background: var(--btn-grad-hover); }
+.search-btn:active { transform: translateY(1px); }
+
+.icon-bar { display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0 10px; justify-content: center; }
+.icon-btn { width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--dim); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 22px; transition: border-color .15s, color .15s, background .15s, transform .1s; position: relative; }
+.icon-btn:hover { border-color: var(--blue); color: var(--text); transform: translateY(-1px); }
+.icon-btn.active { border-color: var(--blue); background: var(--row-hover); color: var(--blue); box-shadow: 0 0 0 2px var(--focus); }
+.icon-btn .cubing-icon { font-size: 22px; }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: var(--card); box-shadow: var(--shadow); margin-top: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+th, td { padding: 8px 12px; text-align: right; }
+thead th { background: var(--thead-bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 2; font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--thead-text); }
+thead th:first-child { border-top-left-radius: 12px; }
+thead th:last-child { border-top-right-radius: 12px; }
+tbody tr:nth-child(even) td { background: var(--card-2); }
+tbody tr:hover td { background: var(--row-hover); }
+tbody tr:last-child td:first-child { border-bottom-left-radius: 12px; }
+tbody tr:last-child td:last-child { border-bottom-right-radius: 12px; }
+td { color: var(--text-2); border-bottom: 1px solid var(--border-soft); }
+tbody tr:last-child td { border-bottom: none; }
+th:first-child, td:first-child { text-align: right; width: 48px; min-width: 48px; }
+td:first-child { color: var(--blue); font-weight: 600; }
+th:nth-child(2), td:nth-child(2) { text-align: left; }
+td:nth-child(2) { font-family: "SF Mono", "Fira Code", monospace; color: var(--blue); font-weight: 600; }
+th:nth-child(3), td:nth-child(3) { text-align: left; font-weight: 500; max-width: 250px; overflow: hidden; text-overflow: ellipsis; }
+th:nth-child(4), td:nth-child(4) { text-align: left; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+.comp-col { text-align: left; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+.rank-col { color: var(--dim); }
+.rank-bold { font-weight: 700; }
+.rank-top10 { color: var(--text); }
+.rank-wr { font-weight: 700; color: var(--gold); }
+.rank-nr { font-weight: 700; color: var(--blue); }
+.rank-cr { font-weight: 700; color: var(--green); }
+.result-time { font-weight: 700; color: var(--orange); }
+.result-time-wr { font-weight: 700; color: var(--gold); }
+.result-time-nr { font-weight: 700; color: var(--blue); }
+.result-time-cr { font-weight: 700; color: var(--green); }
+
+.loading-overlay { position: fixed; inset: 0; background: rgba(10,13,20,0.94); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; z-index: 50; }
+body.light .loading-overlay { background: rgba(238,241,246,0.94); }
+.loading-spinner { width: 30px; height: 30px; border: 3px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 14px; font-weight: 500; color: var(--dim); }
+.loading-sub { font-size: 11px; color: var(--faint); }
+
+.status { font-size: 14px; color: var(--dim); padding: 48px 0; text-align: center; }
+
+.pagination { display: flex; gap: 6px; align-items: center; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+.pagination button { padding: 6px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text-2); font-size: 13px; font-family: inherit; cursor: pointer; transition: border-color .12s, color .12s, background .12s; }
+.pagination button:hover:not(:disabled):not(.active) { border-color: var(--blue); color: var(--text); }
+.pagination button.active { background: var(--btn-grad); border-color: transparent; color: #fff; font-weight: 600; }
+.pagination button:disabled { opacity: 0.35; cursor: default; }
+.pagination .info { font-size: 13px; color: var(--dim); margin: 0 10px; }
+
+@media (max-width: 860px) {
+  .app-header { flex-direction: column; align-items: flex-start; }
+  .ctrl-row { flex-direction: column; gap: 2px; }
+}
+
+@media (max-width: 600px) {
+  .container { padding: 16px 10px 32px; }
+  h1 { font-size: 18px; }
+  .brand-logo { width: 34px; height: 34px; }
+  .controls { padding: 6px; }
+  th, td { padding: 7px 9px; }
+  .icon-btn { width: 34px; height: 34px; font-size: 19px; }
+  .icon-btn .cubing-icon { font-size: 19px; }
+}
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Loading database...</div>
+  <div class="loading-sub">Decompressing and preparing data</div>
+</div>
+<div class="container">
+  <header class="app-header">
+    <div class="brand">
+      <img src="../favicon.png" alt="" class="brand-logo">
+      <div>
+        <h1><a href="../">MCBF</a> <span class="grad">Kinch Ranks</span></h1>
+        <p class="subtitle" id="pageSubtitle">Event Rankings</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a class="theme-toggle nav-btn" href="../">← Kinch</a>
+      <a class="theme-toggle nav-btn" href="../Statistics/">Statistics</a>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ Day</button>
+    </div>
+  </header>
+
+  <div class="controls" id="controls" style="display:none">
+    <div class="ctrl-row">
+      <div class="ctrl-cell">
+        <span class="cg-label">Region</span>
+        <select id="continentSelect">
+          <option value="__world__">World</option>
+        </select>
+        <select id="countrySelect"></select>
+      </div>
+      <div class="ctrl-cell">
+        <span class="cg-label">Gender</span>
+        <select id="genderSelect">
+          <option value="all">All</option>
+          <option value="m">Male</option>
+          <option value="f">Female</option>
+        </select>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-cell">
+        <span class="cg-label">Name</span>
+        <input type="text" id="search" placeholder="Search...">
+        <button id="searchBtn" class="search-btn">Search</button>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-cell">
+        <span class="cg-label">Debut</span>
+        <select id="sinceSelect">
+          <option value="0">After</option>
+        </select>
+        <select id="untilSelect">
+          <option value="9999">Before</option>
+        </select>
+      </div>
+      <div class="ctrl-cell">
+        <span class="cg-label">Show</span>
+        <select id="pageSizeSelect">
+          <option value="20" selected>20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="icon-bar" id="iconBar"></div>
+
+  <div id="status" class="status">Loading data...</div>
+  <div class="table-wrap" id="tableWrap" style="display:none"></div>
+  <div id="pagination" class="pagination" style="display:none"></div>
+</div>
+
+<script src="https://sql.js.org/dist/sql-wasm.js"></script>
+<script>
+"use strict";
+
+var DB_CACHE = 'kinch_db_v3';
+
+var SCORE_EVENTS = ["333","222","444","555","666","777","333bf","333fm","333oh","clock","minx","pyram","skewb","sq1","444bf","555bf","333mbf","333ft","magic","mmagic"];
+var AVERAGE_EVENTS = new Set(["333","222","444","555","666","777","333oh","clock","minx","pyram","skewb","sq1","333ft"]);
+
+var currentEvent = "333";
+var currentPage = 1;
+var pageSize = 20;
+var currentContinent = "__world__";
+var currentCountry = "__world__";
+var currentGender = "all";
+var currentSince = 0;
+var currentUntil = 9999;
+var currentSearch = "";
+
+var db = null;
+var dbLoaded = false;
+
+function esc(s) { return (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function decodeMbfText(wca) {
+  if (wca <= 0) return null;
+  var old = Math.floor(wca / 1000000000) !== 0;
+  var solved, attempted, timeSec;
+  if (old) {
+    timeSec = wca % 100000;
+    wca = Math.floor(wca / 100000);
+    attempted = wca % 100;
+    wca = Math.floor(wca / 100);
+    solved = 99 - (wca % 100);
+  } else {
+    var missed = wca % 100;
+    wca = Math.floor(wca / 100);
+    timeSec = wca % 100000;
+    wca = Math.floor(wca / 100000);
+    var diff = 99 - (wca % 100);
+    solved = diff + missed;
+    attempted = solved + missed;
+  }
+  var min = Math.floor(timeSec / 60);
+  var sec = timeSec % 60;
+  return solved + "/" + attempted + " in " + min + ":" + ("0" + sec).slice(-2);
+}
+
+function formatCenti(c) {
+  var total = c / 100;
+  var h = Math.floor(total / 3600);
+  var m = Math.floor((total % 3600) / 60);
+  var s = total % 60;
+  if (h > 0) return h + ":" + ("0" + m).slice(-2) + ":" + s.toFixed(2).padStart(5, "0");
+  if (m > 0) return m + ":" + s.toFixed(2).padStart(5, "0");
+  return s.toFixed(2);
+}
+
+function formatSingle(eventId, best_single) {
+  if (best_single == null) return "-";
+  if (eventId === "333mbf") return decodeMbfText(best_single) || "-";
+  if (eventId === "333fm") return best_single.toString();
+  return formatCenti(best_single);
+}
+
+function formatAverage(eventId, best_average) {
+  if (best_average == null || eventId === "333mbf") return "-";
+  if (eventId === "333fm") return (best_average / 100).toFixed(2);
+  return formatCenti(best_average);
+}
+
+// WCA result values are encoded so that ASCENDING order is the correct
+// ranking order for every event (including 333mbf).
+function getSortField(eid) {
+  if (AVERAGE_EVENTS.has(eid)) return "es.best_average";
+  return "es.best_single";
+}
+
+function queryAll(sql, params) {
+  if (!db) return [];
+  try {
+    var stmt = db.prepare(sql);
+    if (params && params.length) stmt.bind(params);
+    var rows = [];
+    while (stmt.step()) rows.push(stmt.getAsObject());
+    stmt.free();
+    return rows;
+  } catch(e) { console.error('SQL error:', e, sql); return []; }
+}
+
+function getDbFromCache() {
+  return new Promise(function(resolve) {
+    var req = indexedDB.open(DB_CACHE, 1);
+    req.onupgradeneeded = function(e) { e.target.result.createObjectStore('dbs'); };
+    req.onsuccess = function(e) {
+      var tx = e.target.result.transaction('dbs', 'readonly');
+      var store = tx.objectStore('dbs');
+      var get = store.get('data');
+      get.onsuccess = function() { resolve(get.result || null); };
+      get.onerror = function() { resolve(null); };
+    };
+    req.onerror = function() { resolve(null); };
+  });
+}
+
+function putDbToCache(buf) {
+  var req = indexedDB.open(DB_CACHE, 1);
+  req.onsuccess = function(e) {
+    var tx = e.target.result.transaction('dbs', 'readwrite');
+    tx.objectStore('dbs').put(buf, 'data');
+  };
+}
+
+function queryCountriesByContinent(con) {
+  if (!dbLoaded) return [];
+  if (con === '__world__') return queryAll("SELECT country FROM persons GROUP BY country ORDER BY country");
+  return queryAll("SELECT country FROM persons WHERE continent=? GROUP BY country ORDER BY country", [con]);
+}
+
+function queryDebutYears() {
+  if (!dbLoaded) return [];
+  var rows = queryAll("SELECT DISTINCT debut_year FROM persons WHERE debut_year >= 2000 ORDER BY debut_year");
+  return rows.map(function(r) { return r.debut_year; });
+}
+
+function buildFilterSQL() {
+  var where = "";
+  var params = [];
+  if (currentCountry !== "__world__") { where += " AND p.country = ?"; params.push(currentCountry); }
+  if (currentGender !== "all") { where += " AND p.gender = ?"; params.push(currentGender); }
+  if (currentSince > 0) { where += " AND p.debut_year >= ?"; params.push(currentSince); }
+  if (currentUntil < 9999) { where += " AND p.debut_year <= ?"; params.push(currentUntil); }
+  if (currentSearch) { where += " AND (p.name LIKE ? OR p.wca_id LIKE ?)"; params.push("%" + currentSearch + "%", "%" + currentSearch + "%"); }
+  return { where: where, params: params };
+}
+
+function loadRankings() {
+  if (!dbLoaded) return;
+  var sortField = getSortField(currentEvent);
+  var filter = buildFilterSQL();
+
+  var countSQL = "SELECT COUNT(*) as total FROM event_scores es JOIN persons p ON p.wca_id = es.wca_id WHERE es.event_id = ? AND " + sortField + " > 0" + filter.where;
+  var countParams = [currentEvent].concat(filter.params);
+  var countRow = queryAll(countSQL, countParams)[0];
+  var total = countRow ? countRow.total : 0;
+  var totalPages = Math.max(1, Math.ceil(total / pageSize));
+  if (currentPage > totalPages) currentPage = 1;
+
+  var startRank = (currentPage - 1) * pageSize + 1;
+  var endRank = startRank + pageSize - 1;
+
+  var sql = "SELECT wca_id, name, country, rank, best_single, best_average, nr_single, nr_average, cr_single, cr_average, wr_single, wr_average, single_comp, average_comp FROM (SELECT p.wca_id, p.name, p.country, RANK() OVER (ORDER BY " + sortField + " ASC) as rank, es.best_single, es.best_average, es.nr_single, es.nr_average, es.cr_single, es.cr_average, es.wr_single, es.wr_average, es.single_comp, es.average_comp FROM event_scores es JOIN persons p ON p.wca_id = es.wca_id WHERE es.event_id = ? AND " + sortField + " > 0" + filter.where + ") WHERE rank BETWEEN ? AND ? ORDER BY rank ASC";
+  var params = [currentEvent].concat(filter.params, [startRank, endRank]);
+
+  var rows = queryAll(sql, params);
+
+  var compIds = {};
+  for (var i = 0; i < rows.length; i++) {
+    if (rows[i].single_comp) compIds[rows[i].single_comp] = true;
+    if (rows[i].average_comp) compIds[rows[i].average_comp] = true;
+  }
+  var compNames = {};
+  var ids = Object.keys(compIds);
+  if (ids.length) {
+    var placeholders = ids.map(function() { return "?"; }).join(",");
+    var compRows = queryAll("SELECT id, name FROM competitions WHERE id IN (" + placeholders + ")", ids);
+    for (var j = 0; j < compRows.length; j++) compNames[compRows[j].id] = compRows[j].name;
+  }
+
+  renderTable(rows, total, totalPages, compNames);
+}
+
+function rcls(val, swr, scr, type) {
+  if (val == null) return "rank-col";
+  var cls = "rank-col";
+  if (val <= 20) cls += " rank-bold";
+  if (val <= 10) cls += " rank-top10";
+  if (val === 1) {
+    if (swr === 1) cls += " rank-wr";
+    else if (type !== "wr" && scr === 1) cls += " rank-cr";
+    else if (type === "nr") cls += " rank-nr";
+    else if (type === "cr") cls += " rank-cr";
+    else if (type === "wr") cls += " rank-wr";
+  }
+  return cls;
+}
+
+function tcls(wr, nr, cr) {
+  if (wr === 1) return "result-time result-time-wr";
+  if (cr === 1) return "result-time result-time-cr";
+  if (nr === 1) return "result-time result-time-nr";
+  return "result-time";
+}
+
+function renderTable(rows, total, totalPages, compNames) {
+  var tableWrap = document.getElementById("tableWrap");
+  var pagination = document.getElementById("pagination");
+  var status = document.getElementById("status");
+
+  if (!rows.length) {
+    tableWrap.style.display = "none";
+    pagination.style.display = "none";
+    status.style.display = "block";
+    status.textContent = "No results found.";
+    return;
+  }
+
+  status.style.display = "none";
+  tableWrap.style.display = "block";
+  pagination.style.display = "flex";
+
+  var html = '<table><thead><tr><th>#</th><th>WCA ID</th><th>Name</th><th>Country</th>'
+    + '<th class="comp-col">Competition</th><th>NR</th><th>CR</th><th>WR</th><th>Single</th>'
+    + '<th>Average</th><th>WR</th><th>CR</th><th>NR</th><th class="comp-col">Competition</th>'
+    + '</tr></thead><tbody>';
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    var sComp = r.single_comp ? (compNames[r.single_comp] || r.single_comp) : "-";
+    var aComp = r.average_comp ? (compNames[r.average_comp] || r.average_comp) : "-";
+    html += '<tr>'
+      + '<td>' + r.rank + '</td>'
+      + '<td>' + esc(r.wca_id) + '</td>'
+      + '<td>' + esc(r.name) + '</td>'
+      + '<td>' + esc(r.country) + '</td>'
+      + '<td class="comp-col">' + esc(sComp) + '</td>'
+      + '<td class="' + rcls(r.nr_single, r.wr_single, r.cr_single, "nr") + '">' + (r.nr_single != null ? r.nr_single : "-") + '</td>'
+      + '<td class="' + rcls(r.cr_single, r.wr_single, r.cr_single, "cr") + '">' + (r.cr_single != null ? r.cr_single : "-") + '</td>'
+      + '<td class="' + rcls(r.wr_single, r.wr_single, r.cr_single, "wr") + '">' + (r.wr_single != null ? r.wr_single : "-") + '</td>'
+      + '<td class="' + (r.best_single != null ? tcls(r.wr_single, r.nr_single, r.cr_single) : "") + '">' + formatSingle(currentEvent, r.best_single) + '</td>'
+      + '<td class="' + (r.best_average != null && currentEvent !== "333mbf" ? tcls(r.wr_average, r.nr_average, r.cr_average) : "") + '">' + formatAverage(currentEvent, r.best_average) + '</td>'
+      + '<td class="' + rcls(r.wr_average, r.wr_average, r.cr_average, "wr") + '">' + (r.wr_average != null ? r.wr_average : "-") + '</td>'
+      + '<td class="' + rcls(r.cr_average, r.wr_average, r.cr_average, "cr") + '">' + (r.cr_average != null ? r.cr_average : "-") + '</td>'
+      + '<td class="' + rcls(r.nr_average, r.wr_average, r.cr_average, "nr") + '">' + (r.nr_average != null ? r.nr_average : "-") + '</td>'
+      + '<td class="comp-col">' + esc(aComp) + '</td>'
+      + '</tr>';
+  }
+  html += '</tbody></table>';
+  tableWrap.innerHTML = html;
+
+  var pagHtml = '';
+  pagHtml += '<button onclick="changePage(1)"' + (currentPage === 1 ? ' disabled' : '') + '>\u00AB</button>';
+  pagHtml += '<button onclick="changePage(' + (currentPage - 1) + ')"' + (currentPage <= 1 ? ' disabled' : '') + '>\u2039</button>';
+  var startPg = Math.max(1, currentPage - 3);
+  var endPg = Math.min(totalPages, currentPage + 3);
+  for (var p = startPg; p <= endPg; p++) {
+    pagHtml += '<button onclick="changePage(' + p + ')"' + (p === currentPage ? ' class="active"' : '') + '>' + p + '</button>';
+  }
+  pagHtml += '<button onclick="changePage(' + (currentPage + 1) + ')"' + (currentPage >= totalPages ? ' disabled' : '') + '>\u203A</button>';
+  pagHtml += '<button onclick="changePage(' + totalPages + ')"' + (currentPage === totalPages ? ' disabled' : '') + '>\u00BB</button>';
+  pagHtml += '<span class="info">' + total.toLocaleString() + ' results</span>';
+  pagination.innerHTML = pagHtml;
+}
+
+function changePage(pg) {
+  currentPage = pg;
+  loadRankings();
+  window.scrollTo(0, 0);
+}
+
+function selectEvent(eid) {
+  currentEvent = eid;
+  currentPage = 1;
+  document.getElementById("pageSubtitle").textContent = "Event Rankings — " + getEventLabel(eid);
+  updateIcons();
+  loadRankings();
+}
+
+var EVENT_LABELS = { "333":"333", "222":"222", "444":"444", "555":"555", "666":"666", "777":"777", "333bf":"333BLD", "333fm":"333FM", "333oh":"333OH", "clock":"Clock", "minx":"Mega", "pyram":"Pyra", "skewb":"Skewb", "sq1":"SQ1", "444bf":"444BLD", "555bf":"555BLD", "333mbf":"333MBLD", "333ft":"333ft", "magic":"Magic", "mmagic":"MMagic" };
+
+function getEventLabel(eid) { return EVENT_LABELS[eid] || eid; }
+
+function buildIcons() {
+  var bar = document.getElementById("iconBar");
+  var html = "";
+  for (var i = 0; i < SCORE_EVENTS.length; i++) {
+    var eid = SCORE_EVENTS[i];
+    html += '<button class="icon-btn' + (eid === currentEvent ? ' active' : '') + '" onclick="selectEvent(\'' + eid + '\')" title="' + getEventLabel(eid) + '"><span class="cubing-icon event-' + eid + '"></span></button>';
+  }
+  bar.innerHTML = html;
+}
+
+function updateIcons() {
+  var btns = document.getElementById("iconBar").querySelectorAll(".icon-btn");
+  for (var i = 0; i < btns.length; i++) {
+    var btn = btns[i];
+    var eid = SCORE_EVENTS[i];
+    if (eid === currentEvent) btn.classList.add("active");
+    else btn.classList.remove("active");
+  }
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("light");
+  var btn = document.getElementById("themeToggle");
+  if (document.body.classList.contains("light")) {
+    btn.textContent = "\uD83C\uDF19 Night";
+    localStorage.setItem("theme", "light");
+  } else {
+    btn.textContent = "\u2600 Day";
+    localStorage.setItem("theme", "dark");
+  }
+}
+
+(function() {
+  if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light");
+    document.getElementById("themeToggle").textContent = "\uD83C\uDF19 Night";
+  }
+})();
+
+function populateCountries(preserveValue) {
+  var sel = document.getElementById("countrySelect");
+  var prevValue = preserveValue ? sel.value : "__world__";
+  sel.innerHTML = '<option value="__world__">All countries</option>';
+  if (!dbLoaded) return;
+  var rows = queryCountriesByContinent(currentContinent);
+  for (var i = 0; i < rows.length; i++) {
+    sel.add(new Option(rows[i].country, rows[i].country));
+  }
+  sel.value = prevValue;
+  currentCountry = prevValue;
+}
+
+function populateSince() {
+  var sinceEl = document.getElementById("sinceSelect");
+  var untilEl = document.getElementById("untilSelect");
+  while (sinceEl.options.length > 1) sinceEl.remove(1);
+  while (untilEl.options.length > 1) untilEl.remove(1);
+  var years = queryDebutYears();
+  for (var i = 0; i < years.length; i++) {
+    sinceEl.add(new Option(years[i], years[i]));
+    untilEl.add(new Option(years[i], years[i]));
+  }
+}
+
+function onDbReady() {
+  document.getElementById("loadingOverlay").style.display = "none";
+  document.getElementById("controls").style.display = "flex";
+  document.getElementById("status").style.display = "none";
+
+  var conSel = document.getElementById("continentSelect");
+  var continents = ["_Africa", "_Asia", "_Europe", "_North America", "_South America", "_Oceania"];
+  for (var i = 0; i < continents.length; i++) {
+    conSel.add(new Option(continents[i].replace("_", ""), continents[i]));
+  }
+  conSel.addEventListener("change", function() {
+    currentContinent = conSel.value;
+    currentCountry = "__world__";
+    currentPage = 1;
+    populateCountries();
+    loadRankings();
+  });
+
+  var countrySel = document.getElementById("countrySelect");
+  countrySel.addEventListener("change", function() {
+    currentCountry = countrySel.value;
+    currentPage = 1;
+    loadRankings();
+  });
+
+  document.getElementById("genderSelect").addEventListener("change", function() {
+    currentGender = this.value;
+    currentPage = 1;
+    loadRankings();
+  });
+
+  document.getElementById("sinceSelect").addEventListener("change", function() {
+    currentSince = parseInt(this.value);
+    currentPage = 1;
+    loadRankings();
+  });
+  document.getElementById("untilSelect").addEventListener("change", function() {
+    currentUntil = parseInt(this.value);
+    currentPage = 1;
+    loadRankings();
+  });
+
+  document.getElementById("pageSizeSelect").addEventListener("change", function() {
+    pageSize = parseInt(this.value);
+    currentPage = 1;
+    loadRankings();
+  });
+
+  document.getElementById("searchBtn").addEventListener("click", function() {
+    currentSearch = document.getElementById("search").value.trim();
+    currentPage = 1;
+    loadRankings();
+  });
+  document.getElementById("search").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      currentSearch = this.value.trim();
+      currentPage = 1;
+      loadRankings();
+    }
+  });
+
+  populateCountries();
+  populateSince();
+  buildIcons();
+  loadRankings();
+}
+
+async function loadDb() {
+  try {
+    var SQL = await initSqlJs({ locateFile: function(f) { return 'https://sql.js.org/dist/' + f; } });
+    var buf;
+    var cached = await getDbFromCache();
+    if (cached) {
+      buf = cached;
+    } else {
+      var resp = await fetch('../data.db.gz');
+      var blob = await resp.blob();
+      var ds = new DecompressionStream('gzip');
+      var decompressedStream = blob.stream().pipeThrough(ds);
+      var decompressedResp = new Response(decompressedStream);
+      buf = await decompressedResp.arrayBuffer();
+      putDbToCache(buf);
+    }
+    db = new SQL.Database(new Uint8Array(buf));
+    dbLoaded = true;
+    onDbReady();
+  } catch(e) {
+    console.error('DB load failed:', e);
+    var overlay = document.getElementById("loadingOverlay");
+    overlay.querySelector(".loading-spinner").style.display = "none";
+    overlay.querySelector(".loading-text").textContent = "Failed to load data.";
+    overlay.querySelector(".loading-sub").textContent = "Refresh to retry.";
+  }
+}
+
+loadDb();
+</script>
+</body>
+</html>
