@@ -2731,6 +2731,8 @@ function showProfile(wcaId) {
   profileDiv.scrollTop = 0;
   window.scrollTo(0, 0);
 
+  history.replaceState(null, "", "#p-" + wcaId);
+
   renderProfile(person);
 }
 
@@ -2742,7 +2744,7 @@ function hideProfile() {
   document.getElementById("pagination").style.display = "flex";
   document.getElementById("subtitle").style.display = "";
   document.getElementById("legendKinch").style.display = "";
-  document.getElementById("legendColors").style.display = "";
+  if (window.location.hash) history.replaceState(null, "", window.location.pathname);
   if (_pendingFullRefresh) {
     _pendingFullRefresh = false;
     init();
@@ -2937,7 +2939,20 @@ function onDbLoaded() {
     return;
   }
   init();
+  handleProfileHash();
 }
+
+function handleProfileHash() {
+  var hash = window.location.hash;
+  if (hash && hash.startsWith("#p-")) {
+    var wcaId = hash.slice(3);
+    setTimeout(function() { showProfile(wcaId); }, 200);
+  }
+}
+
+window.addEventListener("hashchange", function() {
+  if (dbLoaded) handleProfileHash();
+});
 
 if (window.KINCH_QUICK) {
   loadData();

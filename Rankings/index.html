@@ -127,6 +127,8 @@ td:first-child { color: var(--blue); font-weight: 600; }
 th:nth-child(2), td:nth-child(2) { text-align: left; }
 td:nth-child(2) { font-family: "SF Mono", "Fira Code", monospace; color: var(--blue); font-weight: 600; }
 th:nth-child(3), td:nth-child(3) { text-align: left; font-weight: 500; max-width: 250px; overflow: hidden; text-overflow: ellipsis; }
+.person-link { color: inherit; text-decoration: none; }
+.person-link:hover { text-decoration: underline; color: var(--blue); }
 th:nth-child(4), td:nth-child(4) { text-align: left; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
 .comp-col { text-align: left; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
 .rank-col { color: var(--dim); }
@@ -469,7 +471,7 @@ function renderTable(rows, total, totalPages, compNames) {
     html += '<tr>'
       + '<td>' + r.rank + '</td>'
       + '<td>' + esc(r.wca_id) + '</td>'
-      + '<td>' + esc(r.name) + '</td>'
+      + '<td><a class="person-link" href="../#p-' + esc(r.wca_id) + '">' + esc(r.name) + '</a></td>'
       + '<td>' + esc(r.country) + '</td>'
       + '<td class="comp-col">' + esc(sComp) + '</td>'
       + '<td class="' + rcls(r.nr_single, r.wr_single, r.cr_single, "nr") + '">' + (r.nr_single != null ? r.nr_single : "-") + '</td>'
