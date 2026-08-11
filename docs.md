@@ -113,7 +113,7 @@ Uses a hand-rolled `parse_values_line()` to split `INSERT INTO ... VALUES` rows 
 | Key | Description | Source |
 |---|---|---|
 | `podiums` | Most top-3 finishes in final rounds | `results` pos 1–3 in final `round_types` |
-| `world_records` | Most world records **currently** held (distinct event+type) | `ranks_single`/`ranks_average` where world rank = 1 |
+| `world_records` | Most world records **currently** held (distinct event+type, retired events excluded) | `ranks_single`/`ranks_average` where world rank = 1 |
 | `world_records_ever` | Most world records **ever** held (every WR marker over time) | `results.regional_single_record` / `regional_average_record` = `WR` |
 | `most_solves` | Most individual solve attempts | `result_attempts` counted per `results` row |
 | `most_comps` | Most competitions attended | distinct `competition_id` per person |

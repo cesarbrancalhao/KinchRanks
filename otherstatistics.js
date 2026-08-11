@@ -1,11 +1,11 @@
 var STATS_DATA = {
-  "generated_at": "2026-07-10 21:15:38",
+  "generated_at": "2026-08-11 16:37:25",
   "podiums": [
     {
       "wca_id": "2013WALL03",
       "name": "Daniel Wallin",
       "country": "Sweden",
-      "value": 2121,
+      "value": 2144,
       "rank": 1
     },
     {
@@ -23,45 +23,45 @@ var STATS_DATA = {
       "rank": 3
     },
     {
-      "wca_id": "2017GARR05",
-      "name": "Luke Garrett",
-      "country": "United States",
-      "value": 1336,
-      "rank": 4
-    },
-    {
       "wca_id": "2009LIUE01",
       "name": "Evan Liu",
       "country": "United States",
-      "value": 1317,
+      "value": 1350,
+      "rank": 4
+    },
+    {
+      "wca_id": "2017GARR05",
+      "name": "Luke Garrett",
+      "country": "United States",
+      "value": 1339,
       "rank": 5
     },
     {
       "wca_id": "2009ZEMD01",
       "name": "Feliks Zemdegs",
       "country": "Australia",
-      "value": 1059,
+      "value": 1065,
       "rank": 6
     },
     {
       "wca_id": "2016PILA03",
       "name": "Ryan Pilat",
       "country": "United States",
-      "value": 1023,
+      "value": 1032,
       "rank": 7
     },
     {
       "wca_id": "2015KUCA01",
       "name": "Carter Kucala",
       "country": "United States",
-      "value": 971,
+      "value": 984,
       "rank": 8
     },
     {
       "wca_id": "2016ROLZ01",
       "name": "Alwin Rölz",
       "country": "Switzerland",
-      "value": 959,
+      "value": 964,
       "rank": 9
     },
     {
@@ -95,123 +95,123 @@ var STATS_DATA = {
       "rank": 3
     },
     {
-      "wca_id": "2009WANG13",
-      "name": "Yuxuan Wang (王宇轩)",
-      "country": "China",
-      "value": 3,
-      "rank": 3
-    },
-    {
       "wca_id": "2015CHER07",
       "name": "Tommy Cherry",
       "country": "United States",
       "value": 2,
-      "rank": 5
+      "rank": 4
     },
     {
       "wca_id": "2013JOHN10",
       "name": "Brian Johnson",
       "country": "United States",
       "value": 2,
-      "rank": 5
+      "rank": 4
     },
     {
-      "wca_id": "2016HUNG08",
-      "name": "Lim Hung (林弘)",
-      "country": "Malaysia",
+      "wca_id": "2022GIBS04",
+      "name": "Lachlan Gibson",
+      "country": "New Zealand",
       "value": 2,
-      "rank": 5
+      "rank": 4
     },
     {
       "wca_id": "2016FEIS01",
       "name": "Sujan Feist",
       "country": "United States",
       "value": 1,
-      "rank": 8
+      "rank": 7
     },
     {
       "wca_id": "2019WANY36",
       "name": "Yiheng Wang (王艺衡)",
       "country": "China",
       "value": 1,
-      "rank": 8
+      "rank": 7
     },
     {
       "wca_id": "2019EGGI02",
       "name": "Charlie Eggins",
       "country": "Australia",
       "value": 1,
-      "rank": 8
+      "rank": 7
     },
     {
-      "wca_id": "2017GARR05",
-      "name": "Luke Garrett",
-      "country": "United States",
+      "wca_id": "2023CHEN30",
+      "name": "Zhen Chen (陈震)",
+      "country": "China",
       "value": 1,
-      "rank": 8
+      "rank": 7
     },
     {
-      "wca_id": "2021DUNA01",
-      "name": "Brendyn Dunagan",
-      "country": "United States",
+      "wca_id": "2016HUNG08",
+      "name": "Lim Hung (林弘)",
+      "country": "Malaysia",
       "value": 1,
-      "rank": 8
+      "rank": 7
     },
     {
       "wca_id": "2019TARA09",
       "name": "Timofei Tarasenko",
       "country": "Russia",
       "value": 1,
-      "rank": 8
-    },
-    {
-      "wca_id": "2010PULC01",
-      "name": "Ernie Pulchny",
-      "country": "United States",
-      "value": 1,
-      "rank": 8
+      "rank": 7
     },
     {
       "wca_id": "2019JIAN54",
       "name": "Lingkun Jiang (姜凌坤)",
       "country": "China",
       "value": 1,
-      "rank": 8
+      "rank": 7
     },
     {
       "wca_id": "2022SAMS03",
       "name": "Ignacy Samselski",
       "country": "Poland",
       "value": 1,
-      "rank": 8
+      "rank": 7
     },
     {
       "wca_id": "2017AGGA01",
       "name": "Sameer Aggarwal",
       "country": "United States",
       "value": 1,
-      "rank": 8
+      "rank": 7
     },
     {
       "wca_id": "2021YEZI01",
       "name": "Ziyu Ye (叶梓渝)",
       "country": "China",
       "value": 1,
-      "rank": 8
+      "rank": 7
     },
     {
       "wca_id": "2021ZAJD03",
       "name": "Teodor Zajder",
       "country": "Poland",
       "value": 1,
-      "rank": 8
+      "rank": 7
+    },
+    {
+      "wca_id": "2011TRON02",
+      "name": "Sebastiano Tronto",
+      "country": "Italy",
+      "value": 1,
+      "rank": 7
     },
     {
       "wca_id": "2018GIBS04",
       "name": "Levi Gibson",
       "country": "United States",
       "value": 1,
-      "rank": 8
+      "rank": 7
+    },
+    {
+      "wca_id": "2017BRYA06",
+      "name": "Aedan Bryant",
+      "country": "United States",
+      "value": 1,
+      "rank": 7
     }
   ],
   "world_records_ever": [
@@ -361,70 +361,70 @@ var STATS_DATA = {
       "wca_id": "2013WALL03",
       "name": "Daniel Wallin",
       "country": "Sweden",
-      "value": 24495,
+      "value": 24830,
       "rank": 1
     },
     {
       "wca_id": "2010RONK01",
       "name": "Niko Ronkainen",
       "country": "Finland",
-      "value": 23173,
+      "value": 23572,
       "rank": 2
     },
     {
       "wca_id": "2013ROGA02",
       "name": "Przemysław Rogalski",
       "country": "Poland",
-      "value": 21846,
+      "value": 22057,
       "rank": 3
     },
     {
       "wca_id": "2008BARA01",
       "name": "Bence Barát",
       "country": "Hungary",
-      "value": 20188,
+      "value": 20203,
       "rank": 4
     },
     {
       "wca_id": "2010BENT01",
       "name": "Jan Bentlage",
       "country": "Germany",
-      "value": 20115,
+      "value": 20179,
       "rank": 5
     },
     {
       "wca_id": "2009LIUE01",
       "name": "Evan Liu",
       "country": "United States",
-      "value": 19683,
+      "value": 19936,
       "rank": 6
     },
     {
       "wca_id": "2011EDUA01",
       "name": "Eduard Esteban García Domínguez",
       "country": "Colombia",
-      "value": 19652,
+      "value": 19908,
       "rank": 7
     },
     {
       "wca_id": "2017GARR05",
       "name": "Luke Garrett",
       "country": "United States",
-      "value": 19587,
+      "value": 19766,
       "rank": 8
-    },
-    {
-      "wca_id": "2008AURO01",
-      "name": "Sébastien Auroux",
-      "country": "Germany",
-      "value": 18639,
-      "rank": 9
     },
     {
       "wca_id": "2010ROSE03",
       "name": "Dennis Rosero",
       "country": "Colombia",
-      "value": 18545,
+      "value": 18981,
+      "rank": 9
+    },
+    {
+      "wca_id": "2008AURO01",
+      "name": "Sébastien Auroux",
+      "country": "Germany",
+      "value": 18657,
       "rank": 10
     }
   ],
@@ -433,132 +433,132 @@ var STATS_DATA = {
       "wca_id": "2011EDUA01",
       "name": "Eduard Esteban García Domínguez",
       "country": "Colombia",
-      "value": 401,
+      "value": 406,
       "rank": 1
     },
     {
       "wca_id": "2013ROGA02",
       "name": "Przemysław Rogalski",
       "country": "Poland",
-      "value": 401,
-      "rank": 1
+      "value": 404,
+      "rank": 2
     },
     {
       "wca_id": "2010ROSE03",
       "name": "Dennis Rosero",
       "country": "Colombia",
-      "value": 393,
+      "value": 401,
       "rank": 3
     },
     {
       "wca_id": "2020DWOR01",
       "name": "Kacper Paweł Dworak",
       "country": "Poland",
-      "value": 375,
+      "value": 379,
       "rank": 4
     },
     {
       "wca_id": "2013WALL03",
       "name": "Daniel Wallin",
       "country": "Sweden",
-      "value": 352,
+      "value": 358,
       "rank": 5
-    },
-    {
-      "wca_id": "2010GRAC02",
-      "name": "Fabio Bini Graciose",
-      "country": "Brazil",
-      "value": 342,
-      "rank": 6
     },
     {
       "wca_id": "2009ZHEN11",
       "name": "Ming Zheng (郑鸣)",
       "country": "China",
-      "value": 339,
+      "value": 346,
+      "rank": 6
+    },
+    {
+      "wca_id": "2010GRAC02",
+      "name": "Fabio Bini Graciose",
+      "country": "Brazil",
+      "value": 343,
       "rank": 7
     },
     {
       "wca_id": "2013MART03",
       "name": "Chris Martin",
       "country": "United States",
-      "value": 339,
-      "rank": 7
-    },
-    {
-      "wca_id": "2009PROV01",
-      "name": "Matteo Provasi",
-      "country": "Italy",
-      "value": 335,
-      "rank": 9
+      "value": 342,
+      "rank": 8
     },
     {
       "wca_id": "2009LIUE01",
       "name": "Evan Liu",
       "country": "United States",
-      "value": 331,
-      "rank": 10
+      "value": 336,
+      "rank": 9
+    },
+    {
+      "wca_id": "2009PROV01",
+      "name": "Matteo Provasi",
+      "country": "Italy",
+      "value": 336,
+      "rank": 9
     },
     {
       "wca_id": "2010RONK01",
       "name": "Niko Ronkainen",
       "country": "Finland",
-      "value": 314,
+      "value": 320,
       "rank": 11
     },
     {
       "wca_id": "2017GARR05",
       "name": "Luke Garrett",
       "country": "United States",
-      "value": 312,
+      "value": 315,
       "rank": 12
     },
     {
       "wca_id": "2015NICH04",
       "name": "AJ Nicholls",
       "country": "United Kingdom",
-      "value": 310,
+      "value": 314,
       "rank": 13
     },
     {
       "wca_id": "2015ZHUA01",
       "name": "Glen Goh Wee Zhuan (吴洧全)",
       "country": "Singapore",
-      "value": 287,
+      "value": 292,
       "rank": 14
     },
     {
       "wca_id": "2015KUCA01",
       "name": "Carter Kucala",
       "country": "United States",
-      "value": 287,
-      "rank": 14
+      "value": 289,
+      "rank": 15
     }
   ],
   "comps_by_country": {
     "Colombia": [
       {
-        "wca_id": "2011EDUA01",
-        "name": "Eduard Esteban García Domínguez",
-        "value": 372,
+        "wca_id": "2010ROSE03",
+        "name": "Dennis Rosero",
+        "value": 377,
         "rank": 1
       },
       {
-        "wca_id": "2010ROSE03",
-        "name": "Dennis Rosero",
-        "value": 369,
-        "rank": 2
-      },
-      {
-        "wca_id": "2017LOPE31",
-        "name": "Catalina Herrera López",
-        "value": 213,
-        "rank": 3
+        "wca_id": "2011EDUA01",
+        "name": "Eduard Esteban García Domínguez",
+        "value": 377,
+        "rank": 1
       },
       {
         "wca_id": "2014JIME05",
         "name": "Diego Alejandro Casas Jimenez",
-        "value": 210,
+        "value": 215,
+        "rank": 3
+      },
+      {
+        "wca_id": "2017LOPE31",
+        "name": "Catalina Herrera López",
+        "value": 214,
         "rank": 4
       },
       {
@@ -570,25 +570,25 @@ var STATS_DATA = {
       {
         "wca_id": "2012MARI04",
         "name": "José David Castiblanco Marin",
-        "value": 164,
+        "value": 165,
         "rank": 6
+      },
+      {
+        "wca_id": "2014GUER06",
+        "name": "David Stiven Benitez Guerra",
+        "value": 153,
+        "rank": 7
       },
       {
         "wca_id": "2011CAST02",
         "name": "Michael Andres Castillo Lemus",
         "value": 152,
-        "rank": 7
-      },
-      {
-        "wca_id": "2014GUER06",
-        "name": "David Stiven Benitez Guerra",
-        "value": 152,
-        "rank": 7
+        "rank": 8
       },
       {
         "wca_id": "2018PERE37",
         "name": "Francia Perez",
-        "value": 132,
+        "value": 133,
         "rank": 9
       },
       {
@@ -602,31 +602,31 @@ var STATS_DATA = {
       {
         "wca_id": "2013ROGA02",
         "name": "Przemysław Rogalski",
-        "value": 363,
+        "value": 365,
         "rank": 1
       },
       {
         "wca_id": "2014ZAKR01",
         "name": "Karol Zakrzewski",
-        "value": 253,
+        "value": 257,
         "rank": 2
       },
       {
         "wca_id": "2020DWOR01",
         "name": "Kacper Paweł Dworak",
-        "value": 251,
+        "value": 254,
         "rank": 3
       },
       {
         "wca_id": "2013BOBE01",
         "name": "Krzysztof Bober",
-        "value": 246,
+        "value": 248,
         "rank": 4
       },
       {
         "wca_id": "2013BURL01",
         "name": "Łukasz Burliga",
-        "value": 207,
+        "value": 209,
         "rank": 5
       },
       {
@@ -638,19 +638,19 @@ var STATS_DATA = {
       {
         "wca_id": "2013TOKA01",
         "name": "Piotr Tokarski",
-        "value": 192,
+        "value": 194,
         "rank": 7
       },
       {
         "wca_id": "2011MAJC01",
         "name": "Maksymilian Majcher",
-        "value": 190,
+        "value": 193,
         "rank": 8
       },
       {
         "wca_id": "2013OLSZ02",
         "name": "Piotr Olszewski",
-        "value": 186,
+        "value": 187,
         "rank": 9
       },
       {
@@ -664,19 +664,19 @@ var STATS_DATA = {
       {
         "wca_id": "2010GRAC02",
         "name": "Fabio Bini Graciose",
-        "value": 331,
+        "value": 332,
         "rank": 1
       },
       {
         "wca_id": "2016SATO01",
         "name": "Caio Hideaki Sato",
-        "value": 156,
+        "value": 158,
         "rank": 2
       },
       {
         "wca_id": "2014YUNO01",
         "name": "Lucas Ichiro Yunomae",
-        "value": 151,
+        "value": 152,
         "rank": 3
       },
       {
@@ -688,7 +688,7 @@ var STATS_DATA = {
       {
         "wca_id": "2017VIAN01",
         "name": "Matheus Casassa",
-        "value": 104,
+        "value": 106,
         "rank": 5
       },
       {
@@ -700,75 +700,75 @@ var STATS_DATA = {
       {
         "wca_id": "2015BELO02",
         "name": "Pedro Henrique Maciel Ceccopieri Belo (陈昊然)",
-        "value": 82,
+        "value": 83,
         "rank": 7
       },
       {
         "wca_id": "2016CARD06",
         "name": "Felipe Cardim",
-        "value": 82,
+        "value": 83,
         "rank": 7
       },
       {
         "wca_id": "2017SANT12",
         "name": "Renan da Cunha Santos",
-        "value": 82,
+        "value": 83,
         "rank": 7
       },
       {
         "wca_id": "2017NOVA05",
         "name": "João Luiz Melo Novaes",
         "value": 82,
-        "rank": 7
+        "rank": 10
       }
     ],
     "United States": [
       {
         "wca_id": "2013MART03",
         "name": "Chris Martin",
-        "value": 322,
+        "value": 325,
         "rank": 1
       },
       {
         "wca_id": "2017GARR05",
         "name": "Luke Garrett",
-        "value": 308,
+        "value": 310,
         "rank": 2
       },
       {
         "wca_id": "2009LIUE01",
         "name": "Evan Liu",
-        "value": 286,
+        "value": 291,
         "rank": 3
       },
       {
         "wca_id": "2010HULL01",
         "name": "Katie Hull",
-        "value": 277,
+        "value": 278,
         "rank": 4
       },
       {
         "wca_id": "2015KUCA01",
         "name": "Carter Kucala",
-        "value": 269,
+        "value": 270,
         "rank": 5
       },
       {
         "wca_id": "2014CHIC01",
         "name": "Chris Chi",
-        "value": 260,
+        "value": 265,
         "rank": 6
       },
       {
         "wca_id": "2016KELL12",
         "name": "Simon Kellum",
-        "value": 256,
+        "value": 257,
         "rank": 7
       },
       {
         "wca_id": "2017RICH02",
         "name": "Braden Richards",
-        "value": 251,
+        "value": 253,
         "rank": 8
       },
       {
@@ -780,63 +780,63 @@ var STATS_DATA = {
       {
         "wca_id": "2013DICK01",
         "name": "Matthew Dickman",
-        "value": 242,
-        "rank": 10
+        "value": 243,
+        "rank": 9
       }
     ],
     "Sweden": [
       {
         "wca_id": "2013WALL03",
         "name": "Daniel Wallin",
-        "value": 278,
+        "value": 283,
         "rank": 1
       },
       {
         "wca_id": "2021HUGO01",
         "name": "Peter Hugosson-Miller",
-        "value": 191,
+        "value": 196,
         "rank": 2
       },
       {
         "wca_id": "2023ASTR01",
         "name": "Filip Åström",
-        "value": 173,
+        "value": 179,
         "rank": 3
+      },
+      {
+        "wca_id": "2022IVAR01",
+        "name": "Ludwig Ivarsson",
+        "value": 134,
+        "rank": 4
       },
       {
         "wca_id": "2015EWER01",
         "name": "Helmer Ewert",
         "value": 131,
-        "rank": 4
-      },
-      {
-        "wca_id": "2022IVAR01",
-        "name": "Ludwig Ivarsson",
-        "value": 131,
-        "rank": 4
-      },
-      {
-        "wca_id": "2016ZENK01",
-        "name": "Viktor Zenk",
-        "value": 121,
-        "rank": 6
+        "rank": 5
       },
       {
         "wca_id": "2023HULT01",
         "name": "Dante Tellechea Hultmark",
-        "value": 121,
+        "value": 124,
         "rank": 6
       },
       {
         "wca_id": "2019EKLU01",
         "name": "Samuel Eklund-Hanna",
-        "value": 120,
+        "value": 123,
+        "rank": 7
+      },
+      {
+        "wca_id": "2016ZENK01",
+        "name": "Viktor Zenk",
+        "value": 122,
         "rank": 8
       },
       {
         "wca_id": "2023FLOD01",
         "name": "Erland Flodman",
-        "value": 109,
+        "value": 114,
         "rank": 9
       },
       {
@@ -850,13 +850,13 @@ var STATS_DATA = {
       {
         "wca_id": "2009ZHEN11",
         "name": "Ming Zheng (郑鸣)",
-        "value": 258,
+        "value": 264,
         "rank": 1
       },
       {
         "wca_id": "2009CHAN04",
         "name": "Fangyuan Chang (常方圆)",
-        "value": 178,
+        "value": 181,
         "rank": 2
       },
       {
@@ -880,20 +880,20 @@ var STATS_DATA = {
       {
         "wca_id": "2012PANJ02",
         "name": "Jack Pan (潘杰康)",
-        "value": 122,
-        "rank": 6
+        "value": 123,
+        "rank": 5
+      },
+      {
+        "wca_id": "2013SUNY02",
+        "name": "Yongtao Sun (孙永涛)",
+        "value": 113,
+        "rank": 7
       },
       {
         "wca_id": "2007YUNQ01",
         "name": "Yunqi Ouyang (欧阳韵奇)",
         "value": 109,
-        "rank": 7
-      },
-      {
-        "wca_id": "2013SUNY02",
-        "name": "Yongtao Sun (孙永涛)",
-        "value": 109,
-        "rank": 7
+        "rank": 8
       },
       {
         "wca_id": "2012QIUR01",
@@ -902,23 +902,23 @@ var STATS_DATA = {
         "rank": 9
       },
       {
-        "wca_id": "2013FENG02",
-        "name": "Zijia Feng (冯子甲)",
-        "value": 104,
-        "rank": 10
+        "wca_id": "2017WANY29",
+        "name": "Yifan Wang (王逸帆)",
+        "value": 106,
+        "rank": 9
       }
     ],
     "United Kingdom": [
       {
         "wca_id": "2015NICH04",
         "name": "AJ Nicholls",
-        "value": 236,
+        "value": 238,
         "rank": 1
       },
       {
         "wca_id": "2015HAMM01",
         "name": "Billie Hammill",
-        "value": 149,
+        "value": 150,
         "rank": 2
       },
       {
@@ -928,45 +928,45 @@ var STATS_DATA = {
         "rank": 3
       },
       {
-        "wca_id": "2016WHEA01",
-        "name": "Oliver Wheat",
-        "value": 121,
-        "rank": 4
-      },
-      {
         "wca_id": "2018CAMP17",
         "name": "Bella Campbell",
-        "value": 121,
-        "rank": 4
+        "value": 125,
+        "rank": 3
+      },
+      {
+        "wca_id": "2016WHEA01",
+        "name": "Oliver Wheat",
+        "value": 123,
+        "rank": 5
       },
       {
         "wca_id": "2016SINN01",
         "name": "Eleanor Sinnott",
-        "value": 112,
+        "value": 114,
         "rank": 6
       },
       {
         "wca_id": "2017CHAM09",
         "name": "Cham J. Chambers",
-        "value": 112,
+        "value": 114,
         "rank": 6
+      },
+      {
+        "wca_id": "2010CHAN20",
+        "name": "Nevins Chan Pak Hoong (陈百鸿)",
+        "value": 109,
+        "rank": 8
+      },
+      {
+        "wca_id": "2015SPEN01",
+        "name": "Sam Spendla",
+        "value": 108,
+        "rank": 9
       },
       {
         "wca_id": "2018STOK01",
         "name": "Ben Stokes",
         "value": 108,
-        "rank": 8
-      },
-      {
-        "wca_id": "2010CHAN20",
-        "name": "Nevins Chan Pak Hoong (陈百鸿)",
-        "value": 107,
-        "rank": 9
-      },
-      {
-        "wca_id": "2015SPEN01",
-        "name": "Sam Spendla",
-        "value": 107,
         "rank": 9
       }
     ],
@@ -974,31 +974,31 @@ var STATS_DATA = {
       {
         "wca_id": "2012REYE04",
         "name": "Niño Francis S. Reyes",
-        "value": 219,
+        "value": 222,
         "rank": 1
       },
       {
         "wca_id": "2015YOSH01",
         "name": "Yuji Yoshida",
-        "value": 201,
+        "value": 206,
         "rank": 2
       },
       {
         "wca_id": "2012QUIB01",
         "name": "Louie Jay Quibote",
-        "value": 131,
+        "value": 133,
         "rank": 3
       },
       {
         "wca_id": "2016STEP05",
         "name": "Dale Palmares",
-        "value": 116,
+        "value": 117,
         "rank": 4
       },
       {
         "wca_id": "2017WONG01",
         "name": "Brenton Angelo Lo Wong",
-        "value": 115,
+        "value": 116,
         "rank": 5
       },
       {
@@ -1010,26 +1010,26 @@ var STATS_DATA = {
       {
         "wca_id": "2022PRIN09",
         "name": "Zoei Principe",
-        "value": 106,
+        "value": 107,
         "rank": 7
       },
       {
         "wca_id": "2022PRIN08",
         "name": "Zian Principe",
-        "value": 105,
+        "value": 106,
         "rank": 8
+      },
+      {
+        "wca_id": "2023MAGA09",
+        "name": "Juan Miguel Y. Magallanes",
+        "value": 92,
+        "rank": 9
       },
       {
         "wca_id": "2010UBAL01",
         "name": "John Edison Ubaldo (ᜇ᜔ᜌᜓ︀ᜈ᜔ ᜁᜇᜒᜐᜓ︀ᜈ᜔ ᜂᜊᜎ᜔ᜇᜓ︀)",
         "value": 88,
-        "rank": 9
-      },
-      {
-        "wca_id": "2023MAGA09",
-        "name": "Juan Miguel Y. Magallanes",
-        "value": 88,
-        "rank": 9
+        "rank": 10
       }
     ],
     "Italy": [
@@ -1098,7 +1098,7 @@ var STATS_DATA = {
       {
         "wca_id": "2010RONK01",
         "name": "Niko Ronkainen",
-        "value": 182,
+        "value": 183,
         "rank": 1
       },
       {
@@ -1128,7 +1128,7 @@ var STATS_DATA = {
       {
         "wca_id": "2021LEMP01",
         "name": "Luukas Lempinen",
-        "value": 82,
+        "value": 83,
         "rank": 6
       },
       {
@@ -1140,7 +1140,7 @@ var STATS_DATA = {
       {
         "wca_id": "2022KOPE01",
         "name": "Atilla Kopecky",
-        "value": 61,
+        "value": 62,
         "rank": 8
       },
       {
@@ -1222,55 +1222,55 @@ var STATS_DATA = {
       {
         "wca_id": "2006ARAK01",
         "name": "Sinpei Araki (荒木慎平)",
-        "value": 169,
+        "value": 170,
         "rank": 1
       },
       {
         "wca_id": "2006OOKU01",
         "name": "Takayuki Ookusa (大艸尊之)",
-        "value": 146,
+        "value": 150,
         "rank": 2
       },
       {
         "wca_id": "2008TAKA01",
         "name": "Yuhei Takagi (高木佑平)",
-        "value": 142,
+        "value": 143,
         "rank": 3
       },
       {
         "wca_id": "2005KOSE01",
         "name": "Fumiki Koseki (古関章記)",
-        "value": 125,
+        "value": 126,
         "rank": 4
       },
       {
         "wca_id": "2007SHIR01",
         "name": "Takuma Shirahase (白波瀬拓磨)",
-        "value": 116,
+        "value": 120,
         "rank": 5
       },
       {
         "wca_id": "2008UENO01",
         "name": "Shuto Ueno (上野柊斗)",
-        "value": 115,
+        "value": 117,
         "rank": 6
+      },
+      {
+        "wca_id": "2007OOBA01",
+        "name": "Kou Oobatake (大畠功)",
+        "value": 106,
+        "rank": 7
       },
       {
         "wca_id": "2007SUGA01",
         "name": "Nobuaki Suga (菅信昭)",
         "value": 105,
-        "rank": 7
-      },
-      {
-        "wca_id": "2007OOBA01",
-        "name": "Kou Oobatake (大畠功)",
-        "value": 104,
         "rank": 8
       },
       {
         "wca_id": "2007OMUR01",
         "name": "Shuhei Omura (大村周平)",
-        "value": 96,
+        "value": 97,
         "rank": 9
       },
       {
@@ -1284,13 +1284,13 @@ var STATS_DATA = {
       {
         "wca_id": "2008VIRO01",
         "name": "Philippe Virouleau",
-        "value": 168,
+        "value": 169,
         "rank": 1
       },
       {
         "wca_id": "2016PYWI01",
         "name": "Wilfrid Py",
-        "value": 154,
+        "value": 156,
         "rank": 2
       },
       {
@@ -1300,16 +1300,16 @@ var STATS_DATA = {
         "rank": 3
       },
       {
-        "wca_id": "2008MORE02",
-        "name": "Hippolyte Moreau",
-        "value": 131,
+        "wca_id": "2014SEBA01",
+        "name": "Juliette Sébastien",
+        "value": 132,
         "rank": 4
       },
       {
-        "wca_id": "2014SEBA01",
-        "name": "Juliette Sébastien",
+        "wca_id": "2008MORE02",
+        "name": "Hippolyte Moreau",
         "value": 131,
-        "rank": 4
+        "rank": 5
       },
       {
         "wca_id": "2010KADD01",
@@ -1330,16 +1330,16 @@ var STATS_DATA = {
         "rank": 8
       },
       {
-        "wca_id": "2014LAFO02",
-        "name": "Clara Lafourcade",
-        "value": 107,
+        "wca_id": "2018AUBR01",
+        "name": "Étienne Aubry",
+        "value": 110,
         "rank": 9
       },
       {
-        "wca_id": "2018AUBR01",
-        "name": "Étienne Aubry",
+        "wca_id": "2014LAFO02",
+        "name": "Clara Lafourcade",
         "value": 107,
-        "rank": 9
+        "rank": 10
       }
     ],
     "Spain": [
@@ -1358,14 +1358,14 @@ var STATS_DATA = {
       {
         "wca_id": "2013GARC08",
         "name": "Jesús Lindo García",
-        "value": 123,
+        "value": 124,
         "rank": 3
       },
       {
         "wca_id": "2016LAZA03",
         "name": "Fernando Sáez Lázaro",
         "value": 123,
-        "rank": 3
+        "rank": 4
       },
       {
         "wca_id": "2010GARC02",
@@ -1376,13 +1376,13 @@ var STATS_DATA = {
       {
         "wca_id": "2015SALO01",
         "name": "Álvaro Aguilar Salobreña",
-        "value": 118,
-        "rank": 6
+        "value": 120,
+        "rank": 5
       },
       {
         "wca_id": "2015ANTO04",
         "name": "Manuel Prieto de Antón",
-        "value": 113,
+        "value": 114,
         "rank": 7
       },
       {
@@ -1408,13 +1408,13 @@ var STATS_DATA = {
       {
         "wca_id": "2010RAHM02",
         "name": "Cendy Cahyo Rahmat",
-        "value": 154,
+        "value": 155,
         "rank": 1
       },
       {
         "wca_id": "2011ALVI01",
         "name": "Wilson Alvis (陈智胜)",
-        "value": 96,
+        "value": 97,
         "rank": 2
       },
       {
@@ -1426,43 +1426,43 @@ var STATS_DATA = {
       {
         "wca_id": "2010NATA01",
         "name": "Gerson Natanael",
-        "value": 51,
+        "value": 52,
         "rank": 4
       },
       {
         "wca_id": "2015HUDO01",
         "name": "Hafizh Dary Faridhan Hudoyo",
         "value": 51,
-        "rank": 4
+        "rank": 5
       },
       {
         "wca_id": "2018KODA01",
         "name": "Muhammad Faeyza Koda",
-        "value": 49,
+        "value": 50,
         "rank": 6
+      },
+      {
+        "wca_id": "2018ALAM08",
+        "name": "Leon Marcell Alamanda",
+        "value": 49,
+        "rank": 7
       },
       {
         "wca_id": "2017FALA02",
         "name": "Zaky Kurnia Falah",
         "value": 48,
-        "rank": 7
-      },
-      {
-        "wca_id": "2018ALAM08",
-        "name": "Leon Marcell Alamanda",
-        "value": 48,
-        "rank": 7
+        "rank": 8
       },
       {
         "wca_id": "2017MAXW01",
         "name": "Phillip Maxwell",
-        "value": 46,
+        "value": 47,
         "rank": 9
       },
       {
-        "wca_id": "2015FUSH01",
-        "name": "Firstian Fushada (符逢城)",
-        "value": 43,
+        "wca_id": "2018WARD05",
+        "name": "Winda Wardani",
+        "value": 44,
         "rank": 10
       }
     ],
@@ -1470,7 +1470,7 @@ var STATS_DATA = {
       {
         "wca_id": "2007STRO01",
         "name": "Sarah Strong",
-        "value": 152,
+        "value": 153,
         "rank": 1
       },
       {
@@ -1482,7 +1482,7 @@ var STATS_DATA = {
       {
         "wca_id": "2010MATT02",
         "name": "Kevin Matthews",
-        "value": 96,
+        "value": 98,
         "rank": 3
       },
       {
@@ -1494,8 +1494,8 @@ var STATS_DATA = {
       {
         "wca_id": "2016DONO02",
         "name": "Orion Donovan",
-        "value": 85,
-        "rank": 5
+        "value": 86,
+        "rank": 4
       },
       {
         "wca_id": "2013ESPA01",
@@ -1504,16 +1504,16 @@ var STATS_DATA = {
         "rank": 6
       },
       {
-        "wca_id": "2016PATT02",
-        "name": "Nicholas Patterson",
+        "wca_id": "2014MUTC01",
+        "name": "Alex Mutch",
         "value": 83,
         "rank": 7
       },
       {
-        "wca_id": "2014MUTC01",
-        "name": "Alex Mutch",
-        "value": 81,
-        "rank": 8
+        "wca_id": "2016PATT02",
+        "name": "Nicholas Patterson",
+        "value": 83,
+        "rank": 7
       },
       {
         "wca_id": "2015XION03",
@@ -1538,7 +1538,7 @@ var STATS_DATA = {
       {
         "wca_id": "2010SCHM01",
         "name": "Leon Schmidtchen",
-        "value": 138,
+        "value": 139,
         "rank": 2
       },
       {
@@ -1550,7 +1550,7 @@ var STATS_DATA = {
       {
         "wca_id": "2016KRAF01",
         "name": "Noah Kraft",
-        "value": 124,
+        "value": 125,
         "rank": 4
       },
       {
@@ -1588,6 +1588,68 @@ var STATS_DATA = {
         "name": "Malte Ihlefeld",
         "value": 95,
         "rank": 9
+      }
+    ],
+    "Chinese Taipei": [
+      {
+        "wca_id": "2006LINC01",
+        "name": "Chia-Leo Lin (林珈樂)",
+        "value": 145,
+        "rank": 1
+      },
+      {
+        "wca_id": "2012CHON03",
+        "name": "Chao-Che Chung (鍾肇哲)",
+        "value": 132,
+        "rank": 2
+      },
+      {
+        "wca_id": "2006TSAI03",
+        "name": "Yueh-Lin Tsai (蔡岳霖)",
+        "value": 112,
+        "rank": 3
+      },
+      {
+        "wca_id": "2012LUOS01",
+        "name": "Shu-Yii Luo (駱書翊)",
+        "value": 99,
+        "rank": 4
+      },
+      {
+        "wca_id": "2010WUIF01",
+        "name": "Yi-Fan Wu (吳亦凡)",
+        "value": 97,
+        "rank": 5
+      },
+      {
+        "wca_id": "2011JHAN01",
+        "name": "Shun-Hsin Chang (張舜欣)",
+        "value": 90,
+        "rank": 6
+      },
+      {
+        "wca_id": "2013CHAN09",
+        "name": "Yu-Hsuan Chang (張祐瑄)",
+        "value": 89,
+        "rank": 7
+      },
+      {
+        "wca_id": "2011LIUR02",
+        "name": "Rui-Jun Liu (劉睿鈞)",
+        "value": 88,
+        "rank": 8
+      },
+      {
+        "wca_id": "2015WANG09",
+        "name": "Kai-Wen Wang (王楷文)",
+        "value": 83,
+        "rank": 9
+      },
+      {
+        "wca_id": "2012HUAN12",
+        "name": "Ping-Yueh Huang (黃品越)",
+        "value": 82,
+        "rank": 10
       }
     ],
     "Switzerland": [
@@ -1652,68 +1714,6 @@ var STATS_DATA = {
         "rank": 9
       }
     ],
-    "Chinese Taipei": [
-      {
-        "wca_id": "2006LINC01",
-        "name": "Chia-Leo Lin (林珈樂)",
-        "value": 143,
-        "rank": 1
-      },
-      {
-        "wca_id": "2012CHON03",
-        "name": "Chao-Che Chung (鍾肇哲)",
-        "value": 130,
-        "rank": 2
-      },
-      {
-        "wca_id": "2006TSAI03",
-        "name": "Yueh-Lin Tsai (蔡岳霖)",
-        "value": 110,
-        "rank": 3
-      },
-      {
-        "wca_id": "2012LUOS01",
-        "name": "Shu-Yii Luo (駱書翊)",
-        "value": 97,
-        "rank": 4
-      },
-      {
-        "wca_id": "2010WUIF01",
-        "name": "Yi-Fan Wu (吳亦凡)",
-        "value": 95,
-        "rank": 5
-      },
-      {
-        "wca_id": "2011JHAN01",
-        "name": "Shun-Hsin Chang (張舜欣)",
-        "value": 89,
-        "rank": 6
-      },
-      {
-        "wca_id": "2011LIUR02",
-        "name": "Rui-Jun Liu (劉睿鈞)",
-        "value": 88,
-        "rank": 7
-      },
-      {
-        "wca_id": "2013CHAN09",
-        "name": "Yu-Hsuan Chang (張祐瑄)",
-        "value": 87,
-        "rank": 8
-      },
-      {
-        "wca_id": "2012HUAN12",
-        "name": "Ping-Yueh Huang (黃品越)",
-        "value": 82,
-        "rank": 9
-      },
-      {
-        "wca_id": "2015WANG09",
-        "name": "Kai-Wen Wang (王楷文)",
-        "value": 82,
-        "rank": 9
-      }
-    ],
     "India": [
       {
         "wca_id": "2012MADA01",
@@ -1724,7 +1724,7 @@ var STATS_DATA = {
       {
         "wca_id": "2013GHOD01",
         "name": "Abhijeet Ghodgaonkar (अभिजीत घोडगावकर)",
-        "value": 130,
+        "value": 132,
         "rank": 2
       },
       {
@@ -1734,21 +1734,21 @@ var STATS_DATA = {
         "rank": 3
       },
       {
-        "wca_id": "2014SRIV05",
-        "name": "Somya Srivastava",
-        "value": 112,
+        "wca_id": "2014KANN02",
+        "name": "Arun Kannan",
+        "value": 113,
         "rank": 4
       },
       {
-        "wca_id": "2014KANN02",
-        "name": "Arun Kannan",
-        "value": 110,
-        "rank": 5
+        "wca_id": "2014SRIV05",
+        "name": "Somya Srivastava",
+        "value": 113,
+        "rank": 4
       },
       {
         "wca_id": "2017BACH09",
         "name": "Gaurav Bachani",
-        "value": 107,
+        "value": 108,
         "rank": 6
       },
       {
@@ -1766,7 +1766,7 @@ var STATS_DATA = {
       {
         "wca_id": "2016MAHA07",
         "name": "Shubham Maharana",
-        "value": 91,
+        "value": 92,
         "rank": 9
       },
       {
@@ -1780,61 +1780,61 @@ var STATS_DATA = {
       {
         "wca_id": "2009ZEMD01",
         "name": "Feliks Zemdegs",
-        "value": 128,
+        "value": 129,
         "rank": 1
       },
       {
         "wca_id": "2016CHAR01",
         "name": "Jonathan Charlesworth",
-        "value": 121,
+        "value": 123,
         "rank": 2
       },
       {
         "wca_id": "2019KLEV01",
         "name": "Patrick Kleverlaan",
-        "value": 118,
+        "value": 119,
         "rank": 3
       },
       {
         "wca_id": "2015WAKE01",
         "name": "Ben Wakelin",
-        "value": 109,
+        "value": 110,
         "rank": 4
       },
       {
         "wca_id": "2016HOBB01",
         "name": "Emmet Hobbs",
-        "value": 109,
+        "value": 110,
         "rank": 4
-      },
-      {
-        "wca_id": "2016JARM01",
-        "name": "Myles Jarman",
-        "value": 107,
-        "rank": 6
       },
       {
         "wca_id": "2019SMIT36",
         "name": "Amy Smith",
-        "value": 107,
+        "value": 109,
         "rank": 6
+      },
+      {
+        "wca_id": "2016JARM01",
+        "name": "Myles Jarman",
+        "value": 108,
+        "rank": 7
       },
       {
         "wca_id": "2012MCNE01",
         "name": "Jayden McNeill",
-        "value": 104,
+        "value": 105,
         "rank": 8
       },
       {
         "wca_id": "2014PRID01",
         "name": "Ethan Pride",
         "value": 104,
-        "rank": 8
+        "rank": 9
       },
       {
         "wca_id": "2010STOL01",
         "name": "Cameron Stollery",
-        "value": 101,
+        "value": 102,
         "rank": 10
       }
     ],
@@ -1842,7 +1842,7 @@ var STATS_DATA = {
       {
         "wca_id": "2003BRUC01",
         "name": "Ron van Bruchem",
-        "value": 126,
+        "value": 127,
         "rank": 1
       },
       {
@@ -1854,31 +1854,31 @@ var STATS_DATA = {
       {
         "wca_id": "2012VERS02",
         "name": "Robin Verstraten",
-        "value": 85,
+        "value": 87,
         "rank": 3
+      },
+      {
+        "wca_id": "2015WITM01",
+        "name": "Mattheo de Wit",
+        "value": 83,
+        "rank": 4
       },
       {
         "wca_id": "2007OEYM01",
         "name": "Maria Oey",
         "value": 82,
-        "rank": 4
-      },
-      {
-        "wca_id": "2015WITM01",
-        "name": "Mattheo de Wit",
-        "value": 81,
         "rank": 5
       },
       {
         "wca_id": "2012KASS01",
         "name": "Daniël Kassab",
-        "value": 77,
+        "value": 79,
         "rank": 6
       },
       {
         "wca_id": "2016VOSO01",
         "name": "Olivier Vos",
-        "value": 74,
+        "value": 76,
         "rank": 7
       },
       {
@@ -1890,13 +1890,13 @@ var STATS_DATA = {
       {
         "wca_id": "2016SMUL01",
         "name": "Mika Smulders",
-        "value": 69,
-        "rank": 9
+        "value": 71,
+        "rank": 8
       },
       {
-        "wca_id": "2010SCHI01",
-        "name": "Reinier Schippers",
-        "value": 68,
+        "wca_id": "2017CHAN44",
+        "name": "Vincent Chan",
+        "value": 70,
         "rank": 10
       }
     ],
@@ -1966,61 +1966,61 @@ var STATS_DATA = {
       {
         "wca_id": "2014MEND02",
         "name": "Alexis Rodrigo Cazu Mendoza",
-        "value": 113,
+        "value": 117,
         "rank": 1
       },
       {
         "wca_id": "2015CARD01",
         "name": "Jaime Tadeo Perez Cardona",
-        "value": 87,
+        "value": 91,
         "rank": 2
       },
       {
         "wca_id": "2014MART08",
         "name": "Areli Rubí Gordillo Martínez",
-        "value": 82,
+        "value": 83,
         "rank": 3
       },
       {
         "wca_id": "2016CORV01",
         "name": "Alejandro Daniel Salceda Corvera",
-        "value": 78,
+        "value": 80,
         "rank": 4
-      },
-      {
-        "wca_id": "2016RIVE14",
-        "name": "Rocio Rodriguez Rivera",
-        "value": 74,
-        "rank": 5
       },
       {
         "wca_id": "2016ROBL05",
         "name": "Christofer Alejandro Aguirre Robledo",
-        "value": 72,
-        "rank": 6
+        "value": 75,
+        "rank": 5
+      },
+      {
+        "wca_id": "2016RIVE14",
+        "name": "Rocio Rodriguez Rivera",
+        "value": 75,
+        "rank": 5
       },
       {
         "wca_id": "2016IBAR07",
         "name": "Jesús Armando Aguirre Ibarra",
-        "value": 62,
+        "value": 64,
         "rank": 7
       },
       {
         "wca_id": "2017HERN11",
         "name": "Joaquin Ruenes Hernández",
-        "value": 62,
-        "rank": 7
+        "value": 63,
+        "rank": 8
       },
       {
         "wca_id": "2014SALA15",
         "name": "Luis Sinhue Medina Salas",
-        "value": 60,
+        "value": 62,
         "rank": 9
       },
       {
-        "wca_id": "2011SALA06",
-        "name": "José Adrian Jaquez Salazar",
-        "value": 59,
+        "wca_id": "2016MART09",
+        "name": "Eduardo Antonio Lara Martínez",
+        "value": 61,
         "rank": 10
       }
     ],
@@ -2028,20 +2028,26 @@ var STATS_DATA = {
       {
         "wca_id": "2007GOHO01",
         "name": "Choi Goho (최고호)",
-        "value": 112,
+        "value": 114,
         "rank": 1
       },
       {
         "wca_id": "2007YOUN04",
         "name": "Ko Youngjin (고영진)",
-        "value": 89,
+        "value": 91,
         "rank": 2
       },
       {
         "wca_id": "2008CHOI04",
         "name": "Ilkyoo Choi (최일규)",
-        "value": 87,
+        "value": 88,
         "rank": 3
+      },
+      {
+        "wca_id": "2014HEOG01",
+        "name": "Keunsoo Heo (허근수)",
+        "value": 83,
+        "rank": 4
       },
       {
         "wca_id": "2017PARK05",
@@ -2050,15 +2056,9 @@ var STATS_DATA = {
         "rank": 4
       },
       {
-        "wca_id": "2014HEOG01",
-        "name": "Keunsoo Heo (허근수)",
-        "value": 81,
-        "rank": 5
-      },
-      {
         "wca_id": "2015KIMH04",
         "name": "Hyunjo Kim (김현조)",
-        "value": 78,
+        "value": 80,
         "rank": 6
       },
       {
@@ -2076,13 +2076,75 @@ var STATS_DATA = {
       {
         "wca_id": "2013NAHM01",
         "name": "Seung Hyuk Nahm (남승혁)",
-        "value": 67,
-        "rank": 9
+        "value": 68,
+        "rank": 8
       },
       {
         "wca_id": "2015SUCK01",
         "name": "Jang SeokWon (장석원)",
         "value": 60,
+        "rank": 10
+      }
+    ],
+    "Romania": [
+      {
+        "wca_id": "2012CAPA01",
+        "name": "Mihai Căpăţinescu",
+        "value": 111,
+        "rank": 1
+      },
+      {
+        "wca_id": "2013PANT01",
+        "name": "Mihnea Andrei Panţu",
+        "value": 62,
+        "rank": 2
+      },
+      {
+        "wca_id": "2013VASI02",
+        "name": "Vasile Dan",
+        "value": 57,
+        "rank": 3
+      },
+      {
+        "wca_id": "2013FRON01",
+        "name": "Martin Fronescu",
+        "value": 55,
+        "rank": 4
+      },
+      {
+        "wca_id": "2021CHEL01",
+        "name": "Ianis Costin Chele",
+        "value": 54,
+        "rank": 5
+      },
+      {
+        "wca_id": "2023STAN09",
+        "name": "Radu Mihai Stan",
+        "value": 54,
+        "rank": 5
+      },
+      {
+        "wca_id": "2018STOI03",
+        "name": "Mihail Stoicescu",
+        "value": 52,
+        "rank": 7
+      },
+      {
+        "wca_id": "2023CREM01",
+        "name": "Lucian Mihai Cremeneanu",
+        "value": 50,
+        "rank": 8
+      },
+      {
+        "wca_id": "2019IGNA02",
+        "name": "Alexandru Ignat",
+        "value": 49,
+        "rank": 9
+      },
+      {
+        "wca_id": "2019STEL01",
+        "name": "Serban Stelian",
+        "value": 47,
         "rank": 10
       }
     ],
@@ -2096,7 +2158,7 @@ var STATS_DATA = {
       {
         "wca_id": "2011RIGG03",
         "name": "Natán Riggenbach",
-        "value": 108,
+        "value": 109,
         "rank": 2
       },
       {
@@ -2114,7 +2176,7 @@ var STATS_DATA = {
       {
         "wca_id": "2016SUZU03",
         "name": "Andrés Hisashi Suzuki Cabrera",
-        "value": 80,
+        "value": 81,
         "rank": 5
       },
       {
@@ -2145,68 +2207,6 @@ var STATS_DATA = {
         "wca_id": "2019MAGU04",
         "name": "Jose Antonio Cuipal Maguiña",
         "value": 65,
-        "rank": 10
-      }
-    ],
-    "Romania": [
-      {
-        "wca_id": "2012CAPA01",
-        "name": "Mihai Căpăţinescu",
-        "value": 109,
-        "rank": 1
-      },
-      {
-        "wca_id": "2013PANT01",
-        "name": "Mihnea Andrei Panţu",
-        "value": 60,
-        "rank": 2
-      },
-      {
-        "wca_id": "2013VASI02",
-        "name": "Vasile Dan",
-        "value": 57,
-        "rank": 3
-      },
-      {
-        "wca_id": "2013FRON01",
-        "name": "Martin Fronescu",
-        "value": 55,
-        "rank": 4
-      },
-      {
-        "wca_id": "2021CHEL01",
-        "name": "Ianis Costin Chele",
-        "value": 53,
-        "rank": 5
-      },
-      {
-        "wca_id": "2023STAN09",
-        "name": "Radu Mihai Stan",
-        "value": 53,
-        "rank": 5
-      },
-      {
-        "wca_id": "2018STOI03",
-        "name": "Mihail Stoicescu",
-        "value": 52,
-        "rank": 7
-      },
-      {
-        "wca_id": "2019IGNA02",
-        "name": "Alexandru Ignat",
-        "value": 49,
-        "rank": 8
-      },
-      {
-        "wca_id": "2023CREM01",
-        "name": "Lucian Mihai Cremeneanu",
-        "value": 49,
-        "rank": 8
-      },
-      {
-        "wca_id": "2019STEL01",
-        "name": "Serban Stelian",
-        "value": 47,
         "rank": 10
       }
     ],
@@ -2276,7 +2276,7 @@ var STATS_DATA = {
       {
         "wca_id": "2014HOLU01",
         "name": "Lev Golub (Лев Голуб)",
-        "value": 104,
+        "value": 105,
         "rank": 1
       },
       {
@@ -2306,8 +2306,8 @@ var STATS_DATA = {
       {
         "wca_id": "2018RIAB01",
         "name": "Yurii Riabov (Юрій Рябов)",
-        "value": 70,
-        "rank": 6
+        "value": 71,
+        "rank": 5
       },
       {
         "wca_id": "2017SUKH02",
@@ -2379,7 +2379,7 @@ var STATS_DATA = {
       },
       {
         "wca_id": "2017GAET01",
-        "name": "José Antonio Gaete Rozas-Peña",
+        "name": "José Antonio Gaete",
         "value": 65,
         "rank": 8
       },
@@ -2396,35 +2396,97 @@ var STATS_DATA = {
         "rank": 10
       }
     ],
+    "Singapore": [
+      {
+        "wca_id": "2012JIET01",
+        "name": "Carmen Teo Bin Jie (张斌婕)",
+        "value": 95,
+        "rank": 1
+      },
+      {
+        "wca_id": "2015ZHUA01",
+        "name": "Glen Goh Wee Zhuan (吴洧全)",
+        "value": 91,
+        "rank": 2
+      },
+      {
+        "wca_id": "2014WENW01",
+        "name": "Wong Chong Wen (黄崇文)",
+        "value": 90,
+        "rank": 3
+      },
+      {
+        "wca_id": "2015QUAN03",
+        "name": "Ng Jia Quan (黄佳铨)",
+        "value": 81,
+        "rank": 4
+      },
+      {
+        "wca_id": "2016YONG02",
+        "name": "Tristan Chua Yong",
+        "value": 77,
+        "rank": 5
+      },
+      {
+        "wca_id": "2015SIAN01",
+        "name": "Dylan Seah Tze Siang (谢智翔)",
+        "value": 74,
+        "rank": 6
+      },
+      {
+        "wca_id": "2023YILU01",
+        "name": "Luis Tan Hong Yi (陈宏溢)",
+        "value": 63,
+        "rank": 7
+      },
+      {
+        "wca_id": "2016LIAN02",
+        "name": "Chang Hong Liang (张泓量)",
+        "value": 58,
+        "rank": 8
+      },
+      {
+        "wca_id": "2019BANG01",
+        "name": "Andrew Tan Jing Bang",
+        "value": 58,
+        "rank": 8
+      },
+      {
+        "wca_id": "2019SREE06",
+        "name": "Akash Sreedharan (ஆகாஷ் ஸ்ரீதரன்)",
+        "value": 58,
+        "rank": 8
+      }
+    ],
     "New Zealand": [
       {
         "wca_id": "2013ASBE01",
         "name": "Alex Asbery",
-        "value": 94,
+        "value": 95,
         "rank": 1
       },
       {
         "wca_id": "2010HUNT02",
         "name": "Aneurin Hunt",
-        "value": 90,
+        "value": 91,
         "rank": 2
       },
       {
         "wca_id": "2015MACD03",
         "name": "James Macdiarmid",
-        "value": 78,
+        "value": 79,
         "rank": 3
       },
       {
         "wca_id": "2013NELS01",
         "name": "Tom Nelson",
-        "value": 73,
+        "value": 74,
         "rank": 4
       },
       {
         "wca_id": "2017WADE01",
         "name": "Liam Wadek",
-        "value": 69,
+        "value": 70,
         "rank": 5
       },
       {
@@ -2436,87 +2498,25 @@ var STATS_DATA = {
       {
         "wca_id": "2020MADD02",
         "name": "Jack Maddigan",
-        "value": 67,
-        "rank": 7
+        "value": 68,
+        "rank": 6
       },
       {
         "wca_id": "2019RAMO05",
         "name": "Dwyane Ramos",
-        "value": 56,
+        "value": 57,
         "rank": 8
       },
       {
         "wca_id": "2018FOST03",
         "name": "Ashley Foster",
-        "value": 52,
+        "value": 53,
         "rank": 9
       },
       {
-        "wca_id": "2019VUJC01",
-        "name": "Alexander Vujcich",
-        "value": 51,
-        "rank": 10
-      }
-    ],
-    "Singapore": [
-      {
-        "wca_id": "2012JIET01",
-        "name": "Carmen Teo Bin Jie (张斌婕)",
-        "value": 93,
-        "rank": 1
-      },
-      {
-        "wca_id": "2015ZHUA01",
-        "name": "Glen Goh Wee Zhuan (吴洧全)",
-        "value": 90,
-        "rank": 2
-      },
-      {
-        "wca_id": "2014WENW01",
-        "name": "Wong Chong Wen (黄崇文)",
-        "value": 88,
-        "rank": 3
-      },
-      {
-        "wca_id": "2015QUAN03",
-        "name": "Ng Jia Quan (黄佳铨)",
-        "value": 79,
-        "rank": 4
-      },
-      {
-        "wca_id": "2016YONG02",
-        "name": "Tristan Chua Yong",
-        "value": 75,
-        "rank": 5
-      },
-      {
-        "wca_id": "2015SIAN01",
-        "name": "Dylan Seah Tze Siang (谢智翔)",
-        "value": 73,
-        "rank": 6
-      },
-      {
-        "wca_id": "2023YILU01",
-        "name": "Luis Tan Hong Yi (陈宏溢)",
-        "value": 62,
-        "rank": 7
-      },
-      {
-        "wca_id": "2016LIAN02",
-        "name": "Chang Hong Liang (张泓量)",
-        "value": 57,
-        "rank": 8
-      },
-      {
-        "wca_id": "2019BANG01",
-        "name": "Andrew Tan Jing Bang",
-        "value": 57,
-        "rank": 8
-      },
-      {
-        "wca_id": "2019SREE06",
-        "name": "Akash Sreedharan (ஆகாஷ் ஸ்ரீதரன்)",
-        "value": 56,
+        "wca_id": "2020MCDO01",
+        "name": "Jack McDougall",
+        "value": 52,
         "rank": 10
       }
     ],
@@ -2524,43 +2524,43 @@ var STATS_DATA = {
       {
         "wca_id": "2009SUPC01",
         "name": "Anukun Supcharoenkun (อนุกูล ทรัพย์เจริญกุล)",
-        "value": 92,
+        "value": 94,
         "rank": 1
       },
       {
         "wca_id": "2009KONV01",
         "name": "Asia Konvittayayotin (เอเชีย กรวิทยโยธิน)",
-        "value": 89,
+        "value": 90,
         "rank": 2
       },
       {
         "wca_id": "2011MAHT02",
         "name": "Natthaphat Mahtani (ณัฐภัทร จี มาทานี)",
-        "value": 79,
+        "value": 82,
         "rank": 3
       },
       {
         "wca_id": "2018PARI07",
         "name": "Parist Pariyakanok (พริษฐ์ ปริยกนก)",
-        "value": 71,
+        "value": 73,
         "rank": 4
       },
       {
         "wca_id": "2017RAKS01",
         "name": "Aris Raksamani (อริศม์ รักษมณี)",
-        "value": 69,
+        "value": 72,
         "rank": 5
       },
       {
         "wca_id": "2009CHAI01",
         "name": "Tanai Chaikraveephand (ธนัย ชัยกระวีพันธ์)",
-        "value": 56,
+        "value": 59,
         "rank": 6
       },
       {
         "wca_id": "2023CHAI02",
         "name": "Anawin Chaichana (อนาวิล ชัยชนะ)",
-        "value": 55,
+        "value": 57,
         "rank": 7
       },
       {
@@ -2578,45 +2578,45 @@ var STATS_DATA = {
       {
         "wca_id": "2023TANG15",
         "name": "Enoch Tangprasittipol",
-        "value": 44,
-        "rank": 10
+        "value": 46,
+        "rank": 9
       }
     ],
     "Turkey": [
       {
         "wca_id": "2013AZNA01",
         "name": "İskender Aznavur",
-        "value": 80,
+        "value": 81,
         "rank": 1
       },
       {
         "wca_id": "2018ABLA01",
         "name": "Ahmet Çınar Ablak",
-        "value": 77,
+        "value": 78,
         "rank": 2
       },
       {
         "wca_id": "2018CAML01",
         "name": "Mustafa Çamlıca",
-        "value": 75,
+        "value": 76,
         "rank": 3
       },
       {
         "wca_id": "2014SADN01",
         "name": "Mert Sağdınç",
-        "value": 70,
+        "value": 71,
         "rank": 4
       },
       {
         "wca_id": "2019ABLA01",
         "name": "Ecevit Ablak",
-        "value": 67,
+        "value": 68,
         "rank": 5
       },
       {
         "wca_id": "2013CETI01",
         "name": "Ömer Çetinkaya",
-        "value": 63,
+        "value": 64,
         "rank": 6
       },
       {
@@ -2626,16 +2626,16 @@ var STATS_DATA = {
         "rank": 7
       },
       {
-        "wca_id": "2022JAHA03",
-        "name": "Alim Jahangırov",
+        "wca_id": "2022YILD01",
+        "name": "Toprak Berva Yıldırım",
         "value": 37,
         "rank": 8
       },
       {
-        "wca_id": "2022YILD01",
-        "name": "Toprak Berva Yıldırım",
-        "value": 36,
-        "rank": 9
+        "wca_id": "2022JAHA03",
+        "name": "Alim Jahangırov",
+        "value": 37,
+        "rank": 8
       },
       {
         "wca_id": "2018COSA01",
@@ -2702,7 +2702,7 @@ var STATS_DATA = {
       {
         "wca_id": "2015VISE01",
         "name": "Caro Visentin",
-        "value": 49,
+        "value": 50,
         "rank": 10
       }
     ],
@@ -2710,61 +2710,61 @@ var STATS_DATA = {
       {
         "wca_id": "2017TIMM01",
         "name": "Ben Timmons",
-        "value": 76,
+        "value": 78,
         "rank": 1
       },
       {
         "wca_id": "2015HENN02",
         "name": "Mary Hennessy",
-        "value": 74,
+        "value": 75,
         "rank": 2
       },
       {
         "wca_id": "2017KELL08",
         "name": "Simon Kelly",
-        "value": 65,
+        "value": 67,
         "rank": 3
       },
       {
         "wca_id": "2019TIMM01",
         "name": "Kevin Timmons",
-        "value": 64,
+        "value": 66,
         "rank": 4
       },
       {
         "wca_id": "2023DOWL01",
         "name": "Lucas Patrick Dowling",
-        "value": 63,
+        "value": 65,
         "rank": 5
       },
       {
         "wca_id": "2019CARE02",
         "name": "William Carey",
-        "value": 60,
+        "value": 62,
         "rank": 6
-      },
-      {
-        "wca_id": "2016BEAU03",
-        "name": "Maria Beausang",
-        "value": 57,
-        "rank": 7
       },
       {
         "wca_id": "2012BEAH01",
         "name": "Ciarán Beahan",
-        "value": 56,
-        "rank": 8
+        "value": 58,
+        "rank": 7
+      },
+      {
+        "wca_id": "2016BEAU03",
+        "name": "Maria Beausang",
+        "value": 58,
+        "rank": 7
       },
       {
         "wca_id": "2017OTOO03",
         "name": "Seán O\\'Toole",
-        "value": 55,
+        "value": 57,
         "rank": 9
       },
       {
-        "wca_id": "2022CORR06",
-        "name": "Jack Corr",
-        "value": 53,
+        "wca_id": "2019BURK05",
+        "name": "Rían Burke",
+        "value": 54,
         "rank": 10
       }
     ],
@@ -2772,31 +2772,31 @@ var STATS_DATA = {
       {
         "wca_id": "2008VARG01",
         "name": "Dániel Varga",
-        "value": 75,
+        "value": 76,
         "rank": 1
       },
       {
         "wca_id": "2008BARA01",
         "name": "Bence Barát",
-        "value": 75,
+        "value": 76,
         "rank": 1
       },
       {
         "wca_id": "2016SZAN01",
         "name": "Szabolcs Szántai",
-        "value": 64,
+        "value": 65,
         "rank": 3
       },
       {
         "wca_id": "2016KIAC01",
         "name": "Bence Kiácz",
-        "value": 58,
+        "value": 59,
         "rank": 4
       },
       {
         "wca_id": "2017POLY02",
         "name": "Balázs Polyák",
-        "value": 52,
+        "value": 53,
         "rank": 5
       },
       {
@@ -2808,25 +2808,25 @@ var STATS_DATA = {
       {
         "wca_id": "2017ZIMA01",
         "name": "Benedek Zimányi",
-        "value": 44,
+        "value": 45,
         "rank": 7
       },
       {
         "wca_id": "2016SLEZ01",
         "name": "Gábor Slezák",
-        "value": 43,
+        "value": 44,
         "rank": 8
       },
       {
         "wca_id": "2016NOVO01",
         "name": "Gergely Novotni",
-        "value": 43,
+        "value": 44,
         "rank": 8
       },
       {
         "wca_id": "2022SZAB03",
         "name": "Dávid Szabó",
-        "value": 41,
+        "value": 42,
         "rank": 10
       }
     ],
@@ -2834,13 +2834,13 @@ var STATS_DATA = {
       {
         "wca_id": "2009JUNW01",
         "name": "Wang Junwen (王俊文)",
-        "value": 75,
+        "value": 76,
         "rank": 1
       },
       {
         "wca_id": "2010JUNL02",
         "name": "Leow Yi Jun (廖艺畯)",
-        "value": 73,
+        "value": 74,
         "rank": 2
       },
       {
@@ -2852,37 +2852,37 @@ var STATS_DATA = {
       {
         "wca_id": "2016HUNG08",
         "name": "Lim Hung (林弘)",
-        "value": 64,
+        "value": 65,
         "rank": 4
       },
       {
         "wca_id": "2015ZHUA01",
         "name": "Glen Goh Wee Zhuan (吴洧全)",
-        "value": 63,
-        "rank": 5
+        "value": 65,
+        "rank": 4
       },
       {
         "wca_id": "2016DICK03",
         "name": "Eng Dickson (黄迪胜)",
-        "value": 60,
+        "value": 62,
         "rank": 6
       },
       {
         "wca_id": "2010SYAH03",
         "name": "Muhammad Syahmi",
-        "value": 58,
+        "value": 59,
         "rank": 7
       },
       {
         "wca_id": "2015QUAN03",
         "name": "Ng Jia Quan (黄佳铨)",
-        "value": 57,
+        "value": 58,
         "rank": 8
       },
       {
         "wca_id": "2018KRIS28",
         "name": "Sri Ganesh Krishna",
-        "value": 55,
+        "value": 56,
         "rank": 9
       },
       {
@@ -3020,19 +3020,19 @@ var STATS_DATA = {
       {
         "wca_id": "2013CISN01",
         "name": "Enrymar Cisneros",
-        "value": 61,
+        "value": 62,
         "rank": 1
       },
       {
         "wca_id": "2014SANC19",
         "name": "Rafael Antonio Sanchez",
-        "value": 52,
+        "value": 53,
         "rank": 2
       },
       {
         "wca_id": "2015TORR12",
         "name": "Bernardo Torres",
-        "value": 48,
+        "value": 49,
         "rank": 3
       },
       {
@@ -3048,16 +3048,16 @@ var STATS_DATA = {
         "rank": 5
       },
       {
-        "wca_id": "2013FILI01",
-        "name": "Jurgens Filiaggi",
-        "value": 35,
+        "wca_id": "2018RODR43",
+        "name": "Louis Rodriguez Guerrero",
+        "value": 36,
         "rank": 6
       },
       {
-        "wca_id": "2018RODR43",
-        "name": "Louis Rodriguez",
+        "wca_id": "2013FILI01",
+        "name": "Jurgens Filiaggi",
         "value": 35,
-        "rank": 6
+        "rank": 7
       },
       {
         "wca_id": "2014ALVA10",
@@ -3075,6 +3075,68 @@ var STATS_DATA = {
         "wca_id": "2013RIVA01",
         "name": "Cristian Alberto Rivas Rivas",
         "value": 22,
+        "rank": 10
+      }
+    ],
+    "Kazakhstan": [
+      {
+        "wca_id": "2017ZHAD01",
+        "name": "Damir Zhanataev",
+        "value": 62,
+        "rank": 1
+      },
+      {
+        "wca_id": "2018AGAB03",
+        "name": "Asset Agabekov",
+        "value": 34,
+        "rank": 2
+      },
+      {
+        "wca_id": "2017SHAR27",
+        "name": "Shyngys Sharapadin (Шынгыс Шарападин)",
+        "value": 33,
+        "rank": 3
+      },
+      {
+        "wca_id": "2018ISAK06",
+        "name": "Damir Issakov",
+        "value": 30,
+        "rank": 4
+      },
+      {
+        "wca_id": "2015YERT01",
+        "name": "Alikhan Yertursyn (Алихан Ертурсын)",
+        "value": 27,
+        "rank": 5
+      },
+      {
+        "wca_id": "2018SEIT02",
+        "name": "Azamat Seitbekov (Азамат Сейтбеков)",
+        "value": 26,
+        "rank": 6
+      },
+      {
+        "wca_id": "2014ARYS01",
+        "name": "Ilyas Arystanbekov (Ильяс Арыстанбеков)",
+        "value": 25,
+        "rank": 7
+      },
+      {
+        "wca_id": "2018ORAZ01",
+        "name": "Abylai Orazalin (Абылай Оразалин)",
+        "value": 23,
+        "rank": 8
+      },
+      {
+        "wca_id": "2021ZHUR04",
+        "name": "Diasbek Zhuraev (Диасбек Жураев)",
+        "value": 22,
+        "rank": 9
+      },
+      {
+        "wca_id": "2017KURM01",
+        "name": "Alisher Kurmash",
+        "value": 20,
         "rank": 10
       }
     ],
@@ -3140,121 +3202,59 @@ var STATS_DATA = {
         "rank": 9
       }
     ],
-    "Kazakhstan": [
-      {
-        "wca_id": "2017ZHAD01",
-        "name": "Damir Zhanataev",
-        "value": 58,
-        "rank": 1
-      },
-      {
-        "wca_id": "2017SHAR27",
-        "name": "Shyngys Sharapadin (Шынгыс Шарападин)",
-        "value": 33,
-        "rank": 2
-      },
-      {
-        "wca_id": "2018AGAB03",
-        "name": "Asset Agabekov",
-        "value": 32,
-        "rank": 3
-      },
-      {
-        "wca_id": "2018ISAK06",
-        "name": "Damir Issakov",
-        "value": 29,
-        "rank": 4
-      },
-      {
-        "wca_id": "2015YERT01",
-        "name": "Alikhan Yertursyn (Алихан Ертурсын)",
-        "value": 27,
-        "rank": 5
-      },
-      {
-        "wca_id": "2014ARYS01",
-        "name": "Ilyas Arystanbekov (Ильяс Арыстанбеков)",
-        "value": 25,
-        "rank": 6
-      },
-      {
-        "wca_id": "2018SEIT02",
-        "name": "Azamat Seitbekov (Азамат Сейтбеков)",
-        "value": 25,
-        "rank": 6
-      },
-      {
-        "wca_id": "2018ORAZ01",
-        "name": "Abylai Orazalin (Абылай Оразалин)",
-        "value": 23,
-        "rank": 8
-      },
-      {
-        "wca_id": "2018KENE01",
-        "name": "Alimzhan Kenesbek (Алимжан Кенесбек)",
-        "value": 20,
-        "rank": 9
-      },
-      {
-        "wca_id": "2018ZHOM01",
-        "name": "Bekzhan Zhomartuly",
-        "value": 20,
-        "rank": 9
-      }
-    ],
     "Czech Republic": [
-      {
-        "wca_id": "2014QUYN02",
-        "name": "Tomáš Nguyen",
-        "value": 55,
-        "rank": 1
-      },
       {
         "wca_id": "2017TEIC01",
         "name": "Cyril Teichmann",
-        "value": 55,
+        "value": 57,
         "rank": 1
+      },
+      {
+        "wca_id": "2014QUYN02",
+        "name": "Tomáš Nguyen",
+        "value": 56,
+        "rank": 2
       },
       {
         "wca_id": "2018KRIZ01",
         "name": "Jan Křížka",
-        "value": 53,
-        "rank": 3
+        "value": 56,
+        "rank": 2
       },
       {
         "wca_id": "2022KORI01",
         "name": "Adam Kořínek",
-        "value": 49,
+        "value": 52,
         "rank": 4
       },
       {
         "wca_id": "2017KUPR02",
         "name": "Arseniy Kuprin",
-        "value": 48,
+        "value": 51,
         "rank": 5
       },
       {
         "wca_id": "2016BECK06",
         "name": "Veronika Becková",
-        "value": 46,
+        "value": 49,
         "rank": 6
       },
       {
         "wca_id": "2015FALD01",
         "name": "Tadeáš Faldus",
-        "value": 45,
+        "value": 46,
         "rank": 7
       },
       {
         "wca_id": "2017FONS04",
         "name": "Jan Fonš",
-        "value": 41,
+        "value": 44,
         "rank": 8
       },
       {
         "wca_id": "2015GROH02",
         "name": "Matěj Grohmann",
-        "value": 40,
+        "value": 41,
         "rank": 9
       },
       {
@@ -3326,85 +3326,23 @@ var STATS_DATA = {
         "rank": 10
       }
     ],
-    "South Africa": [
-      {
-        "wca_id": "2018RUSH01",
-        "name": "Daniel Rush",
-        "value": 51,
-        "rank": 1
-      },
-      {
-        "wca_id": "2014PEAR02",
-        "name": "Maverick Pearson",
-        "value": 50,
-        "rank": 2
-      },
-      {
-        "wca_id": "2015FAUG01",
-        "name": "Marike Faught",
-        "value": 43,
-        "rank": 3
-      },
-      {
-        "wca_id": "2014GRAY03",
-        "name": "Brendan James Gray",
-        "value": 42,
-        "rank": 4
-      },
-      {
-        "wca_id": "2015GROB02",
-        "name": "Ruben Grobler",
-        "value": 42,
-        "rank": 4
-      },
-      {
-        "wca_id": "2022RUSH01",
-        "name": "Anthony Kalaya Rush",
-        "value": 40,
-        "rank": 6
-      },
-      {
-        "wca_id": "2017LAWR04",
-        "name": "Timothy Lawrance",
-        "value": 34,
-        "rank": 7
-      },
-      {
-        "wca_id": "2016HASS04",
-        "name": "Taariq Hassim",
-        "value": 33,
-        "rank": 8
-      },
-      {
-        "wca_id": "2019BADR01",
-        "name": "Osman Badroodin",
-        "value": 33,
-        "rank": 8
-      },
-      {
-        "wca_id": "2016HARI06",
-        "name": "Shivaan Harichander",
-        "value": 30,
-        "rank": 10
-      }
-    ],
     "Ecuador": [
       {
         "wca_id": "2018MORO01",
         "name": "Ronny Morocho",
-        "value": 51,
+        "value": 53,
         "rank": 1
       },
       {
         "wca_id": "2017CUES02",
         "name": "Luis Fernando Aldás Cuestas",
-        "value": 44,
+        "value": 45,
         "rank": 2
       },
       {
         "wca_id": "2018GOME01",
         "name": "Raúl Gómez",
-        "value": 36,
+        "value": 37,
         "rank": 3
       },
       {
@@ -3416,8 +3354,20 @@ var STATS_DATA = {
       {
         "wca_id": "2018LUDE01",
         "name": "Anthony Gerard Álvarez Ludeña",
-        "value": 25,
+        "value": 26,
         "rank": 5
+      },
+      {
+        "wca_id": "2017ANDR06",
+        "name": "María del Cisne Ortega Andrade",
+        "value": 24,
+        "rank": 6
+      },
+      {
+        "wca_id": "2017ANDR07",
+        "name": "María José Ortega Andrade",
+        "value": 24,
+        "rank": 6
       },
       {
         "wca_id": "2018RIVE09",
@@ -3432,22 +3382,72 @@ var STATS_DATA = {
         "rank": 6
       },
       {
-        "wca_id": "2017ANDR06",
-        "name": "María del Cisne Ortega Andrade",
-        "value": 23,
+        "wca_id": "2022CABA01",
+        "name": "Marco Alexander Díaz Cabascango",
+        "value": 24,
+        "rank": 6
+      }
+    ],
+    "South Africa": [
+      {
+        "wca_id": "2014PEAR02",
+        "name": "Maverick Pearson",
+        "value": 51,
+        "rank": 1
+      },
+      {
+        "wca_id": "2018RUSH01",
+        "name": "Daniel Rush",
+        "value": 51,
+        "rank": 1
+      },
+      {
+        "wca_id": "2015FAUG01",
+        "name": "Marike Faught",
+        "value": 44,
+        "rank": 3
+      },
+      {
+        "wca_id": "2015GROB02",
+        "name": "Ruben Grobler",
+        "value": 43,
+        "rank": 4
+      },
+      {
+        "wca_id": "2014GRAY03",
+        "name": "Brendan James Gray",
+        "value": 42,
+        "rank": 5
+      },
+      {
+        "wca_id": "2022RUSH01",
+        "name": "Anthony Kalaya Rush",
+        "value": 40,
+        "rank": 6
+      },
+      {
+        "wca_id": "2017LAWR04",
+        "name": "Timothy Lawrance",
+        "value": 35,
+        "rank": 7
+      },
+      {
+        "wca_id": "2019BADR01",
+        "name": "Osman Badroodin",
+        "value": 34,
         "rank": 8
       },
       {
-        "wca_id": "2017ANDR07",
-        "name": "María José Ortega Andrade",
-        "value": 23,
-        "rank": 8
+        "wca_id": "2016HASS04",
+        "name": "Taariq Hassim",
+        "value": 33,
+        "rank": 9
       },
       {
-        "wca_id": "2022MARI01",
-        "name": "David Alejandro Ibarra Marin",
-        "value": 23,
-        "rank": 8
+        "wca_id": "2016HARI06",
+        "name": "Shivaan Harichander",
+        "value": 31,
+        "rank": 10
       }
     ],
     "Guatemala": [
@@ -3640,13 +3640,13 @@ var STATS_DATA = {
       {
         "wca_id": "2017PIHE01",
         "name": "Remo Pihel",
-        "value": 46,
+        "value": 47,
         "rank": 1
       },
       {
         "wca_id": "2018ZEMT01",
         "name": "Maksim Zemtšihhin",
-        "value": 45,
+        "value": 46,
         "rank": 2
       },
       {
@@ -3658,7 +3658,7 @@ var STATS_DATA = {
       {
         "wca_id": "2019RATS05",
         "name": "Mike Vidrik Rätsep",
-        "value": 40,
+        "value": 41,
         "rank": 4
       },
       {
@@ -3776,14 +3776,14 @@ var STATS_DATA = {
       {
         "wca_id": "2019BORO03",
         "name": "Šimon Borovský",
-        "value": 31,
+        "value": 32,
         "rank": 3
       },
       {
         "wca_id": "2023URIN01",
         "name": "Oskar Ďurinský",
         "value": 31,
-        "rank": 3
+        "rank": 4
       },
       {
         "wca_id": "2023JURI01",
@@ -3894,7 +3894,7 @@ var STATS_DATA = {
       {
         "wca_id": "2018GVAR01",
         "name": "Andro Gvaramadze",
-        "value": 40,
+        "value": 41,
         "rank": 2
       },
       {
@@ -3944,6 +3944,32 @@ var STATS_DATA = {
         "name": "Nino Zguladze",
         "value": 20,
         "rank": 9
+      }
+    ],
+    "Paraguay": [
+      {
+        "wca_id": "2016ACOS08",
+        "name": "Elias Miguel Acosta Acosta",
+        "value": 40,
+        "rank": 1
+      },
+      {
+        "wca_id": "2016RIVE01",
+        "name": "Gustavo Riveiro",
+        "value": 38,
+        "rank": 2
+      },
+      {
+        "wca_id": "2022CACE02",
+        "name": "Kenji Julián Cáceres Matsumoto",
+        "value": 23,
+        "rank": 3
+      },
+      {
+        "wca_id": "2022MART73",
+        "name": "Carlos Benjamin Mereles Martinez",
+        "value": 20,
+        "rank": 4
       }
     ],
     "El Salvador": [
@@ -4006,26 +4032,6 @@ var STATS_DATA = {
         "name": "Elvis Isaí Rosales Hernández",
         "value": 22,
         "rank": 10
-      }
-    ],
-    "Paraguay": [
-      {
-        "wca_id": "2016ACOS08",
-        "name": "Elias Miguel Acosta Acosta",
-        "value": 39,
-        "rank": 1
-      },
-      {
-        "wca_id": "2016RIVE01",
-        "name": "Gustavo Riveiro",
-        "value": 37,
-        "rank": 2
-      },
-      {
-        "wca_id": "2022CACE02",
-        "name": "Kenji Julián Cáceres Matsumoto",
-        "value": 22,
-        "rank": 3
       }
     ],
     "Belarus": [
@@ -4160,40 +4166,40 @@ var STATS_DATA = {
         "rank": 2
       },
       {
+        "wca_id": "2022CHRI09",
+        "name": "Panagiotis Christopoulos",
+        "value": 33,
+        "rank": 2
+      },
+      {
         "wca_id": "2017PRIG01",
         "name": "Vasilis Prigkos",
         "value": 32,
-        "rank": 3
+        "rank": 4
       },
       {
         "wca_id": "2018PANT04",
         "name": "Pantos Pantos",
         "value": 32,
-        "rank": 3
-      },
-      {
-        "wca_id": "2022CHRI09",
-        "name": "Panagiotis Christopoulos",
-        "value": 32,
-        "rank": 3
+        "rank": 4
       },
       {
         "wca_id": "2022IATR01",
         "name": "Thodoris Iatrou",
-        "value": 29,
+        "value": 30,
         "rank": 6
+      },
+      {
+        "wca_id": "2023NIKO07",
+        "name": "Ilias Nikolaou",
+        "value": 29,
+        "rank": 7
       },
       {
         "wca_id": "2023BOUR03",
         "name": "Spyros Bourntenis",
         "value": 28,
-        "rank": 7
-      },
-      {
-        "wca_id": "2023NIKO07",
-        "name": "Ilias Nikolaou",
-        "value": 28,
-        "rank": 7
+        "rank": 8
       },
       {
         "wca_id": "2016GRIG02",
@@ -4382,7 +4388,7 @@ var STATS_DATA = {
       {
         "wca_id": "2017CAST48",
         "name": "Egdar Castillo",
-        "value": 30,
+        "value": 31,
         "rank": 1
       },
       {
@@ -4408,7 +4414,7 @@ var STATS_DATA = {
       {
         "wca_id": "2018ALIY01",
         "name": "Ali Aliyev",
-        "value": 24,
+        "value": 26,
         "rank": 3
       }
     ],
@@ -4652,26 +4658,26 @@ var STATS_DATA = {
         "rank": 7
       }
     ],
+    "Jordan": [
+      {
+        "wca_id": "2019HAMM04",
+        "name": "Kamel Hammouri",
+        "value": 24,
+        "rank": 1
+      },
+      {
+        "wca_id": "2021OTAI01",
+        "name": "Zakarya Otair",
+        "value": 22,
+        "rank": 2
+      }
+    ],
     "Honduras": [
       {
         "wca_id": "2017MEJI03",
         "name": "Luis David Hernández Mejía",
         "value": 24,
         "rank": 1
-      }
-    ],
-    "Jordan": [
-      {
-        "wca_id": "2019HAMM04",
-        "name": "Kamel Hammouri",
-        "value": 23,
-        "rank": 1
-      },
-      {
-        "wca_id": "2021OTAI01",
-        "name": "Zakarya Otair",
-        "value": 21,
-        "rank": 2
       }
     ],
     "Tunisia": [
@@ -4775,12 +4781,44 @@ var STATS_DATA = {
   ],
   "longest_career": [
     {
+      "wca_id": "2003VAND01",
+      "name": "Lars Vandenbergh",
+      "country": "Belgium",
+      "value": 8387,
+      "detail": "2003-08-23 to 2026-08-09",
+      "rank": 1
+    },
+    {
+      "wca_id": "2003LIDO01",
+      "name": "Doug Li",
+      "country": "United States",
+      "value": 8373,
+      "detail": "2003-08-23 to 2026-07-26",
+      "rank": 2
+    },
+    {
+      "wca_id": "2003BRUC01",
+      "name": "Ron van Bruchem",
+      "country": "Netherlands",
+      "value": 8363,
+      "detail": "2003-08-23 to 2026-07-16",
+      "rank": 3
+    },
+    {
+      "wca_id": "2003DENN01",
+      "name": "Ton Dennenbroek",
+      "country": "Netherlands",
+      "value": 8358,
+      "detail": "2003-08-23 to 2026-07-11",
+      "rank": 4
+    },
+    {
       "wca_id": "2003HARD01",
       "name": "Chris Hardwick",
       "country": "United States",
       "value": 8349,
       "detail": "2003-08-23 to 2026-07-02",
-      "rank": 1
+      "rank": 5
     },
     {
       "wca_id": "2003LEEJ01",
@@ -4788,31 +4826,7 @@ var STATS_DATA = {
       "country": "Australia",
       "value": 8349,
       "detail": "2003-08-23 to 2026-07-02",
-      "rank": 1
-    },
-    {
-      "wca_id": "2003LIDO01",
-      "name": "Doug Li",
-      "country": "United States",
-      "value": 8337,
-      "detail": "2003-08-23 to 2026-06-20",
-      "rank": 3
-    },
-    {
-      "wca_id": "2003DENN01",
-      "name": "Ton Dennenbroek",
-      "country": "Netherlands",
-      "value": 8330,
-      "detail": "2003-08-23 to 2026-06-13",
-      "rank": 4
-    },
-    {
-      "wca_id": "2003BRUC01",
-      "name": "Ron van Bruchem",
-      "country": "Netherlands",
-      "value": 8330,
-      "detail": "2003-08-23 to 2026-06-13",
-      "rank": 4
+      "rank": 5
     },
     {
       "wca_id": "2003BRAN01",
@@ -4820,14 +4834,6 @@ var STATS_DATA = {
       "country": "United States",
       "value": 8309,
       "detail": "2003-08-23 to 2026-05-23",
-      "rank": 6
-    },
-    {
-      "wca_id": "2003VAND01",
-      "name": "Lars Vandenbergh",
-      "country": "Belgium",
-      "value": 8289,
-      "detail": "2003-08-23 to 2026-05-03",
       "rank": 7
     },
     {
@@ -4839,19 +4845,19 @@ var STATS_DATA = {
       "rank": 8
     },
     {
+      "wca_id": "2004ROND01",
+      "name": "Thomas Rond",
+      "country": "United States",
+      "value": 8213,
+      "detail": "2004-01-24 to 2026-07-20",
+      "rank": 9
+    },
+    {
       "wca_id": "2003HELT01",
       "name": "Koen Heltzel",
       "country": "Netherlands",
       "value": 8190,
       "detail": "2003-10-11 to 2026-03-14",
-      "rank": 9
-    },
-    {
-      "wca_id": "2004ROND01",
-      "name": "Thomas Rond",
-      "country": "United States",
-      "value": 8183,
-      "detail": "2004-01-24 to 2026-06-20",
       "rank": 10
     }
   ]
