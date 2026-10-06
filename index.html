@@ -129,6 +129,7 @@ body.light .wr-name-text { color: var(--blue); }
 .wr-value { font-size: 19px; font-weight: 800; color: var(--gold); letter-spacing: .01em; }
 .wr-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .wr-pos { font-size: 12.5px; font-weight: 700; color: var(--green); white-space: nowrap; }
+.wr-pos-gray { color: var(--dim); }
 .wr-date { font-size: 12.5px; color: var(--dim); white-space: nowrap; }
 .wr-comp { font-size: 13px; color: var(--dim); line-height: 1.4; }
 .wr-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); background: var(--card); color: var(--text-2); font-size: 17px; line-height: 1; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); transition: border-color .15s, color .15s; }
@@ -274,8 +275,8 @@ td:nth-child(2) { font-weight: 500; text-align: left; }
       </div>
     </div>
     <div class="header-actions">
-      <a class="theme-toggle nav-btn" href="Statistics/">Statistics</a>
-      <a class="theme-toggle nav-btn" href="Rankings/">Rankings</a>
+      <a class="theme-toggle nav-btn" href="Statistics/" data-i18n="statistics">Statistics</a>
+      <a class="theme-toggle nav-btn" href="Rankings/" data-i18n="rankings">Rankings</a>
       <select id="langSelect" onchange="setLanguage(this.value)">
         <option value="en">English</option>
         <option value="pt">Português</option>
@@ -296,17 +297,17 @@ td:nth-child(2) { font-weight: 500; text-align: left; }
   <div class="wr-section" id="wrSection">
     <div class="wr-title" data-i18n="latestWrs">Latest World Records</div>
     <div class="wr-carousel-wrap">
-      <button class="wr-nav prev" onclick="scrollWr(-1)" aria-label="Previous">&#8249;</button>
+      <button class="wr-nav prev" onclick="scrollWr(-1)" data-i18n-aria="prev" aria-label="Previous">&#8249;</button>
       <div class="wr-carousel" id="wrCarousel"></div>
-      <button class="wr-nav next" onclick="scrollWr(1)" aria-label="Next">&#8250;</button>
+      <button class="wr-nav next" onclick="scrollWr(1)" data-i18n-aria="next" aria-label="Next">&#8250;</button>
     </div>
   </div>
 
   <div class="controls" id="controls" style="position:relative">
     <div class="db-loading-overlay" id="dbLoadingOverlay">
       <div class="db-loading-spinner"></div>
-      <div class="db-loading-text">Loading data...</div>
-      <div class="db-loading-sub">Top 1000 displayed &mdash; full dataset incoming</div>
+      <div class="db-loading-text" data-i18n="loadingData">Loading data...</div>
+      <div class="db-loading-sub" data-i18n="dbLoadingSub">Top 1000 displayed &mdash; full dataset incoming</div>
     </div>
     <div class="ctrl-row">
       <div class="ctrl-cell">
@@ -438,6 +439,12 @@ const LANG = {
     day: "☀ Day",
     night: "☾ Night",
     loadingData: "Loading data...",
+    dbLoadingSub: "Top 1000 displayed — full dataset incoming",
+    dbFailed: "Failed to load data.",
+    dbRetry: "Top 1000 only. Refresh to retry.",
+    loading: "Loading",
+    statistics: "Statistics",
+    rankings: "Rankings",
     noData: "No data found.",
     total: "total",
     first: "First",
@@ -466,6 +473,7 @@ const LANG = {
     latestWrs: "Latest World Records",
     wrSingle: "Single WR",
     wrAverage: "Average WR",
+    wrSingleRanking: "Official ranking is based on the average",
   },
   pt: {
     title: "Kinch Ranks",
@@ -510,6 +518,12 @@ const LANG = {
     day: "☀ Dia",
     night: "☾ Noite",
     loadingData: "Carregando dados...",
+    dbLoadingSub: "Top 1000 exibido — carregando o banco de dados completo",
+    dbFailed: "Falha ao carregar os dados.",
+    dbRetry: "Somente top 1000. Atualize para tentar novamente.",
+    loading: "Carregando",
+    statistics: "Estatísticas",
+    rankings: "Rankings",
     noData: "Nenhum dado encontrado.",
     total: "total",
     first: "Início",
@@ -538,6 +552,7 @@ const LANG = {
     latestWrs: "Recordes mundiais recentes",
     wrSingle: "WR Single",
     wrAverage: "WR Média",
+    wrSingleRanking: "O ranking oficial é baseado na média",
   },
   es: {
     title: "Kinch Ranks",
@@ -582,6 +597,12 @@ const LANG = {
     day: "☀ Día",
     night: "☾ Noche",
     loadingData: "Cargando datos...",
+    dbLoadingSub: "Top 1000 mostrado — cargando la base de datos completa",
+    dbFailed: "Error al cargar los datos.",
+    dbRetry: "Solo top 1000. Actualiza para reintentar.",
+    loading: "Cargando",
+    statistics: "Estadísticas",
+    rankings: "Rankings",
     noData: "No se encontraron datos.",
     total: "total",
     first: "Inicio",
@@ -610,6 +631,7 @@ const LANG = {
     latestWrs: "Últimos récords mundiales",
     wrSingle: "WR Single",
     wrAverage: "WR Media",
+    wrSingleRanking: "El ranking oficial se basa en la media",
   },
   de: {
     title: "Kinch Ranks",
@@ -654,6 +676,12 @@ const LANG = {
     day: "☀ Tag",
     night: "☾ Nacht",
     loadingData: "Daten werden geladen...",
+    dbLoadingSub: "Top 1000 angezeigt — vollständiger Datensatz wird geladen",
+    dbFailed: "Daten konnten nicht geladen werden.",
+    dbRetry: "Nur Top 1000. Aktualisieren zum Wiederholen.",
+    loading: "Lädt",
+    statistics: "Statistiken",
+    rankings: "Rankings",
     noData: "Keine Daten gefunden.",
     total: "gesamt",
     first: "Erste",
@@ -682,6 +710,7 @@ const LANG = {
     latestWrs: "Neueste Weltrekorde",
     wrSingle: "Single-WR",
     wrAverage: "Average-WR",
+    wrSingleRanking: "Die offizielle Rangliste basiert auf dem Durchschnitt",
   },
   it: {
     title: "Kinch Ranks",
@@ -726,6 +755,12 @@ const LANG = {
     day: "☀ Giorno",
     night: "☾ Notte",
     loadingData: "Caricamento dati...",
+    dbLoadingSub: "Top 1000 mostrato — caricamento del database completo",
+    dbFailed: "Impossibile caricare i dati.",
+    dbRetry: "Solo top 1000. Aggiorna per riprovare.",
+    loading: "Caricamento",
+    statistics: "Statistiche",
+    rankings: "Classifiche",
     noData: "Nessun dato trovato.",
     total: "totale",
     first: "Inizio",
@@ -754,6 +789,7 @@ const LANG = {
     latestWrs: "Ultimi record mondiali",
     wrSingle: "WR Singolo",
     wrAverage: "WR Media",
+    wrSingleRanking: "La classifica ufficiale si basa sulla media",
   },
   ca: {
     title: "Kinch Ranks",
@@ -798,6 +834,12 @@ const LANG = {
     day: "☀ Dia",
     night: "☾ Nit",
     loadingData: "Carregant dades...",
+    dbLoadingSub: "Top 1000 mostrat — carregant la base de dades completa",
+    dbFailed: "No s'han pogut carregar les dades.",
+    dbRetry: "Només top 1000. Actualitza per tornar-ho a provar.",
+    loading: "Carregant",
+    statistics: "Estadístiques",
+    rankings: "Rànquings",
     noData: "No s'han trobat dades.",
     total: "total",
     first: "Inici",
@@ -826,6 +868,7 @@ const LANG = {
     latestWrs: "Últims rècords mundials",
     wrSingle: "WR Single",
     wrAverage: "WR Mitjana",
+    wrSingleRanking: "El rànquing oficial es basa en la mitjana",
   },
   ko: {
     title: "Kinch Ranks",
@@ -870,6 +913,12 @@ const LANG = {
     day: "☀ 낮",
     night: "☾ 밤",
     loadingData: "데이터 로딩 중...",
+    dbLoadingSub: "상위 1000명 표시 중 — 전체 데이터베이스 로드 중",
+    dbFailed: "데이터를 불러오지 못했습니다.",
+    dbRetry: "상위 1000명만 표시됩니다. 새로고침하여 다시 시도하세요.",
+    loading: "로딩 중",
+    statistics: "통계",
+    rankings: "랭킹",
     noData: "데이터가 없습니다.",
     total: "명",
     first: "처음",
@@ -898,6 +947,7 @@ const LANG = {
     latestWrs: "최근 세계 기록",
     wrSingle: "싱글 WR",
     wrAverage: "평균 WR",
+    wrSingleRanking: "공식 순위는 평균 기준입니다",
   },
   zh: {
     title: "Kinch Ranks",
@@ -942,6 +992,12 @@ const LANG = {
     day: "☀ 日间",
     night: "☾ 夜间",
     loadingData: "加载数据中...",
+    dbLoadingSub: "已显示前1000名 — 正在载入完整数据库",
+    dbFailed: "数据加载失败。",
+    dbRetry: "仅显示前1000名。刷新页面重试。",
+    loading: "载入中",
+    statistics: "统计",
+    rankings: "排名",
     noData: "未找到数据。",
     total: "人",
     first: "首页",
@@ -970,6 +1026,7 @@ const LANG = {
     latestWrs: "最新世界纪录",
     wrSingle: "单次WR",
     wrAverage: "平均WR",
+    wrSingleRanking: "官方排名以平均成绩为准",
   },
   vi: {
     title: "Kinch Ranks",
@@ -1014,6 +1071,12 @@ const LANG = {
     day: "☀ Ngày",
     night: "☾ Đêm",
     loadingData: "Đang tải dữ liệu...",
+    dbLoadingSub: "Hiển thị top 1000 — đang tải dữ liệu đầy đủ",
+    dbFailed: "Không tải được dữ liệu.",
+    dbRetry: "Chỉ top 1000. Tải lại để thử lại.",
+    loading: "Đang tải",
+    statistics: "Thống kê",
+    rankings: "Bảng xếp hạng",
     noData: "Không tìm thấy dữ liệu.",
     total: "tổng",
     first: "Đầu",
@@ -1042,6 +1105,7 @@ const LANG = {
     latestWrs: "Kỷ lục thế giới mới nhất",
     wrSingle: "WR Đơn",
     wrAverage: "WR Trung bình",
+    wrSingleRanking: "Bảng xếp hạng chính thức dùng thành tích trung bình",
   },
 };
 
@@ -1977,6 +2041,9 @@ function applyTranslations() {
     if (el.hasAttribute("placeholder")) el.placeholder = t(key);
     else el.textContent = t(key);
   });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el => {
+    el.setAttribute("aria-label", t(el.dataset.i18nAria));
+  });
   document.title = t("title");
   document.getElementById("themeToggle").textContent = document.body.classList.contains("light") ? t("night") : t("day");
   updateAdvancedBtn();
@@ -2016,7 +2083,10 @@ function renderWrCarousel() {
     html += '<div class="wr-wca">' + esc(w.wca_id) + '</div>';
     html += '<div class="wr-value">' + formatWrValue(w) + '</div>';
     html += '<div class="wr-meta">';
-    if (w.risen != null) html += '<span class="wr-pos">&#9650; +' + w.risen + '</span>';
+    if (w.risen != null) {
+      var grayPos = w.type === "single" && AVERAGE_EVENTS.has(w.event);
+      html += '<span class="wr-pos' + (grayPos ? ' wr-pos-gray' : '') + '"' + (grayPos ? ' title="' + esc(t("wrSingleRanking")) + '"' : '') + '>&#9650; +' + w.risen + '</span>';
+    }
     html += '<span class="wr-date">' + formatWrDate(w.date) + '</span>';
     html += '</div>';
     html += '<div class="wr-comp">' + esc(w.competition) + '</div>';
@@ -2297,7 +2367,7 @@ function putDbToCache(buf) {
 
 async function loadDb() {
   let overlay = document.getElementById("dbLoadingOverlay");
-  overlay.querySelector(".db-loading-text").textContent = "Loading data...";
+  overlay.querySelector(".db-loading-text").textContent = t("loadingData");
   try {
     let SQL = await initSqlJs({ locateFile: function(f) { return 'https://sql.js.org/dist/' + f; } });
     let buf;
@@ -2318,8 +2388,8 @@ async function loadDb() {
   } catch(e) {
     console.error('DB load failed:', e);
     overlay.querySelector(".db-loading-spinner").style.display = "none";
-    overlay.querySelector(".db-loading-text").textContent = "Failed to load data.";
-    overlay.querySelector(".db-loading-sub").textContent = "Top 1000 only. Refresh to retry.";
+    overlay.querySelector(".db-loading-text").textContent = t("dbFailed");
+    overlay.querySelector(".db-loading-sub").textContent = t("dbRetry");
     return;
   }
   onDbLoaded();
@@ -2467,13 +2537,13 @@ function init() {
 
   if (!hasFullData) {
     document.getElementById("continentSelect").disabled = true;
-    document.getElementById("continentSelect").options[0].textContent = "Loading";
+    document.getElementById("continentSelect").options[0].textContent = t("loading");
     document.getElementById("countrySelect").disabled = true;
-    document.getElementById("countrySelect").innerHTML = "<option>Loading</option>";
+    document.getElementById("countrySelect").innerHTML = "<option>" + t("loading") + "</option>";
     document.getElementById("sinceSelect").disabled = true;
-    document.getElementById("sinceSelect").options[0].textContent = "Loading";
+    document.getElementById("sinceSelect").options[0].textContent = t("loading");
     document.getElementById("untilSelect").disabled = true;
-    document.getElementById("untilSelect").options[0].textContent = "Loading";
+    document.getElementById("untilSelect").options[0].textContent = t("loading");
   } else {
     document.getElementById("continentSelect").disabled = false;
     document.getElementById("continentSelect").options[0].textContent = t("world");
