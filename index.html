@@ -103,6 +103,12 @@ h1 a { text-decoration: none; }
 .search-btn { padding: 7px 16px; border: none; border-radius: 8px; background: var(--btn-grad); color: #fff; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; white-space: nowrap; transition: background .15s, transform .1s; }
 .search-btn:hover { background: var(--btn-grad-hover); }
 .search-btn:active { transform: translateY(1px); }
+.advanced-btn { padding: 7px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text-2); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; white-space: nowrap; transition: border-color .12s, color .12s; }
+.advanced-btn:hover { border-color: var(--blue); color: var(--text); }
+.name-cell { flex-wrap: nowrap; }
+.name-cell input[type="text"] { width: auto; flex: 1; }
+#advancedFilters { display: none; flex-direction: column; gap: 4px; }
+#advancedFilters.open { display: flex; }
 .clock-label { font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--faint); text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap; margin-left: 12px; }
 .clock-label input[type="checkbox"] { accent-color: var(--blue); width: 14px; height: 14px; cursor: pointer; }
 .retired-section { border: 1px solid var(--border); border-radius: 8px; padding: 4px 10px; margin-left: 12px; display: inline-flex; align-items: center; gap: 6px; background: var(--card-2); }
@@ -273,29 +279,7 @@ td:nth-child(2) { font-weight: 500; text-align: left; }
         </select>
         <select id="countrySelect"></select>
       </div>
-      <div class="ctrl-cell">
-        <span class="cg-label" data-i18n="events">Events</span>
-        <select id="groupSelect">
-          <option value="__all__" data-i18n="allEvents">All events</option>
-          <option value="nxn" data-i18n="nxn">NxN</option>
-          <option value="big" data-i18n="bigCubes">Big cubes</option>
-          <option value="bld" data-i18n="bld">BLD</option>
-          <option value="nonbld" data-i18n="nonBld">Non-BLD</option>
-          <option value="other" data-i18n="otherEvents">Other events</option>
-          <option value="removed" data-i18n="removed">Removed</option>
-        </select>
-      </div>
-    </div>
-    <div class="ctrl-row">
-      <div class="ctrl-cell">
-        <span class="cg-label" data-i18n="gender">Gender</span>
-        <select id="genderSelect">
-          <option value="all" data-i18n="all">All</option>
-          <option value="m" data-i18n="male">Male</option>
-          <option value="f" data-i18n="female">Female</option>
-        </select>
-      </div>
-      <div class="ctrl-cell">
+      <div class="ctrl-cell name-cell">
         <span class="cg-label" data-i18n="name">Name</span>
         <input type="text" id="search" data-i18n="searchPlaceholder" placeholder="Search...">
         <button id="searchBtn" class="search-btn" data-i18n="search">Search</button>
@@ -303,30 +287,59 @@ td:nth-child(2) { font-weight: 500; text-align: left; }
     </div>
     <div class="ctrl-row">
       <div class="ctrl-cell">
-        <span class="cg-label" data-i18n="debut">Debut</span>
-        <select id="sinceSelect">
-          <option value="0" data-i18n="after">After</option>
-        </select>
-        <select id="untilSelect">
-          <option value="9999" data-i18n="before">Before</option>
-        </select>
+        <button id="advancedToggle" class="advanced-btn" onclick="toggleAdvanced()">Advanced search</button>
       </div>
-      <div class="ctrl-cell">
-        <span class="cg-label" data-i18n="show">Show</span>
-        <select id="pageSizeSelect">
-          <option value="50">50</option>
-          <option value="100" selected>100</option>
-          <option value="200">200</option>
-          <option value="300">300</option>
-          <option value="500">500</option>
-        </select>
-        <label class="clock-label" id="clockToggle"><span data-i18n="clock">Clock</span> <input type="checkbox" id="includeClock"></label>
-        <span class="retired-section" id="retiredToggles">
-          <span class="retired-label" data-i18n="removedEvents">Removed events</span>
-          <label class="clock-label" style="margin-left:0"><span data-i18n="feet">333ft</span> <input type="checkbox" id="include333ft"></label>
-          <label class="clock-label" style="margin-left:0"><span data-i18n="magic">Magic</span> <input type="checkbox" id="includeMagic"></label>
-          <label class="clock-label" style="margin-left:0"><span data-i18n="mmagic">MMagic</span> <input type="checkbox" id="includeMMagic"></label>
-        </span>
+    </div>
+    <div id="advancedFilters">
+      <div class="ctrl-row">
+        <div class="ctrl-cell">
+          <span class="cg-label" data-i18n="events">Events</span>
+          <select id="groupSelect">
+            <option value="__all__" data-i18n="allEvents">All events</option>
+            <option value="nxn" data-i18n="nxn">NxN</option>
+            <option value="big" data-i18n="bigCubes">Big cubes</option>
+            <option value="bld" data-i18n="bld">BLD</option>
+            <option value="nonbld" data-i18n="nonBld">Non-BLD</option>
+            <option value="other" data-i18n="otherEvents">Other events</option>
+            <option value="removed" data-i18n="removed">Removed</option>
+          </select>
+        </div>
+        <div class="ctrl-cell">
+          <span class="cg-label" data-i18n="gender">Gender</span>
+          <select id="genderSelect">
+            <option value="all" data-i18n="all">All</option>
+            <option value="m" data-i18n="male">Male</option>
+            <option value="f" data-i18n="female">Female</option>
+          </select>
+        </div>
+      </div>
+      <div class="ctrl-row">
+        <div class="ctrl-cell">
+          <span class="cg-label" data-i18n="debut">Debut</span>
+          <select id="sinceSelect">
+            <option value="0" data-i18n="after">After</option>
+          </select>
+          <select id="untilSelect">
+            <option value="9999" data-i18n="before">Before</option>
+          </select>
+        </div>
+        <div class="ctrl-cell">
+          <span class="cg-label" data-i18n="show">Show</span>
+          <select id="pageSizeSelect">
+            <option value="50">50</option>
+            <option value="100" selected>100</option>
+            <option value="200">200</option>
+            <option value="300">300</option>
+            <option value="500">500</option>
+          </select>
+          <label class="clock-label" id="clockToggle"><span data-i18n="clock">Clock</span> <input type="checkbox" id="includeClock"></label>
+          <span class="retired-section" id="retiredToggles">
+            <span class="retired-label" data-i18n="removedEvents">Removed events</span>
+            <label class="clock-label" style="margin-left:0"><span data-i18n="feet">333ft</span> <input type="checkbox" id="include333ft"></label>
+            <label class="clock-label" style="margin-left:0"><span data-i18n="magic">Magic</span> <input type="checkbox" id="includeMagic"></label>
+            <label class="clock-label" style="margin-left:0"><span data-i18n="mmagic">MMagic</span> <input type="checkbox" id="includeMMagic"></label>
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -360,6 +373,8 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Search...",
     search: "Search",
+    advancedSearch: "Advanced search",
+    hideAdvanced: "Hide",
     removedEvents: "Removed events:",
     feet: "333ft",
     magic: "Magic",
@@ -430,6 +445,8 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Buscar...",
     search: "Buscar",
+    advancedSearch: "Busca avançada",
+    hideAdvanced: "Ocultar",
     removedEvents: "Eventos removidos:",
     world: "Mundo",
     continentAfrica: "África",
@@ -497,6 +514,8 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Buscar...",
     search: "Buscar",
+    advancedSearch: "Búsqueda avanzada",
+    hideAdvanced: "Ocultar",
     removedEvents: "Eventos eliminados:",
     world: "Mundo",
     continentAfrica: "África",
@@ -564,6 +583,8 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Suchen...",
     search: "Suchen",
+    advancedSearch: "Erweiterte Suche",
+    hideAdvanced: "Ausblenden",
     removedEvents: "Entfernte Events:",
     world: "Welt",
     continentAfrica: "Afrika",
@@ -631,6 +652,8 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Cerca...",
     search: "Cerca",
+    advancedSearch: "Ricerca avanzata",
+    hideAdvanced: "Nascondi",
     removedEvents: "Eventi rimossi:",
     world: "Mondo",
     continentAfrica: "Africa",
@@ -698,6 +721,8 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Cercar...",
     search: "Cercar",
+    advancedSearch: "Cerca avançada",
+    hideAdvanced: "Amaga",
     removedEvents: "Esdeveniments eliminats:",
     world: "Món",
     continentAfrica: "Àfrica",
@@ -765,6 +790,8 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "검색...",
     search: "검색",
+    advancedSearch: "고급 검색",
+    hideAdvanced: "숨기기",
     removedEvents: "삭제된 종목:",
     world: "전체",
     continentAfrica: "아프리카",
@@ -832,6 +859,8 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "搜索...",
     search: "搜索",
+    advancedSearch: "高级搜索",
+    hideAdvanced: "隐藏",
     removedEvents: "已移除项目:",
     world: "世界",
     continentAfrica: "非洲",
@@ -899,6 +928,8 @@ const LANG = {
     clock: "Clock",
     searchPlaceholder: "Tìm kiếm...",
     search: "Tìm kiếm",
+    advancedSearch: "Tìm kiếm nâng cao",
+    hideAdvanced: "Ẩn",
     removedEvents: "Nội dung đã xóa:",
     world: "Thế giới",
     continentAfrica: "Châu Phi",
@@ -1884,6 +1915,20 @@ function applyTranslations() {
   });
   document.title = t("title");
   document.getElementById("themeToggle").textContent = document.body.classList.contains("light") ? t("night") : t("day");
+  updateAdvancedBtn();
+}
+
+function updateAdvancedBtn() {
+  var adv = document.getElementById("advancedFilters");
+  var btn = document.getElementById("advancedToggle");
+  if (!adv || !btn) return;
+  btn.textContent = adv.classList.contains("open") ? t("hideAdvanced") : t("advancedSearch");
+}
+
+function toggleAdvanced() {
+  var adv = document.getElementById("advancedFilters");
+  adv.classList.toggle("open");
+  updateAdvancedBtn();
 }
 
 function setLanguage(lang) {
