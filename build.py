@@ -4,6 +4,7 @@ import json
 import os
 import sqlite3
 import gzip
+import bisect
 from collections import defaultdict
 from datetime import datetime, timezone
 
@@ -481,6 +482,8 @@ def main():
     pbs = defaultdict(lambda: defaultdict(dict))
     country_continent = {}
     comp_names = {}
+    comp_dates = {}
+    wr_latest = []
 
     in_table = None
     line_no = 0
@@ -519,6 +522,15 @@ def main():
                     cname = row[1]
                     if cid and cname:
                         comp_names[cid] = cname
+                    if cid and len(row) > 7:
+                        try:
+                            comp_dates[cid] = (
+                                int(row[5] or 0),
+                                int(row[6] or 0),
+                                int(row[7] or 0),
+                            )
+                        except (TypeError, ValueError):
+                            comp_dates[cid] = (0, 0, 0)
 
                 elif in_table == "persons":
                     row = parse_sql_row(line)
@@ -558,6 +570,31 @@ def main():
                     if not person_id:
                         continue
 
+                    if len(row) > 12 and (row[11] == "WR" or row[12] == "WR"):
+                        prev_entry = pbs[person_id][event_id]
+                        if row[11] == "WR" and isinstance(best, int) and best > 0:
+                            wr_latest.append({
+                                "person_id": person_id,
+                                "name": row[7] or "",
+                                "country": row[9] or "",
+                                "event": event_id,
+                                "type": "single",
+                                "competition_id": competition_id,
+                                "value": best,
+                                "prev": prev_entry.get("single"),
+                            })
+                        if row[12] == "WR" and isinstance(average, int) and average > 0:
+                            wr_latest.append({
+                                "person_id": person_id,
+                                "name": row[7] or "",
+                                "country": row[9] or "",
+                                "event": event_id,
+                                "type": "average",
+                                "competition_id": competition_id,
+                                "value": average,
+                                "prev": prev_entry.get("average"),
+                            })
+
                     result_count += 1
                     if result_count % 500000 == 0:
                         print(f"  line {line_no}: {result_count} results, {len(persons)} persons, {len(pbs)} with PBs, {len(comp_names)} comps", flush=True)
@@ -584,6 +621,62 @@ def main():
 
     print(f"Parsed: {len(persons)} persons, {result_count} results, {len(pbs)} with PBs, {len(comp_names)} comps", flush=True)
     print(f"  Country→continent mappings: {len(country_continent)}", flush=True)
+
+    seen_wr = set()
+    unique_wrs = []
+    for w in wr_latest:
+        key = (w["person_id"], w["event"], w["type"], w["competition_id"])
+        if key in seen_wr:
+            continue
+        seen_wr.add(key)
+        unique_wrs.append(w)
+    unique_wrs.sort(key=lambda x: comp_dates.get(x["competition_id"], (0, 0, 0)))
+
+    single_vals = {}
+    avg_vals = {}
+    for person_id, events in pbs.items():
+        for eid, vals in events.items():
+            s = vals.get("single")
+            if s is not None and s > 0:
+                single_vals.setdefault(eid, []).append(s)
+            a = vals.get("average")
+            if a is not None and a > 0:
+                avg_vals.setdefault(eid, []).append(a)
+    for eid in single_vals:
+        single_vals[eid].sort()
+    for eid in avg_vals:
+        avg_vals[eid].sort()
+
+    def _count_better(eid, vlist, val):
+        if val is None:
+            return 0
+        if eid == MBF_EVENT:
+            k = compute_kinch_mbf(val)
+            if k is None:
+                return 0
+            return sum(1 for x in vlist if (compute_kinch_mbf(x) or -1.0) > k)
+        return bisect.bisect_left(vlist, val)
+
+    latest_wrs = []
+    for w in reversed(unique_wrs[-10:]):
+        eid = w["event"]
+        vlist = single_vals.get(eid, []) if w["type"] == "single" else avg_vals.get(eid, [])
+        rank_after = _count_better(eid, vlist, w["value"]) + 1
+        prev = w["prev"]
+        rank_before = (_count_better(eid, vlist, prev) + 1) if prev is not None else None
+        cid = w["competition_id"]
+        latest_wrs.append({
+            "name": w["name"],
+            "wca_id": w["person_id"],
+            "country": w["country"],
+            "event": eid,
+            "type": w["type"],
+            "value": w["value"],
+            "risen": (rank_before - rank_after) if rank_before is not None else None,
+            "date": list(comp_dates.get(cid, (0, 0, 0))),
+            "competition": comp_names.get(cid, cid),
+        })
+    print(f"  Latest WRs: {len(latest_wrs)}", flush=True)
 
     for p in persons.values():
         p["continent_id"] = country_continent.get(p["country_id"], "")
@@ -990,6 +1083,7 @@ def main():
     quick_data = {
         "entries": precomputed,
         "wr": wr_data["all"],
+        "latest_wrs": latest_wrs,
         "generated_at": output["generated_at"],
     }
     quick_js = os.path.join(os.path.dirname(__file__), "1000.js")
